@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+	<gresource prefix="/kr/gooroom/IntegrationApplet/modules/endsession">
+		<file preprocess="xml-stripblanks">endsession-control.ui</file>
+	</gresource>
+</gresources>
+

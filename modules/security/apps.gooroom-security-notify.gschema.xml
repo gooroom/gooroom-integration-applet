@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist gettext-domain="gooroom-security-notify">
+
+  <schema id="apps.gooroom-security-notify" path="/apps/gooroom-security-notify/">
+
+    <key name="allow-duplicate-notifications" type="b">
+      <default>false</default>
+      <summary>Whether to allow duplicate notifications</summary>
+      <description>Whether to allow duplicate notifications</description>
+    </key>
+
+  </schema>
+</schemalist>
+

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+	<gresource prefix="/kr/gooroom/IntegrationApplet/ui">
+		<file preprocess="xml-stripblanks">popup-window.ui</file>
+	</gresource>
+</gresources>
+

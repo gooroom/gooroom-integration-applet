@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gresources>
+	<gresource prefix="/kr/gooroom/IntegrationApplet/modules/security">
+		<file preprocess="xml-stripblanks">security-control.ui</file>
+		<file preprocess="xml-stripblanks">security-control-menu.ui</file>
+	</gresource>
+</gresources>
+

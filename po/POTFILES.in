@@ -1,0 +1,18 @@
+common/common.c
+modules/user/user-module.c
+modules/sound/sound-module.c
+modules/power/power-module.c
+modules/datetime/datetime-module.c
+modules/security/security-module.c
+modules/endsession/endsession-module.c
+modules/nimf/nimf-module.c
+src/gooroom-integration-applet.c
+src/popup-window.c
+[type: gettext/glade]src/popup-window.ui
+[type: gettext/glade]modules/user/user-control.ui
+[type: gettext/glade]modules/security/security-control.ui
+[type: gettext/glade]modules/security/security-control-menu.ui
+[type: gettext/glade]modules/datetime/datetime-control-menu.ui
+[type: gettext/glade]modules/endsession/endsession-control.ui
+[type: gettext/glade]modules/nimf/nimf-control.ui
+[type: gettext/ini]data/kr.gooroom.IntegrationApplet.panel-applet.in.in

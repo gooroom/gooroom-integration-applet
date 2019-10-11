@@ -1,0 +1,11 @@
+[Applet Factory]
+Id=GooroomIntegrationAppletFactory
+Location=@APPLET_LOCATION@
+InProcess=true
+Name=Gooroom Integration Applet Factory
+Description=Factory for Gooroom Integration Applet
+
+[GooroomIntegrationApplet]
+_Name=Gooroom Integration Applet
+_Description=Integration applet for GNOME panel
+Icon=system-run-symbolic
