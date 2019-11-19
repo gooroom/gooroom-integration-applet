@@ -494,19 +494,20 @@ out:
 	return retval;
 }
 
-static gboolean
-is_gooroom_online_account (const gchar *username)
+gboolean
+is_local_user (void)
 {
-	gboolean ret = FALSE;
+	gboolean ret = TRUE;
 
-	struct passwd *user_entry = getpwnam (username);
-
+	struct passwd *user_entry = getpwnam (g_get_user_name ());
 	if (user_entry) {
 		gchar **tokens = g_strsplit (user_entry->pw_gecos, ",", -1);
 
 		if (g_strv_length (tokens) > 4 ) {
-			if (tokens[4] && (g_strcmp0 (tokens[4], "gooroom-online-account") == 0)) {
-				ret = TRUE;
+			if (tokens[4] && (g_str_equal (tokens[4], "gooroom-account") ||
+                              g_str_equal (tokens[4], "google-account") ||
+                              g_str_equal (tokens[4], "naver-account"))) {
+				ret = FALSE;
 			}
 		}
 
@@ -515,29 +516,6 @@ is_gooroom_online_account (const gchar *username)
 
 	return ret;
 }
-
-gboolean
-is_online_user (void)
-{
-	gboolean ret = FALSE;
-	gchar username[1024] = {0};
-
-	if (getlogin_r (username, sizeof(username)-1) != 0)
-		return FALSE;
-
-	struct passwd *pwent = getpwnam (username);
-	if (pwent) {
-		gchar *file = g_strdup_printf ("/var/run/user/%d/gooroom/.grm-user", pwent->pw_uid);
-
-		ret = (g_file_test (file, G_FILE_TEST_EXISTS) &&
-				is_gooroom_online_account (username)) ? TRUE : FALSE;
-
-		g_free (file);
-	}
-
-	return ret;
-}
-
 
 gboolean
 is_admin_group (void)

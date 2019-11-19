@@ -89,15 +89,15 @@ done:
 }
 
 static void
-run_security_log_parser_async_done (GPid pid, gint status, gpointer data)
+run_security_log_parser_async_done (GPid child_pid, gint status, gpointer user_data)
 {
-    g_spawn_close_pid (pid);
+	g_spawn_close_pid (child_pid);
 }
 
 gboolean
-run_security_log_parser_async (gchar *seektime, GIOFunc callback_func, gpointer data)
+run_security_log_parser_async (gchar *seektime, GPid *pid, GIOFunc callback_func, gpointer data)
 {
-	GPid pid;
+	GPid child_pid;
 	gboolean ret = FALSE;
 	gint stdout_fd;
 	gchar *pkexec, *cmdline = NULL;
@@ -105,12 +105,12 @@ run_security_log_parser_async (gchar *seektime, GIOFunc callback_func, gpointer 
     pkexec = g_find_program_in_path ("pkexec");
 
 	if (!seektime)
-	    g_file_get_contents (GOOROOM_SECURITY_LOGPARSER_SEEKTIME, &seektime, NULL, NULL);
+		g_file_get_contents (GOOROOM_SECURITY_LOGPARSER_SEEKTIME, &seektime, NULL, NULL);
 
-    if (seektime)
-        cmdline = g_strdup_printf ("%s %s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER, seektime);
-    else
-        cmdline = g_strdup_printf ("%s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER);
+	if (seektime)
+		cmdline = g_strdup_printf ("%s %s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER, seektime);
+	else
+		cmdline = g_strdup_printf ("%s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER);
 
 	gchar **arr_cmd = g_strsplit (cmdline, " ", -1);
 
@@ -120,13 +120,15 @@ run_security_log_parser_async (gchar *seektime, GIOFunc callback_func, gpointer 
                                   G_SPAWN_SEARCH_PATH | G_SPAWN_DO_NOT_REAP_CHILD,
                                   NULL,
                                   NULL,
-                                  &pid,
+                                  &child_pid,
                                   NULL,
                                   &stdout_fd,
                                   NULL,
-                                  NULL)) {
+                                  NULL))
+	{
+		if (pid) *pid = child_pid;
 
-		g_child_watch_add (pid, (GChildWatchFunc)run_security_log_parser_async_done, data);
+		g_child_watch_add (child_pid, (GChildWatchFunc)run_security_log_parser_async_done, NULL);
 
 		GIOChannel *io_channel = g_io_channel_unix_new (stdout_fd);
 		g_io_channel_set_flags (io_channel, G_IO_FLAG_NONBLOCK, NULL);

@@ -33,7 +33,7 @@ G_BEGIN_DECLS
 #define GOOROOM_MANAGEMENT_SERVER_CONF         "/etc/gooroom/gooroom-client-server-register/gcsr.conf"
 #define GOOROOM_AGENT_SERVICE_NAME             "gooroom-agent.service"
 
-gboolean is_online_user                    (void);
+gboolean is_local_user                     (void);
 gboolean is_admin_group                    (void);
 gboolean is_standalone_mode                (void);
 

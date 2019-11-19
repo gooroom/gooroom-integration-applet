@@ -33,6 +33,7 @@ json_object *JSON_OBJECT_GET                       (json_object *obj,
                                                     const gchar *key);
 
 gboolean     run_security_log_parser_async         (gchar    *seektime,
+                                                    GPid     *pid,
                                                     GIOFunc   callback_func,
                                                     gpointer  data);
 

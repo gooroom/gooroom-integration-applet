@@ -68,6 +68,7 @@ struct _SecurityModulePrivate
 	GtkBuilder *builder;
 
 	guint timeout_id;
+	GPid log_parser_pid;
 
 	gboolean notification_show;
 
@@ -133,10 +134,20 @@ notify_notification (NotifyNotification *notification, guint vulnerable)
 	g_free (full_body);
 }
 
+static void
+security_log_parser_done_cb (GPid pid, gint status, gpointer data)
+{
+	SecurityModule *module = SECURITY_MODULE (data);
+
+	g_spawn_close_pid (pid);
+
+	module->priv->log_parser_pid = -1;
+}
+
 static gboolean
-security_status_update_done (GIOChannel   *source,
-                             GIOCondition  condition,
-                             gpointer      data)
+read_log_parser_result (GIOChannel   *source,
+                        GIOCondition  condition,
+                        gpointer      data)
 {
 	gchar  buff[1024] = {0, };
 	gsize  bytes_read;
@@ -272,12 +283,15 @@ error:
 }
 
 static gboolean
-security_status_update_async (gpointer data)
+security_status_update_idle (gpointer data)
 {
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 
-	if (!run_security_log_parser_async (NULL, security_status_update_done, data)) {
+	if (priv->log_parser_pid > 0)
+		kill (priv->log_parser_pid, SIGTERM);
+
+	if (!run_security_log_parser_async (NULL, &priv->log_parser_pid, read_log_parser_result, data)) {
 		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray),
                                       "security-status-unknown",
                                       GTK_ICON_SIZE_BUTTON);
@@ -310,15 +324,14 @@ security_status_update_async (gpointer data)
 }
 
 static gboolean
-security_status_update_delayed (gpointer data)
+security_status_update_continually_idle (gpointer data)
 {
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 
-	security_status_update_async (module);
+	security_status_update_idle (module);
 
-	/* update after 5 sec */
-	priv->timeout_id = g_timeout_add (SECURITY_STATUS_UPDATE_TIMEOUT, (GSourceFunc) security_status_update_async, module);
+	priv->timeout_id = g_timeout_add (SECURITY_STATUS_UPDATE_TIMEOUT, (GSourceFunc) security_status_update_idle, module);
 
 	return FALSE;
 }
@@ -341,7 +354,7 @@ on_file_status_changed_cb (GFileMonitor      *monitor,
 				priv->timeout_id = 0;
 			}
 
-			g_timeout_add (200, (GSourceFunc) security_status_update_delayed, module);
+			g_timeout_add (200, (GSourceFunc) security_status_update_continually_idle, module);
 			break;
 		}
 
@@ -446,7 +459,7 @@ build_control_menu_ui (SecurityModule *module)
 	g_signal_connect (G_OBJECT (priv->btn_sec_safety), "clicked", G_CALLBACK (on_safety_measure_button_clicked), module);
 	g_signal_connect (G_OBJECT (priv->btn_sec_settings), "clicked", G_CALLBACK (on_settings_button_clicked), module);
 
-	if (is_admin_group () && !is_online_user ()) {
+	if (is_admin_group () && is_local_user ()) {
 		gtk_widget_show (priv->btn_sec_safety);
 		gtk_widget_set_sensitive (priv->btn_sec_safety, FALSE);
 	} else {
@@ -467,6 +480,9 @@ security_module_finalize (GObject *object)
 		g_source_remove (priv->timeout_id);
 		priv->timeout_id = 0;
 	}
+
+	if (priv->log_parser_pid > 0)
+		kill (priv->log_parser_pid, SIGTERM);
 
 	if (priv->notification) {
 		notify_notification_close (priv->notification, NULL);
@@ -516,6 +532,7 @@ security_module_init (SecurityModule *module)
 	priv->notification   = NULL;
 	priv->settings       = NULL;
 	priv->timeout_id     = 0;
+	priv->log_parser_pid = -1;
 	priv->notification_show = FALSE;
 
 	priv->builder = gtk_builder_new ();
@@ -568,7 +585,7 @@ security_module_tray_new (SecurityModule *module)
 
 	gtk_widget_show (priv->tray);
 
-	g_timeout_add (3000, (GSourceFunc) security_status_update_delayed, module);
+	g_timeout_add (3000, (GSourceFunc) security_status_update_continually_idle, module);
 
 	return priv->tray;
 }
@@ -587,7 +604,7 @@ security_module_control_new (SecurityModule *module, GtkSizeGroup *size_group)
 
 	build_control_ui (module, size_group);
 
-	g_timeout_add (100, (GSourceFunc) security_status_update_delayed, module);
+	g_timeout_add (100, (GSourceFunc) security_status_update_continually_idle, module);
 
 
 	return priv->control;
@@ -607,7 +624,7 @@ security_module_control_menu_new (SecurityModule *module)
 
 	build_control_menu_ui (module);
 
-	g_timeout_add (100, (GSourceFunc) security_status_update_delayed, module);
+	g_timeout_add (100, (GSourceFunc) security_status_update_continually_idle, module);
 
 	gtk_widget_show (priv->box_sec_menu);
 

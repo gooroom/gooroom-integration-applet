@@ -114,25 +114,33 @@ is_function_available (const char *function)
 static void
 on_endsession_button_clicked_cb (GtkButton *button, gpointer data)
 {
-	const gchar *command = NULL;
+	const gchar *opt;
 	EndSessionModule *module = ENDSESSION_MODULE (data);
 	EndSessionModulePrivate *priv = module->priv;
 
 	if (button == GTK_BUTTON (priv->btn_logout)) {
-		command = "gnome-session-quit --force";
+		opt = "--logout";
 	} else if (button == GTK_BUTTON (priv->btn_hibernate)) {
-		command = "systemd-run systemctl hibernate";
+		opt = "--hibernate";
 	} else if (button == GTK_BUTTON (priv->btn_suspend)) {
-		command = "systemd-run systemctl suspend";
+		opt = "--suspend";
 	} else if (button == GTK_BUTTON (priv->btn_restart)) {
-		command = "systemd-run systemctl reboot";
+		opt = "--reboot";
 	} else if (button == GTK_BUTTON (priv->btn_shutdown)) {
-		command = "systemd-run systemctl poweroff";
+		opt = "--poweroff";
 	} else {
-		return;
+		opt = NULL;
 	}
 
-	g_signal_emit (G_OBJECT (module), signals[LAUNCH_COMMAND], 0, command);
+	if (opt) {
+		gchar *glc = g_find_program_in_path ("gooroom-logout-command");
+		if (glc) {
+			gchar *command = g_strdup_printf ("%s %s --delay=500", glc, opt);
+			g_signal_emit (G_OBJECT (module), signals[LAUNCH_COMMAND], 0, command);
+			g_free (command);
+		}
+		g_free (glc);
+	}
 }
 
 static void
