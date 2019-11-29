@@ -1,9 +1,8 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
- *
  *  Copyright (C) 2010 Red Hat, Inc
  *  Copyright (C) 2008 William Jon McCann <jmccann@redhat.com>
  *  Copyright (C) 2010,2015 Richard Hughes <richard@hughsie.com>
+ *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
