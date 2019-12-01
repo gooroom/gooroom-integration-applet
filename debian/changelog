@@ -1,3 +1,13 @@
+gooroom-integration-applet (0.1.1+grm2u1) unstable; urgency=medium
+
+  [ cjheo ]
+  * [d89f369a] Modify command for system shutdown, reboot, hibernate and suspend
+  * [3bf90dc2] Update source regarding copyright
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sun, 01 Dec 2019 18:55:07 +0900
+
 gooroom-integration-applet (0.1.0+grm2) unstable; urgency=medium
 
   * Initial Release.
