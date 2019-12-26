@@ -24,11 +24,10 @@
             <property name="transition_type">crossfade</property>
             <property name="interpolate_size">True</property>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="page_1">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
                 <child>
                   <object class="GtkBox" id="box_user">
                     <property name="visible">True</property>
@@ -57,17 +56,15 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="box_middle">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
-                    <property name="spacing">10</property>
                     <child>
                       <object class="GtkBox" id="box_control">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="orientation">vertical</property>
-                        <property name="spacing">10</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -83,7 +80,6 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="orientation">vertical</property>
-                        <property name="spacing">10</property>
                         <child>
                           <placeholder/>
                         </child>
@@ -102,11 +98,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkBox">
+                  <object class="GtkBox" id="box_end">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="halign">center</property>
-                    <property name="margin_top">10</property>
                     <property name="spacing">70</property>
                     <child>
                       <object class="GtkButton" id="btn_settings">
@@ -182,7 +177,6 @@
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="pack_type">end</property>
                     <property name="position">3</property>
                   </packing>
                 </child>
@@ -192,11 +186,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="page_2">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
                 <child>
                   <object class="GtkButton" id="btn_endsession_back">
                     <property name="name">module-widget</property>
@@ -265,11 +258,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="page_3">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
                 <child>
                   <object class="GtkButton" id="btn_security_back">
                     <property name="name">module-widget</property>
@@ -338,11 +330,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="page_4">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
                 <child>
                   <object class="GtkButton" id="btn_nimf_back">
                     <property name="name">module-widget</property>
@@ -411,11 +402,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkBox">
+              <object class="GtkBox" id="page_5">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
                 <child>
                   <object class="GtkButton" id="btn_datetime_back">
                     <property name="name">module-widget</property>

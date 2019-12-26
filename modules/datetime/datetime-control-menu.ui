@@ -2,6 +2,13 @@
 <!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
+  <object class="GtkCalendar" id="calendar">
+    <property name="visible">True</property>
+    <property name="can_focus">True</property>
+    <property name="year">2019</property>
+    <property name="month">8</property>
+    <property name="day">26</property>
+  </object>
   <object class="GtkScrolledWindow" id="control_menu">
     <property name="visible">True</property>
     <property name="can_focus">True</property>
@@ -11,12 +18,14 @@
       <object class="GtkViewport">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
+        <property name="margin_right">10</property>
+        <property name="shadow_type">none</property>
         <child>
-          <object class="GtkBox">
+          <object class="GtkBox" id="inner_box">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="orientation">vertical</property>
-            <property name="spacing">10</property>
+            <property name="spacing">5</property>
             <child>
               <object class="GtkLabel" id="lbl_datetime">
                 <property name="name">module-widget</property>
@@ -34,18 +43,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkCalendar" id="calendar">
-                <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="year">2019</property>
-                <property name="month">8</property>
-                <property name="day">26</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
+              <placeholder/>
             </child>
             <child>
               <object class="GtkButton" id="btn_settings">

@@ -24,6 +24,7 @@
 #include <glib/gi18n-lib.h>
 
 #include "common.h"
+#include "gooroom-calendar.h"
 #include "datetime-module.h"
 
 #define GET_WIDGET(builder, x) GTK_WIDGET (gtk_builder_get_object (builder, x))
@@ -130,14 +131,6 @@ on_settings_clicked_cb (GtkButton *button, gpointer data)
 	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, "gnome-control-center.desktop");
 }
 
-static gboolean
-calendar_motion_notify_cb (GtkWidget      *widget,
-                           GdkEventMotion *event,
-                           gpointer        data)
-{
-  return TRUE;
-}
-
 static void
 build_control_ui (DateTimeModule *module, GtkSizeGroup *size_group)
 {
@@ -173,9 +166,8 @@ build_control_ui (DateTimeModule *module, GtkSizeGroup *size_group)
 static void
 build_control_menu_ui (DateTimeModule *module)
 {
-    GDateTime *dt;
-    GtkWidget *calendar, *btn_settings;
 	GError *error = NULL;
+	GtkWidget *calendar, *inner_box, *btn_settings;
 	DateTimeModulePrivate *priv = module->priv;
 
 	gtk_builder_add_from_resource (priv->builder, "/kr/gooroom/IntegrationApplet/modules/datetime/datetime-control-menu.ui", &error);
@@ -186,19 +178,14 @@ build_control_menu_ui (DateTimeModule *module)
 
 	priv->control_menu = GET_WIDGET (priv->builder, "control_menu");
 	priv->lbl_datetime = GET_WIDGET (priv->builder, "lbl_datetime");
+	inner_box          = GET_WIDGET (priv->builder, "inner_box");
 	btn_settings       = GET_WIDGET (priv->builder, "btn_settings");
-	calendar           = GET_WIDGET (priv->builder, "calendar");
 
-	dt = g_date_time_new_now_local ();
+	calendar = gooroom_calendar_new ();
+	gtk_widget_show (calendar);
 
-	gtk_calendar_select_month (GTK_CALENDAR (calendar),
-                               g_date_time_get_month (dt) - 1,
-                               g_date_time_get_year (dt));
-
-	gtk_calendar_select_day (GTK_CALENDAR (calendar),
-                             g_date_time_get_day_of_month (dt));
-
-	g_date_time_unref (dt);
+	gtk_box_pack_start (GTK_BOX (inner_box), calendar, FALSE, FALSE, 0);
+	gtk_box_reorder_child (GTK_BOX (inner_box), calendar, 1);
 
 	if (priv->clock_timer) {
 		g_source_remove (priv->clock_timer);
@@ -208,9 +195,6 @@ build_control_menu_ui (DateTimeModule *module)
 	clock_timeout_thread (module);
 
 	priv->clock_timer = gdk_threads_add_timeout (1000, (GSourceFunc) clock_timeout_thread, module);
-
-	/* disabled drag and drop */
-	g_signal_connect (calendar, "motion-notify-event", G_CALLBACK (calendar_motion_notify_cb), NULL);
 
 	g_signal_connect (G_OBJECT (btn_settings), "clicked", G_CALLBACK (on_settings_clicked_cb), module);
 }

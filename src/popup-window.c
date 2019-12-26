@@ -48,9 +48,17 @@ enum {
 
 struct _PopupWindowPrivate
 {
+	GtkWidget *page_1;
+	GtkWidget *page_2;
+	GtkWidget *page_3;
+	GtkWidget *page_4;
+	GtkWidget *page_5;
+
 	GtkWidget *box_user;
+	GtkWidget *box_middle;
 	GtkWidget *box_control;
 	GtkWidget *box_general;
+	GtkWidget *box_end;
 
 	GtkWidget *btn_endsession_back;
 	GtkWidget *btn_security_back;
@@ -187,6 +195,50 @@ add_control_widget (PopupWindow *window,
 		default:
 		break;
 	}
+}
+
+static void
+setup_layout (PopupWindow *window)
+{
+    GdkRectangle area;
+    GdkMonitor *primary;
+	int box_spacing1 = 20, box_spacing2 = 10;
+	int top = 20, end = 20, bottom = 30, start = 20;
+
+	PopupWindowPrivate *priv = window->priv;
+
+	primary = gdk_display_get_primary_monitor (gdk_display_get_default ());
+	gdk_monitor_get_geometry (primary, &area);
+
+	while (1) {
+		if (area.height <= 540) {
+			box_spacing1 = 10, box_spacing2 = 5;
+			top = 10, bottom = 15;
+			break;
+		}
+		if (area.height <= 600) {
+			box_spacing1 = 15, box_spacing2 = 5;
+			top = 15, bottom = 25;
+			break;
+		}
+		break;
+	}
+
+	gtk_widget_set_margin_top (priv->stack, top);
+	gtk_widget_set_margin_end (priv->stack, end);
+	gtk_widget_set_margin_bottom (priv->stack, bottom);
+	gtk_widget_set_margin_start (priv->stack, start);
+
+	gtk_widget_set_margin_top (priv->box_end, box_spacing2);
+
+	gtk_box_set_spacing (GTK_BOX (priv->page_1), box_spacing1);
+	gtk_box_set_spacing (GTK_BOX (priv->box_middle), box_spacing2);
+	gtk_box_set_spacing (GTK_BOX (priv->box_control), box_spacing2);
+	gtk_box_set_spacing (GTK_BOX (priv->box_general), box_spacing2);
+	gtk_box_set_spacing (GTK_BOX (priv->page_2), box_spacing1);
+	gtk_box_set_spacing (GTK_BOX (priv->page_3), box_spacing1);
+	gtk_box_set_spacing (GTK_BOX (priv->page_4), box_spacing1);
+	gtk_box_set_spacing (GTK_BOX (priv->page_5), box_spacing1);
 }
 
 static void
@@ -474,6 +526,8 @@ popup_window_init (PopupWindow *window)
 		gtk_widget_set_visual (GTK_WIDGET (window), visual);
 	}
 
+	setup_layout (window);
+
 	g_signal_connect (G_OBJECT (priv->btn_settings), "clicked",
 			G_CALLBACK (on_system_button_clicked_cb), window);
 	g_signal_connect (G_OBJECT (priv->btn_screenlock), "clicked",
@@ -563,9 +617,16 @@ popup_window_class_init (PopupWindowClass *klass)
 	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass),
 			"/kr/gooroom/IntegrationApplet/ui/popup-window.ui");
 
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_1);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_2);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_3);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_4);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_5);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_user);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_middle);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_control);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_general);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_end);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_settings);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_screenlock);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_endsession);

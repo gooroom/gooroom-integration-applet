@@ -6,6 +6,8 @@ BUILT_SOURCES = \
 
 libdatetime_module_la_SOURCES = \
 	$(BUILT_SOURCES) \
+	gooroom-calendar.h \
+	gooroom-calendar.c \
 	datetime-module.c \
 	datetime-module.h
 

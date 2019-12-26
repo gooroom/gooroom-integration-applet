@@ -39,6 +39,7 @@ struct _UserModulePrivate
 
 	GtkWidget  *tray;
 	GtkWidget  *user_name;
+	GtkWidget  *img_status;
 	GtkWidget  *control;
 
 	ActUserManager  *um;
@@ -102,6 +103,13 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 			gtk_label_set_markup (GTK_LABEL (priv->user_name), markup);
 			g_free (markup);
 		}
+		if (priv->img_status) {
+			GdkPixbuf *pix = get_user_face (icon_name, 24);
+			if (pix) {
+				gtk_image_set_from_pixbuf (GTK_IMAGE (priv->img_status), pix);
+				g_object_unref (G_OBJECT (pix));
+			}
+		}
 	}
 }
 
@@ -122,6 +130,7 @@ build_control_ui (UserModule *module, GtkSizeGroup *size_group)
 	priv->control = GET_WIDGET (priv->builder, "control");
 	btn_face = GET_WIDGET (priv->builder, "btn_face");
 	priv->user_name = GET_WIDGET (priv->builder, "lbl_user_name");
+	priv->img_status = GET_WIDGET (priv->builder, "img_status");
 
 	if (size_group)
 		gtk_size_group_add_widget (size_group, btn_face);

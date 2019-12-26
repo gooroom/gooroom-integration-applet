@@ -68,6 +68,21 @@ G_DEFINE_TYPE_WITH_PRIVATE (GooroomIntegrationApplet, gooroom_integration_applet
 
 
 
+static void
+get_monitor_geometry (GooroomIntegrationApplet *applet,
+                      GdkRectangle             *geometry)
+{
+	GdkDisplay *d;
+	GdkWindow  *w;
+	GdkMonitor *m;
+
+	d = gdk_display_get_default ();
+	w = gtk_widget_get_window (applet->priv->button);
+	m = gdk_display_get_monitor_at_window (d, w);
+
+	gdk_monitor_get_geometry (m, geometry);
+}
+
 /* Copied from gnome-panel-3.30.3/gnome-panel/libpanel-util/panel-launch.c:
  * dummy_child_watch () */
 static void
@@ -216,6 +231,11 @@ on_popup_window_closed (PopupWindow *window,
 static void
 on_popup_window_realized (GtkWidget *widget, gpointer data)
 {
+	gint x, y;
+	GdkRectangle m;
+	PanelAppletOrient orientation;
+	GtkAllocation button_alloc, popup_alloc;
+
 	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (data);
 	GooroomIntegrationAppletPrivate *priv = applet->priv;
 
@@ -223,44 +243,37 @@ on_popup_window_realized (GtkWidget *widget, gpointer data)
 	if (!gtk_widget_get_realized (widget))
 		gtk_widget_realize (widget);
 
-	GtkAllocation alloc, popup_alloc;
-	gint orientation, x, y;
+	orientation = panel_applet_get_orient (PANEL_APPLET (applet));
 
-	/* retrieve geometry parameters and move window appropriately */
-	orientation = panel_applet_get_orient (PANEL_APPLET (PANEL_APPLET (applet)));
-	gdk_window_get_origin (gtk_widget_get_window (GTK_WIDGET (applet)), &x, &y);
-
-	gtk_widget_get_allocation (GTK_WIDGET (applet), &alloc);
+	gdk_window_get_origin (gtk_widget_get_window (priv->button), &x, &y);
+	gtk_widget_get_allocation (priv->button, &button_alloc);
 	gtk_widget_get_allocation (widget, &popup_alloc);
 
-	GdkDisplay *display;
-	GdkMonitor *primary;
-	GdkRectangle geo;
-	display = gdk_display_get_default ();
-	primary = gdk_display_get_primary_monitor (display);
-	gdk_monitor_get_geometry (primary, &geo);
+	get_monitor_geometry (applet, &m);
 
 	switch (orientation) {
-		case PANEL_APPLET_ORIENT_UP:
-			if (x + popup_alloc.width > geo.width)
-				x = geo.width - popup_alloc.width;
-			y -= alloc.height;
-			break;
 		case PANEL_APPLET_ORIENT_DOWN:
-			if (x + popup_alloc.width > geo.width)
-				x = geo.width - popup_alloc.width;
-			y += alloc.height;
+			if ((x + popup_alloc.width) > (m.x + m.width))
+				x -= ((x + popup_alloc.width) - (m.x + m.width));
+			y += button_alloc.height;
+			break;
+
+		case PANEL_APPLET_ORIENT_UP:
+			if ((x + popup_alloc.width) > (m.x + m.width))
+				x -= ((x + popup_alloc.width) - (m.x + m.width));
+			y -= popup_alloc.height;
 			break;
 
 		case PANEL_APPLET_ORIENT_RIGHT:
-			y += alloc.y;
-			x += alloc.x + alloc.width;
+			x += button_alloc.width;
+			if ((y + popup_alloc.height) > (m.y + m.height))
+				y -= ((y + popup_alloc.height) - (m.y + m.height));
 			break;
 
 		case PANEL_APPLET_ORIENT_LEFT:
-			y += alloc.y;
-			x += alloc.x;
 			x -= popup_alloc.width;
+			if ((y + popup_alloc.height) > (m.y + m.height))
+				y -= ((y + popup_alloc.height) - (m.y + m.height));
 			break;
 
 		default:
