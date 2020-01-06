@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-03 18:37+0900\n"
+"POT-Creation-Date: 2020-01-06 16:22+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: ko\n"
@@ -162,15 +162,20 @@ msgstr "입력기 작동이 중지됨"
 msgid "Input Method Settings"
 msgstr "입력기 설정"
 
-#: ../src/gooroom-integration-applet.c:119
+#: ../src/gooroom-integration-applet.c:127
 msgid "Application Launching Error"
 msgstr "어플리케이션 실행 에러"
 
-#: ../src/gooroom-integration-applet.c:183
+#: ../src/gooroom-integration-applet.c:234
 msgid "Could not execute command"
 msgstr "명령을 실행할 수 없습니다."
 
-#: ../src/gooroom-integration-applet.c:212
+#: ../src/gooroom-integration-applet.c:267
+#, c-format
+msgid "Could not launch '%s' program"
+msgstr "'%s' 프로그램을 실행할 수 없습니다."
+
+#: ../src/gooroom-integration-applet.c:270
 #, c-format
 msgid "Could not launch '%s'"
 msgstr "'%s'를 실행할 수 없습니다."

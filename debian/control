@@ -20,7 +20,8 @@ Build-Depends: automake (>= 1.13),
                libstartup-notification0-dev,
                libjson-c-dev,
                libx11-dev,
-               nimf-dev
+               nimf-dev,
+               libgnome-desktop-3-dev
 Standards-Version: 4.1.1
 Homepage: http://gooroom.kr
 Vcs-Git: https://github.com/gooroom/gooroom-integration-applet.git

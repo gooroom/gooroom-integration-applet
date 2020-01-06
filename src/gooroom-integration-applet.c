@@ -32,6 +32,9 @@
 #include <panel-applet.h>
 #include <libnotify/notify.h>
 
+#define GNOME_DESKTOP_USE_UNSTABLE_API
+#include <libgnome-desktop/gnome-languages.h>
+
 
 #include "common.h"
 #include "popup-window.h"
@@ -109,20 +112,67 @@ show_error_dialog (GtkWindow *parent,
 		primary_text = msg;
 	}
 
-	dialog = gtk_message_dialog_new (NULL, 0, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "%s", primary_text);
+	dialog = gtk_message_dialog_new (NULL,
+                                     GTK_DIALOG_MODAL,
+                                     GTK_MESSAGE_ERROR,
+                                     GTK_BUTTONS_CLOSE,
+                                     NULL);
 	if (screen)
 		gtk_window_set_screen (GTK_WINDOW (dialog), screen);
 
 	if (!parent)
 		gtk_window_set_skip_taskbar_hint (GTK_WINDOW (dialog), FALSE);
 
+	gtk_message_dialog_format_secondary_text (GTK_MESSAGE_DIALOG (dialog), "%s", primary_text);
 	gtk_window_set_title (GTK_WINDOW (dialog), _("Application Launching Error"));
 	gtk_widget_show_all (dialog);
 
 	g_signal_connect_swapped (G_OBJECT (dialog), "response",
                               G_CALLBACK (gtk_widget_destroy), G_OBJECT (dialog));
 
-	if (msg) g_free (msg);
+	g_free (msg);
+}
+
+static gchar *
+get_desktop_name (const gchar *desktop_id)
+{
+	gchar *id;
+	gchar *name, *key;
+	gchar *curr_locale, *lang_code;
+	GKeyFile *keyfile;
+
+	if (!desktop_id)
+		return NULL;
+
+	if (g_path_is_absolute (desktop_id)) {
+		id = g_strdup (desktop_id);
+	} else {
+		id = g_strdup_printf ("/usr/share/applications/%s", desktop_id);
+	}
+
+	curr_locale = g_strdup (setlocale (LC_MESSAGES, NULL));
+	gnome_parse_locale (curr_locale, &lang_code, NULL, NULL, NULL);
+
+	key = g_strdup_printf ("Name[%s]", lang_code);
+
+	keyfile = g_key_file_new ();
+
+	if (g_key_file_load_from_file (keyfile, id,
+                                   G_KEY_FILE_KEEP_COMMENTS | G_KEY_FILE_KEEP_TRANSLATIONS,
+                                   NULL)) {
+		name = g_key_file_get_string (keyfile, "Desktop Entry", key, NULL);
+		if (!name) {
+			name = g_key_file_get_string (keyfile, "Desktop Entry", "Name", NULL);
+		}
+	}
+
+	g_key_file_free (keyfile);
+	g_free (curr_locale);
+	g_free (lang_code);
+	g_free (id);
+	g_free (key);
+
+	return name;
 }
 
 static void
@@ -209,9 +259,19 @@ on_launch_desktop_cb (GObject *object, const gchar *desktop_id, gpointer data)
 
 	GdkScreen *screen = gtk_widget_get_screen (GTK_WIDGET (priv->button));
 	if (!launch_desktop_id (desktop_id, screen)) {
-		gchar *msg = g_markup_printf_escaped (_("Could not launch '%s'"), desktop_id);
+		gchar *msg = NULL;
+		gchar *name = get_desktop_name (desktop_id);
+
+		if (name) {
+			msg = g_markup_printf_escaped (_("Could not launch '%s' program"), name);
+			g_free (name);
+		} else {
+			msg = g_markup_printf_escaped (_("Could not launch '%s'"), desktop_id);
+		}
+
 		show_error_dialog (NULL, screen, msg);
 		g_free (msg);
+		g_free (name);
 	}
 }
 

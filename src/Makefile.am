@@ -20,6 +20,7 @@ libgooroom_integration_applet_la_SOURCES = \
 
 libgooroom_integration_applet_la_CFLAGS = \
 	$(GNOME_APPLETS_CFLAGS) \
+	$(GNOME_DESKTOP_CFLAGS) \
 	$(GLIB_CFLAGS)	\
 	$(GTK_CFLAGS)	\
 	$(AM_CFLAGS)	\
@@ -31,6 +32,7 @@ libgooroom_integration_applet_la_LDFLAGS = \
 
 libgooroom_integration_applet_la_LIBADD = \
 	$(GNOME_APPLETS_LIBS) \
+	$(GNOME_DESKTOP_LIBS) \
 	$(GLIB_LIBS)	\
 	$(GTK_LIBS)	\
 	$(LIBNOTIFY_LIBS) \
