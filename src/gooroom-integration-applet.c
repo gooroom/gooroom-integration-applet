@@ -136,8 +136,8 @@ show_error_dialog (GtkWindow *parent,
 static gchar *
 get_desktop_name (const gchar *desktop_id)
 {
-	gchar *id;
-	gchar *name, *key;
+	gchar *id, *key;
+	gchar *name = NULL;
 	gchar *curr_locale, *lang_code;
 	GKeyFile *keyfile;
 
@@ -264,7 +264,6 @@ on_launch_desktop_cb (GObject *object, const gchar *desktop_id, gpointer data)
 
 		if (name) {
 			msg = g_markup_printf_escaped (_("Could not launch '%s' program"), name);
-			g_free (name);
 		} else {
 			msg = g_markup_printf_escaped (_("Could not launch '%s'"), desktop_id);
 		}
