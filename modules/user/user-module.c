@@ -165,6 +165,7 @@ user_module_init (UserModule *module)
 	priv->um = act_user_manager_get_default ();
 
 	g_signal_connect (priv->um, "notify::is-loaded", G_CALLBACK (user_info_update), module);
+	g_signal_connect (priv->um, "user-changed", G_CALLBACK (user_info_update), module);
 }
 
 static void
