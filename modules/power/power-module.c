@@ -467,7 +467,7 @@ on_battery_control_button_clicked_cb (GtkButton *button, gpointer data)
 		g_settings_schema_unref (schema);
 	}
 
-	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, "gnome-control-center.desktop");
+	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, "gnome-power-panel.desktop");
 }
 
 static void
