@@ -38,7 +38,6 @@
 
 #define SECURITY_STATUS_UPDATE_TIMEOUT      5000
 
-#define GOOROOM_SECURITY_LOGPARSER_SEEKTIME    "/var/tmp/GOOROOM-SECURITY-LOGPARSER-SEEKTIME"
 #define SECURITY_STATUS_VIEW_DESKTOP        "gooroom-security-status-view.desktop"
 #define SECURITY_STATUS_SETTINGS_DESKTOP    "gooroom-security-status-settings.desktop"
 
@@ -71,6 +70,7 @@ struct _SecurityModulePrivate
 	GPid log_parser_pid;
 
 	gboolean notification_show;
+	gboolean updating_sec_status;
 
 	NotifyNotification *notification;
 };
@@ -132,6 +132,38 @@ notify_notification (NotifyNotification *notification, guint vulnerable)
 	notify_notification_show (notification, NULL);
 
 	g_free (full_body);
+}
+
+static void
+last_vulnerable_update (guint vulnerable)
+{
+	gchar *pkexec = NULL, *cmd = NULL;
+
+	pkexec = g_find_program_in_path ("pkexec");
+	cmd = g_strdup_printf ("%s %s %u", pkexec, GOOROOM_SECURITY_STATUS_VULNERABLE_HELPER, vulnerable);
+
+	g_spawn_command_line_sync (cmd, NULL, NULL, NULL, NULL);
+}
+
+static guint
+last_vulnerable_get (void)
+{
+	guint vulnerable = 0;
+	gchar *str_vulnerable = NULL;
+
+	if (g_file_test (GOOROOM_SECURITY_STATUS_VULNERABLE, G_FILE_TEST_EXISTS)) {
+		g_file_get_contents (GOOROOM_SECURITY_STATUS_VULNERABLE, &str_vulnerable, NULL, NULL);
+
+		if (1 == sscanf (str_vulnerable, "%"G_GUINT32_FORMAT, &vulnerable)) {
+			if ((vulnerable < (1 << 0)) || (vulnerable >= (1 << 4))) { // 1 <= vulnerable < 16
+				vulnerable = 0;
+			}
+		}
+	}
+
+	g_free (str_vulnerable);
+
+	return vulnerable;
 }
 
 static void
@@ -228,7 +260,9 @@ read_log_parser_result (GIOChannel   *source,
 		}
 	}
 
-	if (vulnerable == 0) {
+	guint last_vulnerable = last_vulnerable_get ();
+
+	if (vulnerable == 0 && last_vulnerable == 0) {
 		icon = "security-status-safety";
 		if (priv->control) {
 			markup = g_markup_printf_escaped ("<b><i><span foreground=\"#7ED321\">%s</span></i></b>", _("Safety"));
@@ -238,6 +272,9 @@ read_log_parser_result (GIOChannel   *source,
 			priv->notification_show = FALSE;
 		}
 	} else {
+		if (vulnerable != 0)
+			last_vulnerable_update (vulnerable);
+
 		icon = "security-status-vulnerable";
 		if (priv->control) {
 			sensitive = TRUE;
@@ -279,6 +316,8 @@ error:
 			gtk_widget_set_sensitive (priv->btn_sec_safety, sensitive);
 	}
 
+	priv->updating_sec_status = FALSE;
+
 	return FALSE;
 }
 
@@ -288,10 +327,15 @@ security_status_update_idle (gpointer data)
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 
+	if (priv->updating_sec_status)
+		return TRUE;
+
+	priv->updating_sec_status = TRUE;
+
 	if (priv->log_parser_pid > 0)
 		kill (priv->log_parser_pid, SIGTERM);
 
-	if (!run_security_log_parser_async (NULL, &priv->log_parser_pid, read_log_parser_result, data)) {
+	if (!run_security_log_parser_async (&priv->log_parser_pid, read_log_parser_result, data)) {
 		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray),
                                       "security-status-unknown",
                                       GTK_ICON_SIZE_BUTTON);
@@ -318,6 +362,8 @@ security_status_update_idle (gpointer data)
 			notify_notification_close (priv->notification, NULL);
 			priv->notification_show = FALSE;
 		}
+
+		priv->updating_sec_status = FALSE;
 	}
 
 	return TRUE;
@@ -329,6 +375,22 @@ security_status_update_continually_idle (gpointer data)
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 
+	guint timeout = SECURITY_STATUS_UPDATE_TIMEOUT;
+
+	if (priv->settings)
+		timeout = g_settings_get_uint (priv->settings, "cycle-time");
+
+	if (priv->timeout_id != 0) {
+		g_source_remove (priv->timeout_id);
+		priv->timeout_id = 0;
+	}
+
+	if (timeout == 0)
+		return FALSE;
+
+	if (timeout < SECURITY_STATUS_UPDATE_TIMEOUT)
+		timeout = SECURITY_STATUS_UPDATE_TIMEOUT;
+
 	security_status_update_idle (module);
 
 	priv->timeout_id = g_timeout_add (SECURITY_STATUS_UPDATE_TIMEOUT, (GSourceFunc) security_status_update_idle, module);
@@ -337,29 +399,40 @@ security_status_update_continually_idle (gpointer data)
 }
 
 static void
-on_file_status_changed_cb (GFileMonitor      *monitor,
-                           GFile             *file,
-                           GFile             *other_file,
-                           GFileMonitorEvent  event_type,
-                           gpointer           data)
+file_status_changed_cb (GFileMonitor      *monitor,
+                        GFile             *file,
+                        GFile             *other_file,
+                        GFileMonitorEvent  event_type,
+                        gpointer           data)
 {
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 
 	switch (event_type)
 	{
-		case G_FILE_MONITOR_EVENT_CHANGED: {
-			if (priv->timeout_id != 0) {
-				g_source_remove (priv->timeout_id);
-				priv->timeout_id = 0;
-			}
-
-			g_timeout_add (200, (GSourceFunc) security_status_update_continually_idle, module);
+		case G_FILE_MONITOR_EVENT_CHANGED:
+		case G_FILE_MONITOR_EVENT_DELETED:
+		case G_FILE_MONITOR_EVENT_CREATED:
+		{
+			g_timeout_add (100, (GSourceFunc) security_status_update_continually_idle, module);
 			break;
 		}
 
 		default:
 			break;
+	}
+}
+
+static void
+settings_changed_cb (GSettings   *settings,
+                     const gchar *key,
+                     gpointer     data)
+{
+	SecurityModule *module = SECURITY_MODULE (data);
+	SecurityModulePrivate *priv = module->priv;
+
+	if (g_str_equal (key, "cycle-time")) {
+		g_timeout_add (100, (GSourceFunc) security_status_update_continually_idle, module);
 	}
 }
 
@@ -393,7 +466,7 @@ on_more_button_clicked (GtkButton *button, gpointer data)
 	on_security_detail_activate (NULL, data);
 }
 
-static gboolean
+static void
 on_safety_measure_button_clicked (GtkButton *button, gpointer data)
 {
 	SecurityModule *module = SECURITY_MODULE (data);
@@ -408,7 +481,7 @@ on_safety_measure_button_clicked (GtkButton *button, gpointer data)
 		send_taking_measure_signal_to_self ();
 	}
 
-	return FALSE;
+	last_vulnerable_update (0);
 }
 
 static void
@@ -517,8 +590,8 @@ static void
 security_module_init (SecurityModule *module)
 {
 	GFile *file;
-	GSettingsSchema *schema;
 	GError *error = NULL;
+	GSettingsSchema *schema;
 	GFileMonitor *monitor;
 	SecurityModulePrivate *priv;
 
@@ -534,13 +607,17 @@ security_module_init (SecurityModule *module)
 	priv->timeout_id     = 0;
 	priv->log_parser_pid = -1;
 	priv->notification_show = FALSE;
+	priv->updating_sec_status = FALSE;
 
 	priv->builder = gtk_builder_new ();
 	gtk_builder_set_translation_domain (priv->builder, GETTEXT_PACKAGE);
 
-	schema = g_settings_schema_source_lookup (g_settings_schema_source_get_default (), "apps.gooroom-security-notify", TRUE);
+	schema = g_settings_schema_source_lookup (g_settings_schema_source_get_default (), "apps.gooroom-security-status", TRUE);
 	if (schema) {
 		priv->settings = g_settings_new_full (schema, NULL, NULL);
+		g_signal_connect (priv->settings, "changed",
+                          G_CALLBACK (settings_changed_cb), module);
+
 		g_settings_schema_unref (schema);
 	}
 
@@ -548,14 +625,14 @@ security_module_init (SecurityModule *module)
 	notify_notification_set_timeout (priv->notification, NOTIFY_EXPIRES_NEVER);
 	notify_notification_add_action (priv->notification, "details-action", _("Details"), show_detail_cb, module, NULL);
 
-	file = g_file_new_for_path (GOOROOM_SECURITY_LOGPARSER_SEEKTIME);
+	file = g_file_new_for_path (GOOROOM_SECURITY_STATUS_VULNERABLE);
 
 	error = NULL;
 	monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, &error);
 	if (error) {
 		g_error_free (error);
 	} else {
-		g_signal_connect (monitor, "changed", G_CALLBACK (on_file_status_changed_cb), module);
+		g_signal_connect (monitor, "changed", G_CALLBACK (file_status_changed_cb), module);
 	}
 	g_object_unref (file);
 }
@@ -572,11 +649,6 @@ security_module_tray_new (SecurityModule *module)
 	g_return_val_if_fail (module != NULL, NULL);
 
 	SecurityModulePrivate *priv = module->priv;
-
-	if (priv->timeout_id != 0) {
-		g_source_remove (priv->timeout_id);
-		priv->timeout_id = 0;
-	}
 
 	if (!priv->tray) {
 		priv->tray = gtk_image_new_from_icon_name ("security-status-unknown", GTK_ICON_SIZE_BUTTON);
@@ -597,11 +669,6 @@ security_module_control_new (SecurityModule *module, GtkSizeGroup *size_group)
 
 	SecurityModulePrivate *priv = module->priv;
 
-	if (priv->timeout_id != 0) {
-		g_source_remove (priv->timeout_id);
-		priv->timeout_id = 0;
-	}
-
 	build_control_ui (module, size_group);
 
 	g_timeout_add (100, (GSourceFunc) security_status_update_continually_idle, module);
@@ -616,11 +683,6 @@ security_module_control_menu_new (SecurityModule *module)
 	g_return_val_if_fail (module != NULL, NULL);
 
 	SecurityModulePrivate *priv = module->priv;
-
-	if (priv->timeout_id != 0) {
-		g_source_remove (priv->timeout_id);
-		priv->timeout_id = 0;
-	}
 
 	build_control_menu_ui (module);
 

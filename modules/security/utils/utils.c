@@ -25,8 +25,6 @@
 
 #include <json-c/json.h>
 
-#define GOOROOM_SECURITY_LOGPARSER_SEEKTIME    "/var/tmp/GOOROOM-SECURITY-LOGPARSER-SEEKTIME"
-
 
 json_object *
 JSON_OBJECT_GET (json_object *obj, const gchar *key)
@@ -95,22 +93,22 @@ run_security_log_parser_async_done (GPid child_pid, gint status, gpointer user_d
 }
 
 gboolean
-run_security_log_parser_async (gchar *seektime, GPid *pid, GIOFunc callback_func, gpointer data)
+run_security_log_parser_async (GPid *pid, GIOFunc callback_func, gpointer data)
 {
 	GPid child_pid;
 	gboolean ret = FALSE;
 	gint stdout_fd;
-	gchar *pkexec, *cmdline = NULL;
+	gchar *seektime = NULL, *pkexec = NULL, *cmdline = NULL;
 
     pkexec = g_find_program_in_path ("pkexec");
 
-	if (!seektime)
-		g_file_get_contents (GOOROOM_SECURITY_LOGPARSER_SEEKTIME, &seektime, NULL, NULL);
+	g_file_get_contents (GOOROOM_SECURITY_LOGPARSER_NEXT_SEEKTIME, &seektime, NULL, NULL);
 
-	if (seektime)
+	if (seektime) {
 		cmdline = g_strdup_printf ("%s %s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER, seektime);
-	else
+	} else {
 		cmdline = g_strdup_printf ("%s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER);
+	}
 
 	gchar **arr_cmd = g_strsplit (cmdline, " ", -1);
 

@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schemalist gettext-domain="gooroom-security-notify">
-
-  <schema id="apps.gooroom-security-notify" path="/apps/gooroom-security-notify/">
-
+<schemalist gettext-domain="gooroom-security-status">
+  <schema id="apps.gooroom-security-status" path="/apps/gooroom-security-status/">
     <key name="allow-duplicate-notifications" type="b">
       <default>false</default>
       <summary>Whether to allow duplicate notifications</summary>
       <description>Whether to allow duplicate notifications</description>
     </key>
-
+    <key name="cycle-time" type="u">
+      <default>5</default>
+      <summary>Cycle to check security status</summary>
+      <description></description>
+    </key>
   </schema>
 </schemalist>
 

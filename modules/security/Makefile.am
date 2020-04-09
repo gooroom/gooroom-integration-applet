@@ -1,6 +1,6 @@
 SUBDIRS = utils
 
-gsettings_SCHEMAS = apps.gooroom-security-notify.gschema.xml
+gsettings_SCHEMAS = apps.gooroom-security-status.gschema.xml
 @GSETTINGS_RULES@
 
 noinst_LTLIBRARIES = libsecurity-module.la
@@ -15,6 +15,7 @@ libsecurity_module_la_SOURCES = \
 	security-module.h
 
 libsecurity_module_la_CPPFLAGS = \
+	-DGOOROOM_SECURITY_STATUS_VULNERABLE_HELPER=\"$(libexecdir)/gooroom-security-status-tools/gooroom-security-status-vulnerable-helper\" \
 	-I$(srcdir)/utils \
 	-I$(top_srcdir)/common	\
 	$(AM_CPPFLAGS)
