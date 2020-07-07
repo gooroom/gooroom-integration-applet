@@ -86,6 +86,13 @@ struct _PopupWindowPrivate
 	int y;
 	int width;
 	int height;
+
+	int init_popup_width;
+	int init_popup_height;
+
+	GdkRectangle workarea;
+
+	GdkDevice *grab_pointer;
 };
 
 enum {
@@ -104,21 +111,40 @@ G_DEFINE_TYPE_WITH_PRIVATE (PopupWindow, popup_window, GTK_TYPE_WINDOW)
 
 
 static void
-grab_pointer (GtkWidget *widget)
+grab_pointer (PopupWindow *window)
 {
-	GdkDisplay *display = gdk_display_get_default ();
+	GdkSeat *seat;
+	GdkDevice *device, *pointer;
 
-	gdk_seat_grab (gdk_display_get_default_seat (display),
-                   gtk_widget_get_window (widget),
-                   GDK_SEAT_CAPABILITY_ALL_POINTING,
-                   TRUE, NULL, NULL, NULL, NULL);
+	device = gtk_get_current_event_device ();
+
+	if (!device) { 
+		GdkDisplay *display;
+
+		display = gtk_widget_get_display (GTK_WIDGET (window));
+		device = gdk_seat_get_pointer (gdk_display_get_default_seat (display));
+	}
+
+	if (gdk_device_get_source (device) == GDK_SOURCE_KEYBOARD)
+		window->priv->grab_pointer = gdk_device_get_associated_device (device);
+	else
+		window->priv->grab_pointer = device;
+
+	gtk_widget_grab_focus (GTK_WIDGET (window));
+
+	seat = gdk_device_get_seat (window->priv->grab_pointer);
+	gdk_seat_grab (seat, gtk_widget_get_window (GTK_WIDGET (window)),
+                   GDK_SEAT_CAPABILITY_ALL, TRUE,
+                   NULL, NULL, NULL, NULL);
 }
 
 static void
-ungrab_pointer ()
+ungrab_pointer (PopupWindow *window)
 {
-	GdkDisplay *display = gdk_display_get_default();
-	gdk_seat_ungrab (gdk_display_get_default_seat (display));
+	if (window->priv->grab_pointer) {
+		gdk_seat_ungrab (gdk_device_get_seat (window->priv->grab_pointer));
+		window->priv->grab_pointer = NULL;
+	}
 }
 
 static void
@@ -198,8 +224,70 @@ add_control_widget (PopupWindow *window,
 }
 
 static void
-setup_layout (PopupWindow *window)
+adjust_layout (PopupWindow *window)
 {
+	int pref_h;
+	int top, end, bottom, start;
+	int box_end_spacing, box_middle_spacing, box_control_spacing, box_general_spacing;
+	int page_spacing[5] = {0, };
+
+	PopupWindowPrivate *priv = window->priv;
+
+	pref_h = priv->init_popup_height;
+
+	top = gtk_widget_get_margin_top (priv->stack);
+	end = gtk_widget_get_margin_end (priv->stack);
+	bottom = gtk_widget_get_margin_bottom (priv->stack);
+	start = gtk_widget_get_margin_start (priv->stack);
+
+	box_end_spacing = gtk_widget_get_margin_top (priv->box_end);
+
+	box_middle_spacing = gtk_box_get_spacing (GTK_BOX (priv->box_middle));
+	box_control_spacing = gtk_box_get_spacing (GTK_BOX (priv->box_control));
+	box_general_spacing = gtk_box_get_spacing (GTK_BOX (priv->box_general));
+
+	page_spacing[0] = gtk_box_get_spacing (GTK_BOX (priv->page_1));
+	page_spacing[1] = gtk_box_get_spacing (GTK_BOX (priv->page_2));
+	page_spacing[2] = gtk_box_get_spacing (GTK_BOX (priv->page_3));
+	page_spacing[3] = gtk_box_get_spacing (GTK_BOX (priv->page_4));
+	page_spacing[4] = gtk_box_get_spacing (GTK_BOX (priv->page_5));
+
+	while (pref_h > priv->workarea.height) {
+		--top;
+		--end;
+		--bottom;
+		--start;
+		--box_end_spacing;
+		--box_middle_spacing;
+		--box_control_spacing;
+		--box_general_spacing;
+		--page_spacing[0];
+		--page_spacing[1];
+		--page_spacing[2];
+		--page_spacing[3];
+		--page_spacing[4];
+
+		gtk_widget_set_margin_top (priv->stack, top);
+		gtk_widget_set_margin_end (priv->stack, end);
+		gtk_widget_set_margin_bottom (priv->stack, bottom);
+		gtk_widget_set_margin_start (priv->stack, start);
+
+		gtk_widget_set_margin_top (priv->box_end, box_end_spacing);
+
+		gtk_box_set_spacing (GTK_BOX (priv->box_middle), box_middle_spacing);
+		gtk_box_set_spacing (GTK_BOX (priv->box_control), box_control_spacing);
+		gtk_box_set_spacing (GTK_BOX (priv->box_general), box_general_spacing);
+
+		gtk_box_set_spacing (GTK_BOX (priv->page_1), page_spacing[0]);
+		gtk_box_set_spacing (GTK_BOX (priv->page_2), page_spacing[1]);
+		gtk_box_set_spacing (GTK_BOX (priv->page_3), page_spacing[2]);
+		gtk_box_set_spacing (GTK_BOX (priv->page_4), page_spacing[3]);
+		gtk_box_set_spacing (GTK_BOX (priv->page_5), page_spacing[4]);
+
+		gtk_widget_get_preferred_height (GTK_WIDGET (window), NULL, &pref_h);
+	}
+
+#if 0
     GdkRectangle area;
     GdkMonitor *primary;
 	int box_spacing1 = 20, box_spacing2 = 10;
@@ -239,6 +327,7 @@ setup_layout (PopupWindow *window)
 	gtk_box_set_spacing (GTK_BOX (priv->page_3), box_spacing1);
 	gtk_box_set_spacing (GTK_BOX (priv->page_4), box_spacing1);
 	gtk_box_set_spacing (GTK_BOX (priv->page_5), box_spacing1);
+#endif
 }
 
 static void
@@ -412,7 +501,7 @@ popup_window_key_press_event (GtkWidget   *widget,
 	PopupWindow *window = POPUP_WINDOW (widget);
 
 	if (event->keyval == GDK_KEY_Escape) {
-		ungrab_pointer ();
+		ungrab_pointer (window);
 		g_signal_emit (G_OBJECT (window), signals[CLOSED], 0, POPUP_WINDOW_CLOSED);
 		return TRUE;
 	}
@@ -452,11 +541,26 @@ popup_window_button_press_event (GtkWidget      *widget,
         (event->x_root >= priv->x + priv->width) ||
         (event->y_root >= priv->y + priv->height))
     {
-		ungrab_pointer ();
+		ungrab_pointer (window);
 		g_signal_emit (G_OBJECT (window), signals[CLOSED], 0, POPUP_WINDOW_CLOSED);
     }
 
 	return GTK_WIDGET_CLASS (popup_window_parent_class)->button_press_event (widget, event);
+}
+
+static void
+popup_window_realize (GtkWidget *widget)
+{
+	PopupWindow *window = POPUP_WINDOW (widget);
+	PopupWindowPrivate *priv = window->priv;
+
+	gtk_widget_get_preferred_width (widget, NULL, &priv->init_popup_width);
+	gtk_widget_get_preferred_height (widget, NULL, &priv->init_popup_height);
+
+	adjust_layout (window);
+
+	if (GTK_WIDGET_CLASS (popup_window_parent_class)->realize)
+		GTK_WIDGET_CLASS (popup_window_parent_class)->realize (widget);
 }
 
 static gboolean
@@ -465,9 +569,9 @@ popup_window_map_event (GtkWidget   *widget,
 {
 	PopupWindow *window = POPUP_WINDOW (widget);
 
-	gtk_window_set_keep_above (GTK_WINDOW (window), TRUE);
+//	gtk_window_set_keep_above (GTK_WINDOW (window), TRUE);
 
-	grab_pointer (widget);
+	grab_pointer (window);
 
 	return GTK_WIDGET_CLASS (popup_window_parent_class)->map_event (widget, event);
 }
@@ -477,14 +581,24 @@ popup_window_focus_out_event (GtkWidget     *widget,
                               GdkEventFocus *event)
 {
 	PopupWindow *window = POPUP_WINDOW (widget);
-	PopupWindowPrivate *priv = window->priv;
 
-	if (!priv->block_focus_out_event) {
-		ungrab_pointer ();
+	if (!window->priv->block_focus_out_event) {
+		ungrab_pointer (window);
 		g_signal_emit (G_OBJECT (window), signals[CLOSED], 0, POPUP_WINDOW_CLOSED);
 	}
 
 	return GTK_WIDGET_CLASS (popup_window_parent_class)->focus_out_event (widget, event);
+}
+
+static void
+popup_window_size_allocate (GtkWidget     *widget,
+                            GtkAllocation *allocation)
+{
+	PopupWindow *window = POPUP_WINDOW (widget);
+	PopupWindowPrivate *priv = window->priv;
+
+	if (GTK_WIDGET_CLASS (popup_window_parent_class)->size_allocate)
+        GTK_WIDGET_CLASS (popup_window_parent_class)->size_allocate (widget, allocation);
 }
 
 static void
@@ -503,14 +617,13 @@ popup_window_init (PopupWindow *window)
 	priv->datetime_module   = NULL;
 	priv->endsession_module = NULL;
 	priv->nimf_module       = NULL;
+	priv->grab_pointer      = NULL;
 
 	priv->block_focus_out_event = FALSE;
 
 	priv->size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
 
 	gtk_window_stick (GTK_WINDOW (window));
-	gtk_window_set_accept_focus (GTK_WINDOW (window), TRUE);
-	gtk_window_set_modal (GTK_WINDOW (window), TRUE);
 	gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
 	gtk_window_set_skip_taskbar_hint (GTK_WINDOW (window), TRUE);
 	gtk_window_set_skip_pager_hint (GTK_WINDOW (window), TRUE);
@@ -526,7 +639,8 @@ popup_window_init (PopupWindow *window)
 		gtk_widget_set_visual (GTK_WIDGET (window), visual);
 	}
 
-	setup_layout (window);
+	GdkMonitor *m = gdk_display_get_primary_monitor (gdk_display_get_default ());
+	gdk_monitor_get_geometry (m, &priv->workarea);
 
 	g_signal_connect (G_OBJECT (priv->btn_settings), "clicked",
 			G_CALLBACK (on_system_button_clicked_cb), window);
@@ -549,7 +663,7 @@ popup_window_dispose (GObject *object)
 {
 	PopupWindow *window = POPUP_WINDOW (object);
 
-	ungrab_pointer ();
+	ungrab_pointer (window);
 
 	destroy_control_widget (window);
 
@@ -577,12 +691,13 @@ popup_window_class_init (PopupWindowClass *klass)
 	object_class->finalize = popup_window_finalize;
 
 	widget_class->focus_out_event = popup_window_focus_out_event;
+    widget_class->realize = popup_window_realize;
 	widget_class->map_event = popup_window_map_event;
 	widget_class->button_press_event = popup_window_button_press_event;
 	widget_class->button_release_event = popup_window_button_release_event;
 	widget_class->configure_event = popup_window_configure_event;
 	widget_class->key_press_event = popup_window_key_press_event;
-
+	widget_class->size_allocate = popup_window_size_allocate;
 
 	signals[CLOSED] = g_signal_new ("closed",
                                     WINDOW_TYPE_POPUP,
@@ -638,9 +753,32 @@ popup_window_class_init (PopupWindowClass *klass)
 }
 
 PopupWindow *
-popup_window_new (void)
+popup_window_new (GtkWidget *parent)
 {
-	return g_object_new (WINDOW_TYPE_POPUP, NULL);
+	GtkWidget *toplevel = NULL;
+	if (parent)
+		toplevel = gtk_widget_get_toplevel (parent);
+
+	return g_object_new (WINDOW_TYPE_POPUP,
+                         "type", GTK_WINDOW_TOPLEVEL,
+                         "type-hint", GDK_WINDOW_TYPE_HINT_POPUP_MENU,
+                         "transient-for", toplevel ? toplevel : NULL,
+                         "modal", TRUE,
+                         NULL);
+}
+
+void
+popup_window_set_workarea (PopupWindow  *window,
+                           GdkRectangle *workarea)
+{
+	g_return_if_fail (workarea != NULL);
+
+	PopupWindowPrivate *priv = window->priv;
+
+	priv->workarea.x = workarea->x;
+	priv->workarea.y = workarea->y;
+	priv->workarea.width = workarea->width;
+	priv->workarea.height = workarea->height;
 }
 
 void

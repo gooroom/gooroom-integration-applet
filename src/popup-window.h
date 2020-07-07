@@ -69,8 +69,10 @@ struct _PopupWindow
 
 GType        popup_window_get_type (void) G_GNUC_CONST;
 
-PopupWindow *popup_window_new      (void);
+PopupWindow *popup_window_new      (GtkWidget *parent);
 
+void popup_window_set_workarea     (PopupWindow  *window,
+                                    GdkRectangle *workarea);
 
 void popup_window_setup_user       (PopupWindow *window,
                                     UserModule  *module);

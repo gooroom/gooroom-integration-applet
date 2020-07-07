@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 16:22+0900\n"
+"POT-Creation-Date: 2020-07-07 15:36+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: ko\n"
@@ -26,8 +26,8 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:171
-#: ../modules/security/security-module.c:301
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:203
+#: ../modules/security/security-module.c:345
 #: ../modules/security/security-control.ui.h:3
 msgid "Unknown"
 msgstr "알수없음"
@@ -142,15 +142,15 @@ msgstr "신뢰부팅"
 msgid "Resources Control"
 msgstr "매체제어"
 
-#: ../modules/security/security-module.c:234
+#: ../modules/security/security-module.c:268
 msgid "Safety"
 msgstr "안전"
 
-#: ../modules/security/security-module.c:244
+#: ../modules/security/security-module.c:281
 msgid "Vulnerable"
 msgstr "취약"
 
-#: ../modules/security/security-module.c:549
+#: ../modules/security/security-module.c:626
 msgid "Details"
 msgstr "자세히 보기"
 
@@ -162,20 +162,20 @@ msgstr "입력기 작동이 중지됨"
 msgid "Input Method Settings"
 msgstr "입력기 설정"
 
-#: ../src/gooroom-integration-applet.c:127
+#: ../src/gooroom-integration-applet.c:175
 msgid "Application Launching Error"
 msgstr "어플리케이션 실행 에러"
 
-#: ../src/gooroom-integration-applet.c:234
+#: ../src/gooroom-integration-applet.c:281
 msgid "Could not execute command"
 msgstr "명령을 실행할 수 없습니다."
 
-#: ../src/gooroom-integration-applet.c:267
+#: ../src/gooroom-integration-applet.c:311
 #, c-format
 msgid "Could not launch '%s' program"
 msgstr "'%s' 프로그램을 실행할 수 없습니다."
 
-#: ../src/gooroom-integration-applet.c:270
+#: ../src/gooroom-integration-applet.c:313
 #, c-format
 msgid "Could not launch '%s'"
 msgstr "'%s'를 실행할 수 없습니다."

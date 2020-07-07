@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-06 16:22+0900\n"
+"POT-Creation-Date: 2020-07-07 15:36+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: en\n"
@@ -26,8 +26,8 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:171
-#: ../modules/security/security-module.c:301
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:203
+#: ../modules/security/security-module.c:345
 #: ../modules/security/security-control.ui.h:3
 msgid "Unknown"
 msgstr "Unknown"
@@ -142,15 +142,15 @@ msgstr "Trusted Booting"
 msgid "Resources Control"
 msgstr "Resources Control"
 
-#: ../modules/security/security-module.c:234
+#: ../modules/security/security-module.c:268
 msgid "Safety"
 msgstr "Safety"
 
-#: ../modules/security/security-module.c:244
+#: ../modules/security/security-module.c:281
 msgid "Vulnerable"
 msgstr "Vulnerable"
 
-#: ../modules/security/security-module.c:549
+#: ../modules/security/security-module.c:626
 msgid "Details"
 msgstr "Details"
 
@@ -162,20 +162,20 @@ msgstr "Input Method Not Running"
 msgid "Input Method Settings"
 msgstr "Input Method Settings"
 
-#: ../src/gooroom-integration-applet.c:127
+#: ../src/gooroom-integration-applet.c:175
 msgid "Application Launching Error"
 msgstr "Application Launching Error"
 
-#: ../src/gooroom-integration-applet.c:234
+#: ../src/gooroom-integration-applet.c:281
 msgid "Could not execute command"
 msgstr "Could not execute command"
 
-#: ../src/gooroom-integration-applet.c:267
+#: ../src/gooroom-integration-applet.c:311
 #, c-format
 msgid "Could not launch '%s' program"
 msgstr "Could not launch '%s' program"
 
-#: ../src/gooroom-integration-applet.c:270
+#: ../src/gooroom-integration-applet.c:313
 #, c-format
 msgid "Could not launch '%s'"
 msgstr "Could not launch '%s'"
