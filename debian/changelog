@@ -1,3 +1,12 @@
+gooroom-integration-applet (0.1.5+grm2u1) unstable; urgency=medium
+
+  [ cjheo ]
+  * [76667a34] [Bug: 2505] PC에서 밝기조절 기능 표시 비활성화
+
+  [ Gooroom Autobuilder ]
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 14 Jul 2020 15:59:45 +0900
+
 gooroom-integration-applet (0.1.4+grm2u1) unstable; urgency=medium
 
   [ cjheo ]
