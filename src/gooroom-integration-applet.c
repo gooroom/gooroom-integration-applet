@@ -425,7 +425,7 @@ integration_window_popup (GooroomIntegrationApplet *applet)
 	g_signal_connect (G_OBJECT (priv->popup), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 
-	gtk_widget_show_all (GTK_WIDGET (priv->popup));
+	gtk_widget_show (GTK_WIDGET (priv->popup));
 
 	gtk_window_present_with_time (GTK_WINDOW (priv->popup), GDK_CURRENT_TIME);
 }

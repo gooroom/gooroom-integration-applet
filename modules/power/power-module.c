@@ -536,11 +536,11 @@ sync_screen_brightness (gpointer data)
 	PowerModule *module = POWER_MODULE (data);
 	PowerModulePrivate *priv = module->priv;
 
-	if (priv->br_scale) {
-		gint brightness;
-		gboolean visible;
-		GVariant *result;
+	gint brightness;
+	gboolean visible;
+	GVariant *result;
 
+	if (priv->br_control) {
 		result = g_dbus_proxy_get_cached_property (priv->screen_proxy, "Brightness");
 		if (result) {
 			/* set the slider */
@@ -595,7 +595,6 @@ got_screen_proxy_cb (GObject      *source_object,
 		g_error_free (error);
 		return;
 	}
-
 	priv->screen_proxy = proxy;
 
 	/* we want to change the bar if the user presses brightness buttons */

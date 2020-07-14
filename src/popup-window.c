@@ -791,8 +791,10 @@ popup_window_setup_user (PopupWindow *window,
 		if (!priv->user_module) {
 			priv->user_module = module;
 			GtkWidget *w = user_module_control_new (priv->user_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_USER);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_USER);
+			}
 		}
 	}
 }
@@ -807,8 +809,10 @@ popup_window_setup_sound (PopupWindow *window,
 		if (!priv->sound_module) {
 			priv->sound_module = module;
 			GtkWidget *w = sound_module_control_new (priv->sound_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_VOLUME);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_VOLUME);
+			}
 		}
 	}
 }
@@ -823,11 +827,13 @@ popup_window_setup_security (PopupWindow    *window,
 		if (!priv->security_module) {
 			priv->security_module = module;
 			GtkWidget *w = security_module_control_new (priv->security_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_SECURITY);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_SECURITY);
 
-			g_signal_connect (G_OBJECT (w), "clicked",
-					G_CALLBACK (on_security_button_clicked_cb), window);
+				g_signal_connect (G_OBJECT (w), "clicked",
+						G_CALLBACK (on_security_button_clicked_cb), window);
+			}
 		}
 	}
 }
@@ -843,12 +849,16 @@ popup_window_setup_power (PopupWindow *window,
 			priv->power_module = module;
 			GtkWidget *w = NULL;
 			w = power_module_brightness_control_new (priv->power_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_BRIGHTNESS);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_BRIGHTNESS);
+			}
 
 			w = power_module_battery_control_new (priv->power_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_BATTERY);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_BATTERY);
+			}
 		}
 	}
 }
@@ -863,11 +873,13 @@ popup_window_setup_datetime (PopupWindow    *window,
 		if (!priv->datetime_module) {
 			priv->datetime_module = module;
 			GtkWidget *w = datetime_module_control_new (priv->datetime_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_DATETIME);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_DATETIME);
 
-			g_signal_connect (G_OBJECT (w), "clicked",
-					G_CALLBACK (on_datetime_button_clicked_cb), window);
+				g_signal_connect (G_OBJECT (w), "clicked",
+						G_CALLBACK (on_datetime_button_clicked_cb), window);
+			}
 		}
 	}
 }
@@ -895,11 +907,13 @@ popup_window_setup_nimf (PopupWindow *window,
 		if (!priv->nimf_module) {
 			priv->nimf_module = module;
 			GtkWidget *w = nimf_module_control_new (priv->nimf_module, priv->size_group);
-			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
-			add_control_widget (window, w, CONTROL_TYPE_NIMF);
+			if (w) {
+				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+				add_control_widget (window, w, CONTROL_TYPE_NIMF);
 
-			g_signal_connect (G_OBJECT (w), "clicked",
-					G_CALLBACK (on_nimf_button_clicked_cb), window);
+				g_signal_connect (G_OBJECT (w), "clicked",
+						G_CALLBACK (on_nimf_button_clicked_cb), window);
+			}
 		}
 	}
 }
