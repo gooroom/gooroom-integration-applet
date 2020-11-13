@@ -1,4 +1,4 @@
-gooroomappletdir = $(pkglibdir)
+gooroomappletdir = $(GNOME_PANEL_MODULES_DIR)
 gooroomapplet_LTLIBRARIES = libgooroom-integration-applet.la
 
 libgooroom_integration_applet_la_CPPFLAGS = \
@@ -16,10 +16,11 @@ libgooroom_integration_applet_la_SOURCES = \
 	popup-window.h	\
 	popup-window.c	\
 	gooroom-integration-applet.c \
+	gooroom-integration-module.c \
 	gooroom-integration-applet.h
 
 libgooroom_integration_applet_la_CFLAGS = \
-	$(GNOME_APPLETS_CFLAGS) \
+	$(LIBGNOMEPANEL_CFLAGS) \
 	$(GNOME_DESKTOP_CFLAGS) \
 	$(GLIB_CFLAGS)	\
 	$(GTK_CFLAGS)	\
@@ -31,7 +32,7 @@ libgooroom_integration_applet_la_LDFLAGS = \
 	$(AM_LDFLAGS)
 
 libgooroom_integration_applet_la_LIBADD = \
-	$(GNOME_APPLETS_LIBS) \
+	$(LIBGNOMEPANEL_LIBS) \
 	$(GNOME_DESKTOP_LIBS) \
 	$(GLIB_LIBS)	\
 	$(GTK_LIBS)	\
@@ -43,7 +44,7 @@ libgooroom_integration_applet_la_LIBADD = \
 	$(top_builddir)/modules/datetime/libdatetime-module.la	\
 	$(top_builddir)/modules/security/libsecurity-module.la	\
 	$(top_builddir)/modules/endsession/libendsession-module.la \
-	$(top_builddir)/modules/nimf/libnimf-module.la
+	#$(top_builddir)/modules/nimf/libnimf-module.la
 
 resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gresource.xml)
 applet-resources.c: gresource.xml $(resource_files)
