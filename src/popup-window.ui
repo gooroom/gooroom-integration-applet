@@ -144,7 +144,6 @@
                     <child>
                       <object class="GtkButton" id="btn_screenlock">
                         <property name="name">icon-button</property>
-                        <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Screen Lock</property>
