@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.1.5+grm2u1+kp01) unstable; urgency=medium
+
+  [ boyeon.choi ]
+  * [b155829b] btn_screenlock hidden
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 19 Jan 2021 12:35:45 +0900
+
 gooroom-integration-applet (0.1.5+grm2u1) unstable; urgency=medium
 
   [ cjheo ]
