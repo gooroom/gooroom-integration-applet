@@ -150,15 +150,21 @@ pulseaudio_volume_sink_info_cb (pa_context         *context,
                                 int                 eol,
                                 void               *userdata)
 {
+  int c;
   gboolean  muted;
   gdouble   vol;
+  gdouble   vol_max = 0.0;
 
   PulseaudioVolume *volume = PULSEAUDIO_VOLUME (userdata);
   if (i == NULL) return;
   pulseaudio_debug ("sink info: %s, %s", i->name, i->description);
 
+  for (c = 0; c < i->volume.channels; c++) {
+    vol_max = MAX (vol_max, (gdouble)i->volume.values[c]);
+  }
+
   muted = !!(i->mute);
-  vol = pulseaudio_volume_v2d (volume, i->volume.values[0]);
+  vol = pulseaudio_volume_v2d (volume, vol_max);
 
   if (volume->muted != muted)
     {
@@ -476,7 +482,7 @@ pulseaudio_volume_set_volume_cb2 (pa_context         *context,
   if (i == NULL) return;
 
   //pulseaudio_debug ("*** %s", pa_cvolume_snprint (st, sizeof (st), &i->volume));
-  pa_cvolume_set (&i->volume, 1, pulseaudio_volume_d2v (volume, volume->volume));
+  pa_cvolume_set ((pa_cvolume *)&i->volume, 1, pulseaudio_volume_d2v (volume, volume->volume));
   pa_context_set_sink_volume_by_index (context, i->index, &i->volume, pulseaudio_volume_sink_volume_changed, volume);
 }
 
