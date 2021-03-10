@@ -75,7 +75,7 @@ get_active_engines (void)
 
 	schema_source = g_settings_schema_source_get_default ();
 
-	schema = g_settings_schema_source_lookup (schema_source, "org.nimf", FALSE);
+	schema = g_settings_schema_source_lookup (schema_source, "org.nimf", TRUE);
 	if (g_settings_schema_has_key (schema, "hidden-active-engines")) {
 		GSettings *gsettings = g_settings_new_full (schema, NULL, NULL);
 		ret = g_settings_get_strv (gsettings, "hidden-active-engines");
@@ -95,7 +95,7 @@ get_default_engine_id (void)
 
 	schema_source = g_settings_schema_source_get_default ();
 
-	schema = g_settings_schema_source_lookup (schema_source, "org.nimf.engines", FALSE);
+	schema = g_settings_schema_source_lookup (schema_source, "org.nimf.engines", TRUE);
 	if (g_settings_schema_has_key (schema, "default-engine")) {
 		GSettings *gsettings = g_settings_new_full (schema, NULL, NULL);
 		ret = g_settings_get_string (gsettings, "default-engine");
@@ -119,7 +119,7 @@ get_default_engine_name (void)
 
 	if (default_engine_id) {
 		gchar *schema_id = g_strdup_printf ("org.nimf.engines.%s", default_engine_id);
-		GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, FALSE);
+		GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, TRUE);
 		if (g_settings_schema_has_key (schema, "hidden-schema-name")) {
 			GSettings *gsettings = g_settings_new_full (schema, NULL, NULL);
 			ret = g_settings_get_string (gsettings, "hidden-schema-name");
@@ -145,7 +145,7 @@ get_engine_name_by_id (const gchar *engine_id)
 	schema_source = g_settings_schema_source_get_default ();
 
 	gchar *schema_id = g_strdup_printf ("org.nimf.engines.%s", engine_id);
-	GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, FALSE);
+	GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, TRUE);
 	if (g_settings_schema_has_key (schema, "hidden-schema-name")) {
 		GSettings *gsettings = g_settings_new_full (schema, NULL, NULL);
 		ret = g_settings_get_string (gsettings, "hidden-schema-name");
@@ -306,7 +306,7 @@ on_engine_button_clicked (GtkButton *button, gpointer data)
 		gchar *schema_id = g_strdup_printf ("org.nimf.engines.%s", engine_id);
 
 		GSettingsSchemaSource *schema_source = g_settings_schema_source_get_default ();
-		GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, FALSE);
+		GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, TRUE);
 		if (g_settings_schema_has_key (schema, "get-method-infos")) {
 			GSettings *gsettings = g_settings_new (schema_id);
 			gchar *method_infos = g_settings_get_string (gsettings, "get-method-infos");
@@ -450,7 +450,7 @@ build_control_menu_ui (NimfModule *module)
 		gboolean checked = g_str_equal (engines[i], curr_engine_id);
 		gchar *schema_id = g_strdup_printf ("org.nimf.engines.%s", engines[i]);
 
-		GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, FALSE);
+		GSettingsSchema *schema = g_settings_schema_source_lookup (schema_source, schema_id, TRUE);
 		if (g_settings_schema_has_key (schema, "hidden-schema-name")) {
 			GSettings *gsettings = g_settings_new_full (schema, NULL, NULL);
 			gchar *engine_name = g_settings_get_string (gsettings, "hidden-schema-name");
