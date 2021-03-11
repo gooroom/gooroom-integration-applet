@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-07 15:36+0900\n"
+"POT-Creation-Date: 2021-03-11 17:20+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: ko\n"
@@ -26,8 +26,8 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:203
-#: ../modules/security/security-module.c:345
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:205
+#: ../modules/security/security-module.c:347
 #: ../modules/security/security-control.ui.h:3
 msgid "Unknown"
 msgstr "알수없음"
@@ -142,15 +142,15 @@ msgstr "신뢰부팅"
 msgid "Resources Control"
 msgstr "매체제어"
 
-#: ../modules/security/security-module.c:268
+#: ../modules/security/security-module.c:270
 msgid "Safety"
 msgstr "안전"
 
-#: ../modules/security/security-module.c:281
+#: ../modules/security/security-module.c:283
 msgid "Vulnerable"
 msgstr "취약"
 
-#: ../modules/security/security-module.c:626
+#: ../modules/security/security-module.c:628
 msgid "Details"
 msgstr "자세히 보기"
 

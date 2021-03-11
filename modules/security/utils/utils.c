@@ -98,16 +98,20 @@ run_security_log_parser_async (GPid *pid, GIOFunc callback_func, gpointer data)
 	GPid child_pid;
 	gboolean ret = FALSE;
 	gint stdout_fd;
+	const gchar *lang;
 	gchar *seektime = NULL, *pkexec = NULL, *cmdline = NULL;
 
-    pkexec = g_find_program_in_path ("pkexec");
+	lang = g_getenv ("LANG");
+	pkexec = g_find_program_in_path ("pkexec");
 
 	g_file_get_contents (GOOROOM_SECURITY_LOGPARSER_NEXT_SEEKTIME, &seektime, NULL, NULL);
 
 	if (seektime) {
-		cmdline = g_strdup_printf ("%s %s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER, seektime);
+		cmdline = g_strdup_printf ("%s %s %s %s", pkexec,
+                                   GOOROOM_SECURITY_LOGPARSER_WRAPPER, seektime, lang);
 	} else {
-		cmdline = g_strdup_printf ("%s %s", pkexec, GOOROOM_SECURITY_LOGPARSER_WRAPPER);
+		cmdline = g_strdup_printf ("%s %s %s", pkexec,
+                                   GOOROOM_SECURITY_LOGPARSER_WRAPPER, lang);
 	}
 
 	gchar **arr_cmd = g_strsplit (cmdline, " ", -1);
