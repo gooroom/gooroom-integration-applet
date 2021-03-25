@@ -57,6 +57,36 @@ static guint signals[LAST_SIGNAL] = { 0 };
 G_DEFINE_TYPE_WITH_PRIVATE (DateTimeModule, datetime_module, G_TYPE_OBJECT)
 
 
+/*
+ * Translate @str according to the locale defined by LC_TIME; unlike
+ * dcgettext(), the translation is still taken from the LC_MESSAGES
+ * catalogue and not the LC_TIME one.
+ */
+static const gchar *
+translate_time_format_string (const char *str)
+{
+  const char *locale = g_getenv ("LC_TIME");
+  const char *res;
+  char *sep;
+  locale_t old_loc;
+  locale_t loc = (locale_t)0;
+
+  if (locale)
+    loc = newlocale (LC_MESSAGES_MASK, locale, (locale_t)0);
+
+  old_loc = uselocale (loc);
+
+  sep = strchr (str, '\004');
+  res = g_dpgettext (GETTEXT_PACKAGE, str, sep ? sep - str + 1 : 0);
+
+  uselocale (old_loc);
+
+  if (loc != (locale_t)0)
+    freelocale (loc);
+
+  return res;
+}
+
 static gboolean
 clock_timeout_thread (gpointer data)
 {
@@ -69,10 +99,9 @@ clock_timeout_thread (gpointer data)
 	if (dt) {
 		if (priv->tray) {
 			if (priv->use_ampm) //12-hour mode
-				fm = g_date_time_format (dt, _("%l:%M %p"));
+				fm = g_date_time_format (dt, translate_time_format_string (N_("%l:%M %p")));
 			else
 				fm = g_date_time_format (dt, "%R");
-
 			markup = g_markup_printf_escaped ("<b>%s</b>", fm);
 			gtk_label_set_markup (GTK_LABEL (priv->tray), markup);
 
@@ -82,9 +111,9 @@ clock_timeout_thread (gpointer data)
 
 		if (priv->details_label) {
 			if (priv->use_ampm) // 12-hour mode
-				fm = g_date_time_format (dt, _("%e %B %Y    %l:%M %p"));
+				fm = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %l:%M:%S %p")));
 			else
-				fm = g_date_time_format (dt, _("%e %B %Y    %R"));
+				fm = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %T")));
 			markup = g_markup_printf_escaped ("<b>%s</b>", fm);
 			gtk_label_set_markup (GTK_LABEL (priv->details_label), markup);
 
@@ -96,10 +125,10 @@ clock_timeout_thread (gpointer data)
 			gchar *fm1 = g_date_time_format (dt, "%A");
 			gchar *fm2;
 			if (priv->use_ampm) // 12-hour mode
-				fm2 = g_date_time_format (dt, _("%e %B %Y    %l:%M %p"));
+				fm2 = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %l:%M %p")));
 			else
-				fm2 = g_date_time_format (dt, _("%e %B %Y    %R"));
-			markup = g_markup_printf_escaped ("<span size='x-large'>%s</span>\n<span size='large'>%s</span>", fm1, fm2);
+				fm2 = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %R")));
+			markup = g_markup_printf_escaped ("<span size='large'>%s</span>\n<span size='x-large'>%s</span>", fm1, fm2);
 			gtk_label_set_markup (GTK_LABEL (priv->lbl_datetime), markup);
 
 			g_free (fm1);

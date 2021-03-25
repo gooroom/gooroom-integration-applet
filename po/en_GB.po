@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-11 17:20+0900\n"
+"POT-Creation-Date: 2021-03-25 19:12+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: en\n"
@@ -26,8 +26,8 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:205
-#: ../modules/security/security-module.c:347
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:203
+#: ../modules/security/security-module.c:345
 #: ../modules/security/security-control.ui.h:3
 msgid "Unknown"
 msgstr "Unknown"
@@ -101,20 +101,27 @@ msgid "Discharging"
 msgstr "Discharging"
 
 #. 12-hour mode
-#: ../modules/datetime/datetime-module.c:72
+#: ../modules/datetime/datetime-module.c:102
 msgid "%l:%M %p"
 msgstr "%l:%M %p"
 
 #. 12-hour mode
-#: ../modules/datetime/datetime-module.c:85
-#: ../modules/datetime/datetime-module.c:99
-msgid "%e %B %Y    %l:%M %p"
-msgstr "%e %B %Y    %l:%M %p"
+#: ../modules/datetime/datetime-module.c:114
+msgid "%B %-d %Y   %l:%M:%S %p"
+msgstr "%-d %B %Y   %l:%M:%S %p"
 
-#: ../modules/datetime/datetime-module.c:87
-#: ../modules/datetime/datetime-module.c:101
-msgid "%e %B %Y    %R"
-msgstr "%e %B %Y    %R"
+#: ../modules/datetime/datetime-module.c:116
+msgid "%B %-d %Y   %T"
+msgstr "%B %-d %Y   %T"
+
+#. 12-hour mode
+#: ../modules/datetime/datetime-module.c:128
+msgid "%B %-d %Y   %l:%M %p"
+msgstr "%-d %B %Y   %l:%M %p"
+
+#: ../modules/datetime/datetime-module.c:130
+msgid "%B %-d %Y   %R"
+msgstr "%B %-d %Y   %R"
 
 #: ../modules/security/security-module.c:95
 msgid "Security Status Of Gooroom System"
@@ -142,15 +149,15 @@ msgstr "Trusted Booting"
 msgid "Resources Control"
 msgstr "Resources Control"
 
-#: ../modules/security/security-module.c:270
+#: ../modules/security/security-module.c:268
 msgid "Safety"
 msgstr "Safety"
 
-#: ../modules/security/security-module.c:283
+#: ../modules/security/security-module.c:281
 msgid "Vulnerable"
 msgstr "Vulnerable"
 
-#: ../modules/security/security-module.c:628
+#: ../modules/security/security-module.c:626
 msgid "Details"
 msgstr "Details"
 
