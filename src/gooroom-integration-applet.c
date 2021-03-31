@@ -45,7 +45,7 @@
 #include "modules/datetime/datetime-module.h"
 #include "modules/security/security-module.h"
 #include "modules/endsession/endsession-module.h"
-//#include "modules/nimf/nimf-module.h"
+#include "modules/nimf/nimf-module.h"
 
 #include "gooroom-integration-applet.h"
 
@@ -62,7 +62,7 @@ struct _GooroomIntegrationAppletPrivate
 	PowerModule      *power_module;
 	DateTimeModule   *datetime_module;
 	EndSessionModule *endsession_module;
-	//NimfModule       *nimf_module;
+	NimfModule       *nimf_module;
 };
 
 
@@ -347,36 +347,34 @@ set_popup_window_position (GooroomIntegrationApplet *applet)
 
 	get_monitor_geometry (applet, &geometry);
 
-#if 0
-	switch (orientation) {
-		case PANEL_APPLET_ORIENT_DOWN:
-			if (x + popup_width > geometry.x + geometry.width)
-				x -= ((x + popup_width) - (geometry.x + geometry.width));
-			y += applet_height;
-			break;
-
-		case PANEL_APPLET_ORIENT_UP:
-			if (x + popup_width > geometry.x + geometry.width)
-				x -= ((x + popup_width) - (geometry.x + geometry.width));
-			y -= popup_height;
-			break;
-
-		case PANEL_APPLET_ORIENT_RIGHT:
-			x += applet_width;
-			if (y + popup_height > geometry.y + geometry.height)
-				y -= ((y + popup_height) - (geometry.y + geometry.height));
-			break;
-
-		case PANEL_APPLET_ORIENT_LEFT:
-			x -= popup_width;
-			if (y + popup_height > geometry.y + geometry.height)
-				y -= ((y + popup_height) - (geometry.y + geometry.height));
-			break;
-
-		default:
-			g_assert_not_reached ();
-	}
-#endif
+//	switch (orientation) {
+//		case PANEL_APPLET_ORIENT_DOWN:
+//			if (x + popup_width > geometry.x + geometry.width)
+//				x -= ((x + popup_width) - (geometry.x + geometry.width));
+//			y += applet_height;
+//			break;
+//
+//		case PANEL_APPLET_ORIENT_UP:
+//			if (x + popup_width > geometry.x + geometry.width)
+//				x -= ((x + popup_width) - (geometry.x + geometry.width));
+//			y -= popup_height;
+//			break;
+//
+//		case PANEL_APPLET_ORIENT_RIGHT:
+//			x += applet_width;
+//			if (y + popup_height > geometry.y + geometry.height)
+//				y -= ((y + popup_height) - (geometry.y + geometry.height));
+//			break;
+//
+//		case PANEL_APPLET_ORIENT_LEFT:
+//			x -= popup_width;
+//			if (y + popup_height > geometry.y + geometry.height)
+//				y -= ((y + popup_height) - (geometry.y + geometry.height));
+//			break;
+//
+//		default:
+//			g_assert_not_reached ();
+//	}
 
 	gtk_window_move (GTK_WINDOW (priv->popup), x, y);
 
@@ -409,7 +407,7 @@ integration_window_popup (GooroomIntegrationApplet *applet)
 	popup_window_setup_user       (priv->popup, priv->user_module);
 	popup_window_setup_sound      (priv->popup, priv->sound_module);
 	popup_window_setup_security   (priv->popup, priv->sec_module);
-	//popup_window_setup_nimf       (priv->popup, priv->nimf_module);
+	popup_window_setup_nimf       (priv->popup, priv->nimf_module);
 	popup_window_setup_datetime   (priv->popup, priv->datetime_module);
 	popup_window_setup_power      (priv->popup, priv->power_module);
 	popup_window_setup_endsession (priv->popup, priv->endsession_module);
@@ -506,7 +504,7 @@ gooroom_integration_applet_finalize (GObject *object)
 	if (priv->user_module) g_object_unref (priv->user_module);
 	if (priv->sound_module) g_object_unref (priv->sound_module);
 	if (priv->sec_module) g_object_unref (priv->sec_module);
-	//if (priv->nimf_module) g_object_unref (priv->nimf_module);
+	if (priv->nimf_module) g_object_unref (priv->nimf_module);
 	if (priv->power_module) g_object_unref (priv->power_module);
 	if (priv->datetime_module) g_object_unref (priv->datetime_module);
 	if (priv->endsession_module) g_object_unref (priv->endsession_module);
@@ -549,7 +547,7 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	priv->user_module       = user_module_new ();
 	priv->sound_module      = sound_module_new ();
 	priv->sec_module        = security_module_new ();
-	//priv->nimf_module       = nimf_module_new ();
+	priv->nimf_module       = nimf_module_new ();
 	priv->power_module      = power_module_new ();
 	priv->datetime_module   = datetime_module_new ();
 	priv->endsession_module = endsession_module_new ();
@@ -563,10 +561,10 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	gtk_container_add (GTK_CONTAINER (priv->button), hbox);
 	gtk_widget_show (hbox);
 
-//	GtkWidget *nimf_tray = nimf_module_tray_new (priv->nimf_module);
-//	if (nimf_tray) {
-//		gtk_box_pack_start (GTK_BOX (hbox), nimf_tray, FALSE, FALSE, 0);
-//	}
+	GtkWidget *nimf_tray = nimf_module_tray_new (priv->nimf_module);
+	if (nimf_tray) {
+		gtk_box_pack_start (GTK_BOX (hbox), nimf_tray, FALSE, FALSE, 0);
+	}
 
 	GtkWidget *power_tray = power_module_tray_new (priv->power_module);
 	if (power_tray) {
@@ -598,8 +596,8 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	g_signal_connect (G_OBJECT (priv->sec_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 	g_signal_connect (G_OBJECT (priv->power_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 	g_signal_connect (G_OBJECT (priv->datetime_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
-//	g_signal_connect (G_OBJECT (priv->nimf_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
-//	g_signal_connect (G_OBJECT (priv->nimf_module), "change-engine-done", G_CALLBACK (on_change_engine_done_cb), applet);
+	g_signal_connect (G_OBJECT (priv->nimf_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
+	g_signal_connect (G_OBJECT (priv->nimf_module), "change-engine-done", G_CALLBACK (on_change_engine_done_cb), applet);
 	g_signal_connect (G_OBJECT (priv->endsession_module), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 
 	g_signal_connect (gdk_display_get_default_screen (display),

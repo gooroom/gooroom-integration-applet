@@ -44,7 +44,7 @@ libgooroom_integration_applet_la_LIBADD = \
 	$(top_builddir)/modules/datetime/libdatetime-module.la	\
 	$(top_builddir)/modules/security/libsecurity-module.la	\
 	$(top_builddir)/modules/endsession/libendsession-module.la \
-	#$(top_builddir)/modules/nimf/libnimf-module.la
+	$(top_builddir)/modules/nimf/libnimf-module.la
 
 resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gresource.xml)
 applet-resources.c: gresource.xml $(resource_files)
