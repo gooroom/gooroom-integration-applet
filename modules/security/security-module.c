@@ -393,7 +393,7 @@ security_status_update_continually_idle (gpointer data)
 
 	security_status_update_idle (module);
 
-	priv->timeout_id = g_timeout_add (SECURITY_STATUS_UPDATE_TIMEOUT, (GSourceFunc) security_status_update_idle, module);
+	priv->timeout_id = g_timeout_add (timeout, (GSourceFunc) security_status_update_idle, module);
 
 	return FALSE;
 }
