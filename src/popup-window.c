@@ -30,9 +30,11 @@
 #include <glib/gi18n-lib.h>
 
 #include <gtk/gtk.h>
+#include <gio/gio.h>
 
 #include "common.h"
 #include "popup-window.h"
+#include "gia-screensaver-gen.h"
 
 enum {
 	CONTROL_TYPE_USER = 0,
@@ -92,7 +94,9 @@ struct _PopupWindowPrivate
 
 	GdkRectangle workarea;
 
-	GdkDevice *grab_pointer;
+	GdkDevice  *grab_pointer;
+	GDBusProxy *proxy;
+	GiaScreensaverGen *screensaver;
 };
 
 enum {
@@ -454,11 +458,60 @@ on_nimf_button_clicked_cb (GtkButton *button, gpointer data)
 	}
 }
 
+
+#if 1
+static void
+lock_cb (GObject      *source_object,
+         GAsyncResult *res,
+         gpointer      user_data)
+{
+  g_print("lock_cb\n");
+
+  FILE *fp = fopen ("/var/tmp/gf-listener.debug", "a+");
+  fprintf (fp, "lock_cb\n");
+
+  GError *error;
+
+  error = NULL;
+  gia_screensaver_gen_call_lock_finish (GIA_SCREENSAVER_GEN (source_object),
+                                       res, &error);
+
+  if (g_error_matches (error, G_IO_ERROR, G_IO_ERROR_CANCELLED))
+    {
+	  fprintf (fp, "lock_cb error occured: %s\n", error->message);
+      g_error_free (error);
+      return;
+    }
+
+  if (error)
+    {
+	  fprintf (fp, "lock_cb error occured: %s\n", error->message);
+      g_warning ("Could not ask screensaver to lock: %s",
+                 error->message);
+
+      g_error_free (error);
+      return;
+    }
+  fclose (fp);
+}
+#endif
+
+#if 1
+static void
+lock_screen_activate (GtkButton *button, gpointer data)
+{
+  gia_screensaver_gen_call_lock (data, NULL, lock_cb, NULL);
+}
+#endif
+
 static void
 on_system_button_clicked_cb (GtkButton *button, gpointer data)
 {
 	PopupWindow *window = POPUP_WINDOW (data);
 	PopupWindowPrivate *priv = window->priv;
+
+	GVariant *ret;
+	GError   *error;
 
 	if (button == GTK_BUTTON (priv->btn_settings)) {
 		GSettingsSchema *schema = NULL;
@@ -473,7 +526,48 @@ on_system_button_clicked_cb (GtkButton *button, gpointer data)
 		}
 		g_signal_emit (G_OBJECT (window), signals[LAUNCH_DESKTOP], 0, "gnome-control-center.desktop");
 	} else if (button == GTK_BUTTON (priv->btn_screenlock)) {
-		g_signal_emit (G_OBJECT (window), signals[LAUNCH_COMMAND], 0, "gnome-screensaver-command -l");
+		g_return_if_fail (WINDOW_IS_POPUP (window));
+
+		FILE *fp = fopen ("/var/tmp/gf-listener.debug", "a+");
+
+		if (!priv->proxy) {
+			g_warning ("Screensaver service not available.");
+			fprintf (fp, "Screensaver service not available.\n");
+			return;
+		}
+
+		error = NULL;
+
+		g_print("1\n");
+		//lock_screen_activate (button, priv->proxy);
+		gia_screensaver_gen_call_lock (priv->proxy,
+                                NULL, lock_cb,
+                                priv->screensaver);
+		g_print("2\n");
+#if 0
+		g_dbus_proxy_call (priv->proxy,
+						  "Lock",
+						  g_variant_new ("()"),
+						  G_DBUS_CALL_FLAGS_NONE,
+						  -1,
+						  NULL,
+						  NULL,
+						  &data);
+
+		if (ret)
+			g_variant_unref (ret);
+
+		if (error) {
+			fprintf (fp, "Could not ask screensaver to lock: %s\n", error->message);
+			g_warning ("Could not ask screensaver to lock: %s",
+				   error->message);
+			g_error_free (error);
+		}
+#endif
+		fclose (fp);
+
+		ungrab_pointer (window);
+		g_signal_emit (G_OBJECT (window), signals[CLOSED], 0, POPUP_WINDOW_CLOSED);
 	}
 }
 
@@ -641,6 +735,25 @@ popup_window_init (PopupWindow *window)
 
 	GdkMonitor *m = gdk_display_get_primary_monitor (gdk_display_get_default ());
 	gdk_monitor_get_geometry (m, &priv->workarea);
+
+	GError *error;
+
+	error = NULL;
+	priv->proxy = g_dbus_proxy_new_for_bus_sync (
+						G_BUS_TYPE_SESSION,
+						G_DBUS_PROXY_FLAGS_NONE,
+						NULL,
+						"org.gnome.ScreenSaver",
+						"/org/gnome/ScreenSaver",
+						"org.gnome.ScreenSaver",
+						NULL, &error);
+
+	if (error) {
+		g_warning ("Could not connect to screensaver: %s",
+			   error->message);
+		g_print ("Could not connect to screensaver: %s\n", error->message);
+		g_error_free (error);
+	}
 
 	g_signal_connect (G_OBJECT (priv->btn_settings), "clicked",
 			G_CALLBACK (on_system_button_clicked_cb), window);

@@ -9,7 +9,10 @@ libgooroom_integration_applet_la_CPPFLAGS = \
 
 BUILT_SOURCES = \
 	applet-resources.c \
-	applet-resources.h
+	applet-resources.h \
+	gia-screensaver-gen.c \
+	gia-screensaver-gen.h \
+	$(NULL)
 
 libgooroom_integration_applet_la_SOURCES = \
 	$(BUILT_SOURCES)	\
@@ -50,5 +53,15 @@ applet-resources.c: gresource.xml $(resource_files)
 	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-source --c-name applet $<
 applet-resources.h: gresource.xml $(resource_files)
 	$(AM_V_GEN) glib-compile-resources --target=$@ --sourcedir=$(srcdir) --generate-header --c-name applet $<
+
+gia-screensaver-gen.h:
+gia-screensaver-gen.c: org.gnome.ScreenSaver.xml
+	$(AM_V_GEN) $(GDBUS_CODEGEN) --c-namespace Gia \
+		--generate-c-code gia-screensaver-gen \
+			$(srcdir)/org.gnome.ScreenSaver.xml
+
+EXTRA_DIST = \
+	org.gnome.ScreenSaver.xml\
+	$(NULL)
 
 CLEANFILES = $(BUILT_SOURCES)

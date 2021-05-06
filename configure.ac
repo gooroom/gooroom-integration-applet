@@ -23,6 +23,7 @@ dnl ********************************
 dnl *** Check for basic programs ***
 dnl ********************************
 AC_PROG_CC()
+AC_PATH_PROG([GDBUS_CODEGEN], [gdbus-codegen])
 AM_PROG_CC_C_O()
 AC_PROG_LD()
 AC_PROG_INSTALL()
