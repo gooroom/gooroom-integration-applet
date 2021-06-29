@@ -366,6 +366,7 @@ menu_button_new (const gchar *text, gboolean checked)
 
 	if (checked) {
 		image = gtk_image_new_from_icon_name ("object-select-symbolic", GTK_ICON_SIZE_BUTTON);
+		gtk_widget_set_name (image, "nimf-selected");
 	} else {
 		image = gtk_image_new_from_icon_name ("", GTK_ICON_SIZE_BUTTON);
 	}
@@ -439,7 +440,7 @@ build_control_menu_ui (NimfModule *module)
 	priv->control_menu = gtk_scrolled_window_new (NULL, NULL);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->control_menu),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 10);
+	GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 	gtk_container_add (GTK_CONTAINER (priv->control_menu), vbox);
 	gtk_widget_show (vbox);
 
@@ -460,6 +461,7 @@ build_control_menu_ui (NimfModule *module)
 				GtkWidget *button = menu_button_new (engine_name, checked);
 				g_object_set_data_full (G_OBJECT (button), "engine-id", g_strdup (engines[i]), g_free);
 				gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+				gtk_widget_set_name (button, "nimf-module-widget");
 				gtk_widget_show_all (button);
 
 				g_signal_connect (G_OBJECT (button), "clicked",
@@ -476,6 +478,7 @@ build_control_menu_ui (NimfModule *module)
 
 	GtkWidget *button = menu_button_new (_("Input Method Settings"), FALSE);
 	gtk_box_pack_start (GTK_BOX (vbox), button, FALSE, FALSE, 0);
+	gtk_widget_set_name (button, "nimf-module-widget");
 	gtk_widget_show_all (button);
 
 	g_signal_connect (G_OBJECT (button), "clicked", G_CALLBACK (on_settings_button_clicked), module);

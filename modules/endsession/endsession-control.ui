@@ -3,24 +3,32 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkBox" id="control">
+    <property name="name">endsession-control</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="orientation">vertical</property>
     <property name="spacing">10</property>
+    <property name="baseline_position">top</property>
     <child>
       <object class="GtkButton" id="btn_logout">
         <property name="name">module-widget</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
+        <property name="margin_top">20</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
+            <property name="margin_right">10</property>
             <property name="spacing">10</property>
             <child>
               <object class="GtkImage">
+                <property name="name">icon-button</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="pixel_size">24</property>
@@ -48,6 +56,9 @@
             </child>
           </object>
         </child>
+        <style>
+          <class name="endsession"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -60,14 +71,19 @@
         <property name="name">module-widget</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
+            <property name="margin_right">10</property>
             <property name="spacing">10</property>
             <child>
               <object class="GtkImage">
+                <property name="name">icon-button</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="pixel_size">24</property>
@@ -95,6 +111,9 @@
             </child>
           </object>
         </child>
+        <style>
+          <class name="endsession"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -107,14 +126,19 @@
         <property name="name">module-widget</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
+            <property name="margin_right">10</property>
             <property name="spacing">10</property>
             <child>
               <object class="GtkImage">
+                <property name="name">icon-button</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="pixel_size">24</property>
@@ -142,6 +166,9 @@
             </child>
           </object>
         </child>
+        <style>
+          <class name="endsession"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -154,14 +181,19 @@
         <property name="name">module-widget</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
+            <property name="margin_right">10</property>
             <property name="spacing">10</property>
             <child>
               <object class="GtkImage">
+                <property name="name">icon-button</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="pixel_size">24</property>
@@ -190,6 +222,9 @@
             </child>
           </object>
         </child>
+        <style>
+          <class name="endsession"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -202,19 +237,27 @@
         <property name="name">module-widget</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
+            <property name="margin_right">10</property>
             <property name="spacing">10</property>
             <child>
               <object class="GtkImage">
+                <property name="name">icon-button</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="pixel_size">24</property>
                 <property name="icon_name">system-shutdown-symbolic</property>
                 <property name="icon_size">3</property>
+                <style>
+                  <class name="btn-shutdown"/>
+                </style>
               </object>
               <packing>
                 <property name="expand">False</property>

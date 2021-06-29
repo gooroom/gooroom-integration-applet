@@ -35,7 +35,6 @@ struct _DateTimeModulePrivate
 	GtkWidget  *control;
 	GtkWidget  *control_menu;
 	GtkWidget  *details_label;
-	GtkWidget  *lbl_datetime;
 
 	GtkBuilder *builder;
 
@@ -62,7 +61,7 @@ G_DEFINE_TYPE_WITH_PRIVATE (DateTimeModule, datetime_module, G_TYPE_OBJECT)
  * dcgettext(), the translation is still taken from the LC_MESSAGES
  * catalogue and not the LC_TIME one.
  */
-static const gchar *
+const gchar *
 translate_time_format_string (const char *str)
 {
   const char *locale = g_getenv ("LC_TIME");
@@ -87,7 +86,16 @@ translate_time_format_string (const char *str)
   return res;
 }
 
-static gboolean
+gboolean
+get_use_ampm (gpointer data)
+{
+	DateTimeModule *module = DATETIME_MODULE (data);
+	DateTimeModulePrivate *priv = module->priv;
+
+	return priv->use_ampm;
+}
+
+gboolean
 clock_timeout_thread (gpointer data)
 {
 	gchar *fm, *markup;
@@ -121,21 +129,6 @@ clock_timeout_thread (gpointer data)
 			g_free (markup);
 		}
 
-		if (priv->lbl_datetime) {
-			gchar *fm1 = g_date_time_format (dt, "%A");
-			gchar *fm2;
-			if (priv->use_ampm) // 12-hour mode
-				fm2 = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %l:%M %p")));
-			else
-				fm2 = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %R")));
-			markup = g_markup_printf_escaped ("<span size='large'>%s</span>\n<span size='x-large'>%s</span>", fm1, fm2);
-			gtk_label_set_markup (GTK_LABEL (priv->lbl_datetime), markup);
-
-			g_free (fm1);
-			g_free (fm2);
-			g_free (markup);
-		}
-
 		g_date_time_unref (dt);
 	}
 
@@ -160,21 +153,26 @@ on_settings_clicked_cb (GtkButton *button, gpointer data)
 	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, "gnome-datetime-panel.desktop");
 }
 
-static void
+void
 build_control_ui (DateTimeModule *module, GtkSizeGroup *size_group)
 {
     GtkWidget *box, *icon, *label;
 	DateTimeModulePrivate *priv = module->priv;
+	GtkStyleContext *context;
 
 	priv->control = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->control), GTK_RELIEF_NONE);
 
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_container_set_border_width (GTK_CONTAINER (box), 0);
 	gtk_container_add (GTK_CONTAINER (priv->control), box);
 
 	icon = gtk_image_new_from_icon_name ("preferences-system-time-symbolic", GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
+
+    context = gtk_widget_get_style_context (GTK_WIDGET (icon));
+	gtk_style_context_add_class (context, "general-box-icon");
+
 	if (size_group)
 		gtk_size_group_add_widget (size_group, icon);
 	gtk_box_pack_start (GTK_BOX (box), icon, FALSE, FALSE, 0);
@@ -188,6 +186,10 @@ build_control_ui (DateTimeModule *module, GtkSizeGroup *size_group)
 	gtk_box_pack_start (GTK_BOX (box), priv->details_label, TRUE, TRUE, 0);
 
 	icon = gtk_image_new_from_icon_name ("go-next-page-symbolic", GTK_ICON_SIZE_BUTTON);
+
+    context = gtk_widget_get_style_context (GTK_WIDGET (icon));
+	gtk_style_context_add_class (context, "go-next-page");
+
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
 	gtk_box_pack_end (GTK_BOX (box), icon, FALSE, FALSE, 0);
 }
@@ -206,15 +208,15 @@ build_control_menu_ui (DateTimeModule *module)
 	}
 
 	priv->control_menu = GET_WIDGET (priv->builder, "control_menu");
-	priv->lbl_datetime = GET_WIDGET (priv->builder, "lbl_datetime");
 	inner_box          = GET_WIDGET (priv->builder, "inner_box");
 	btn_settings       = GET_WIDGET (priv->builder, "btn_settings");
 
 	calendar = gooroom_calendar_new ();
 	gtk_widget_show (calendar);
 
+	gtk_widget_set_name (inner_box, "inner_box");
 	gtk_box_pack_start (GTK_BOX (inner_box), calendar, FALSE, FALSE, 0);
-	gtk_box_reorder_child (GTK_BOX (inner_box), calendar, 1);
+	gtk_box_reorder_child (GTK_BOX (inner_box), calendar, 0);
 
 	if (priv->clock_timer) {
 		g_source_remove (priv->clock_timer);

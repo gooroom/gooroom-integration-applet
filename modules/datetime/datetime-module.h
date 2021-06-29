@@ -61,6 +61,9 @@ GtkWidget      *datetime_module_control_menu_new     (DateTimeModule *module);
 
 void            datetime_module_control_destroy      (DateTimeModule *module);
 void            datetime_module_control_menu_destroy (DateTimeModule *module);
+gboolean		clock_timeout_thread (gpointer data);
+const gchar *   translate_time_format_string (const char *str);
+gboolean		get_use_ampm (gpointer data);
 
 G_END_DECLS
 

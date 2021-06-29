@@ -62,6 +62,8 @@ GtkWidget      *security_module_control_menu_new     (SecurityModule *module);
 
 void            security_module_control_destroy      (SecurityModule *module);
 void            security_module_control_menu_destroy (SecurityModule *module);
+gchar *         get_lbl_sec_status (gpointer data);
+guint           last_vulnerable_get (void);
 
 G_END_DECLS
 

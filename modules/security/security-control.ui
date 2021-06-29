@@ -8,15 +8,18 @@
     <property name="receives_default">True</property>
     <child>
       <object class="GtkBox">
+        <property name="name">security-control</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="spacing">10</property>
         <child>
           <object class="GtkImage" id="img_status">
             <property name="name">security-icon</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="pixel_size">24</property>
+            <style>
+              <class name="general-box-icon"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -85,6 +88,9 @@
             <property name="can_focus">False</property>
             <property name="pixel_size">24</property>
             <property name="icon_name">go-next-page-symbolic</property>
+            <style>
+              <class name="go-next-page"/>
+            </style>
           </object>
           <packing>
             <property name="expand">False</property>

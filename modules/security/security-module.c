@@ -85,6 +85,19 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 G_DEFINE_TYPE_WITH_PRIVATE (SecurityModule, security_module, G_TYPE_OBJECT)
 
+//GtkWidget *
+gchar *
+get_lbl_sec_status (gpointer data)
+{
+	SecurityModule *module = SECURITY_MODULE (data);
+	SecurityModulePrivate *priv = module->priv;
+
+	gchar *stat = g_strdup (gtk_label_get_text (GTK_LABEL (priv->lbl_sec_status)));
+
+    //return priv->lbl_sec_status;
+
+    return stat;
+}
 
 static void
 notify_notification (NotifyNotification *notification, guint vulnerable)
@@ -145,7 +158,8 @@ last_vulnerable_update (guint vulnerable)
 	g_spawn_command_line_sync (cmd, NULL, NULL, NULL, NULL);
 }
 
-static guint
+guint
+//static guint
 last_vulnerable_get (void)
 {
 	guint vulnerable = 0;
@@ -405,6 +419,7 @@ file_status_changed_cb (GFileMonitor      *monitor,
                         GFileMonitorEvent  event_type,
                         gpointer           data)
 {
+	g_print("file_status_changed_cb\n");
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 

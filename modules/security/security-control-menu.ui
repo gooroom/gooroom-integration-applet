@@ -3,21 +3,28 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkBox" id="box_sec_menu">
+    <property name="name">box_sec_menu</property>
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="orientation">vertical</property>
+    <property name="spacing">10</property>
+    <property name="baseline_position">top</property>
     <child>
       <object class="GtkButton" id="btn_sec_more">
-        <property name="name">module-widget</property>
+        <property name="name">sec-module-widget</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
         <property name="tooltip_text" translatable="yes">Learn more about security status of Gooroom</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
+        <property name="margin_top">20</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
             <property name="label" translatable="yes">Gooroom Security Status View</property>
             <property name="ellipsize">end</property>
             <property name="single_line_mode">True</property>
@@ -34,16 +41,19 @@
     </child>
     <child>
       <object class="GtkButton" id="btn_sec_settings">
-        <property name="name">module-widget</property>
+        <property name="name">sec-module-widget</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
         <property name="tooltip_text" translatable="yes">Settings for Gooroom management</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
             <property name="label" translatable="yes">Gooroom Management Settings</property>
             <property name="ellipsize">end</property>
             <property name="single_line_mode">True</property>
@@ -60,16 +70,19 @@
     </child>
     <child>
       <object class="GtkButton" id="btn_sec_safety">
-        <property name="name">module-widget</property>
+        <property name="name">sec-module-widget</property>
         <property name="visible">True</property>
         <property name="can_focus">True</property>
         <property name="receives_default">True</property>
         <property name="tooltip_text" translatable="yes">Take Safety Measures</property>
+        <property name="margin_left">10</property>
+        <property name="margin_right">10</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
+            <property name="margin_left">10</property>
             <property name="label" translatable="yes">Take Safety Measures</property>
             <property name="ellipsize">end</property>
             <property name="single_line_mode">True</property>

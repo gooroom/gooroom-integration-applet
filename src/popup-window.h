@@ -28,6 +28,7 @@
 #include "modules/security/security-module.h"
 #include "modules/endsession/endsession-module.h"
 #include "modules/nimf/nimf-module.h"
+#include "modules/security/utils/utils.h"
 
 G_BEGIN_DECLS
 

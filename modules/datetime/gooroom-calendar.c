@@ -44,6 +44,7 @@ static void
 gooroom_calendar_init (GooroomCalendar *calendar)
 {
 	GDateTime *dt;
+	GtkStyleContext *context;
 
 	dt = g_date_time_new_now_local ();
 
@@ -55,6 +56,9 @@ gooroom_calendar_init (GooroomCalendar *calendar)
                              g_date_time_get_day_of_month (dt));
 
 	g_date_time_unref (dt);
+
+    context = gtk_widget_get_style_context (GTK_WIDGET (calendar));
+	gtk_style_context_add_class (context, "applet-calendar");
 }
 
 static void

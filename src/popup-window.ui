@@ -5,7 +5,7 @@
   <template class="PopupWindow" parent="GtkWindow">
     <property name="name">GooroomIntegrationWindow</property>
     <property name="can_focus">False</property>
-    <property name="border_width">8</property>
+    <property name="border_width">10</property>
     <property name="resizable">False</property>
     <property name="type_hint">popup-menu</property>
     <property name="skip_taskbar_hint">True</property>
@@ -14,33 +14,40 @@
     <property name="focus_on_map">False</property>
     <property name="decorated">False</property>
     <property name="deletable">False</property>
+    <property name="gravity">south-west</property>
     <child>
       <placeholder/>
     </child>
     <child>
-      <object class="GtkBox">
+      <object class="GtkBox" id="main-box">
         <property name="name">main-box</property>
         <property name="visible">True</property>
         <property name="can_focus">False</property>
         <property name="orientation">vertical</property>
         <child>
           <object class="GtkStack" id="stack">
+            <property name="name">stack</property>
             <property name="visible">True</property>
             <property name="can_focus">False</property>
-            <property name="margin_left">20</property>
-            <property name="margin_right">20</property>
-            <property name="margin_top">20</property>
-            <property name="margin_bottom">30</property>
+            <property name="margin_left">5</property>
+            <property name="margin_right">5</property>
+            <property name="margin_top">5</property>
+            <property name="margin_bottom">5</property>
+            <property name="border_width">0</property>
             <property name="transition_type">crossfade</property>
             <property name="interpolate_size">True</property>
             <child>
               <object class="GtkBox" id="page_1">
+                <property name="name">main-page</property>
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
+                <property name="vexpand">True</property>
+                <property name="border_width">0</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkBox" id="box_user">
+                    <property name="name">box_user</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
@@ -55,25 +62,15 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSeparator">
-                    <property name="name">separator</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
                   <object class="GtkBox" id="box_middle">
+                    <property name="name">box_middle</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">10</property>
                     <child>
                       <object class="GtkBox" id="box_control">
+                        <property name="name">box_control</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="orientation">vertical</property>
@@ -83,13 +80,14 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkBox" id="box_general">
+                        <property name="name">box_general</property>
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="orientation">vertical</property>
@@ -113,11 +111,11 @@
                 </child>
                 <child>
                   <object class="GtkBox" id="box_end">
+                    <property name="name">box_end</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="halign">center</property>
-                    <property name="margin_top">10</property>
-                    <property name="spacing">70</property>
+                    <property name="halign">baseline</property>
+                    <property name="homogeneous">True</property>
                     <child>
                       <object class="GtkButton" id="btn_settings">
                         <property name="name">icon-button</property>
@@ -125,6 +123,7 @@
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
                         <property name="tooltip_text" translatable="yes">Settings</property>
+                        <property name="hexpand">False</property>
                         <property name="relief">none</property>
                         <child>
                           <object class="GtkImage">
@@ -136,7 +135,7 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">0</property>
                       </packing>
@@ -153,13 +152,14 @@
                           <object class="GtkImage">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="xpad">0</property>
                             <property name="pixel_size">24</property>
                             <property name="icon_name">system-lock-screen-symbolic</property>
                           </object>
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
@@ -178,12 +178,14 @@
                             <property name="can_focus">False</property>
                             <property name="pixel_size">24</property>
                             <property name="icon_name">system-shutdown-symbolic</property>
-                            <property name="icon_size">3</property>
                           </object>
                         </child>
+                        <style>
+                          <class name="btn-shutdown"/>
+                        </style>
                       </object>
                       <packing>
-                        <property name="expand">False</property>
+                        <property name="expand">True</property>
                         <property name="fill">True</property>
                         <property name="position">2</property>
                       </packing>
@@ -205,10 +207,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkButton" id="btn_endsession_back">
-                    <property name="name">module-widget</property>
+                    <property name="name">back-module-widget</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -220,10 +222,14 @@
                         <property name="spacing">20</property>
                         <child>
                           <object class="GtkImage">
+                            <property name="name">back-button</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="pixel_size">24</property>
                             <property name="icon_name">go-previous-symbolic</property>
+                            <style>
+                              <class name="back-button"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -235,7 +241,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Back</property>
+                            <property name="label" translatable="yes">Power</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -253,16 +259,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSeparator">
-                    <property name="name">separator</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>
@@ -278,10 +275,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkButton" id="btn_security_back">
-                    <property name="name">module-widget</property>
+                    <property name="name">back-module-widget</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -290,13 +287,17 @@
                       <object class="GtkBox">
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
-                        <property name="spacing">20</property>
+                        <property name="spacing">10</property>
                         <child>
                           <object class="GtkImage">
+                            <property name="name">back-button</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="pixel_size">24</property>
                             <property name="icon_name">go-previous-symbolic</property>
+                            <style>
+                              <class name="back-button"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -305,15 +306,70 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
+                          <object class="GtkImage" id="img_status">
+                            <property name="name">security-icon</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Back</property>
+                            <property name="pixel_size">24</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="spacing">6</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">&lt;b&gt;Security Status&lt;/b&gt;</property>
+                                <property name="use_markup">True</property>
+                                <property name="single_line_mode">True</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">:</property>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel" id="lbl_sec_status">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <property name="label" translatable="yes">Unknown</property>
+                                <property name="use_markup">True</property>
+                                <property name="ellipsize">end</property>
+                                <property name="single_line_mode">True</property>
+                                <property name="max_width_chars">1</property>
+                                <property name="xalign">0</property>
+                              </object>
+                              <packing>
+                                <property name="expand">True</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
@@ -326,16 +382,7 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSeparator">
-                    <property name="name">separator</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>
@@ -351,10 +398,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkButton" id="btn_nimf_back">
-                    <property name="name">module-widget</property>
+                    <property name="name">back-module-widget</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -366,10 +413,14 @@
                         <property name="spacing">20</property>
                         <child>
                           <object class="GtkImage">
+                            <property name="name">back-button</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="pixel_size">24</property>
                             <property name="icon_name">go-previous-symbolic</property>
+                            <style>
+                              <class name="back-button"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -381,7 +432,7 @@
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Back</property>
+                            <property name="label" translatable="yes">Keyboard</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -397,21 +448,6 @@
                     <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
-                </child>
-                <child>
-                  <object class="GtkSeparator">
-                    <property name="name">separator</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
-                </child>
-                <child>
-                  <placeholder/>
                 </child>
               </object>
               <packing>
@@ -424,10 +460,10 @@
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="orientation">vertical</property>
-                <property name="spacing">20</property>
+                <property name="spacing">5</property>
                 <child>
                   <object class="GtkButton" id="btn_datetime_back">
-                    <property name="name">module-widget</property>
+                    <property name="name">back-module-widget</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">False</property>
@@ -439,10 +475,14 @@
                         <property name="spacing">20</property>
                         <child>
                           <object class="GtkImage">
+                            <property name="name">back-button</property>
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
                             <property name="pixel_size">24</property>
                             <property name="icon_name">go-previous-symbolic</property>
+                            <style>
+                              <class name="back-button"/>
+                            </style>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -451,10 +491,9 @@
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel">
+                          <object class="GtkLabel" id="lbl_datetime">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
-                            <property name="label" translatable="yes">Back</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -472,20 +511,14 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkSeparator">
-                    <property name="name">separator</property>
-                    <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                  </object>
-                  <packing>
-                    <property name="expand">False</property>
-                    <property name="fill">True</property>
-                    <property name="position">1</property>
-                  </packing>
+                  <placeholder/>
                 </child>
                 <child>
                   <placeholder/>
                 </child>
+                <style>
+                  <class name="datetime-page"/>
+                </style>
               </object>
               <packing>
                 <property name="name">datetime-page</property>

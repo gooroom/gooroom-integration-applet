@@ -203,6 +203,14 @@ msgstr "구름 종료"
 msgid "Back"
 msgstr "뒤로"
 
+#: ../src/popup-window.ui.h
+msgid "Keyboard"
+msgstr "키보드"
+
+#: ../src/popup-window.ui.h
+msgid "Power"
+msgstr "전원"
+
 #: ../modules/security/security-control.ui.h:1
 msgid "<b>Security Status</b>"
 msgstr "<b>보안 상태</b>"

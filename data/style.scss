@@ -1,0 +1,173 @@
+#main-box {
+  min-width: 340px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
+  background-color: rgba(255, 255, 255, 0.3);
+  font-weight: normal;
+}
+
+#box_user {
+  min-height: 44px;
+  border-radius: 12px;
+  background-color: #e6e9f0;
+  padding: 10px 10px 10px 10px;
+}
+
+#box_middle {
+  border-radius: 12px;
+  background-color: #e6e9f0;
+  padding: 20px 0px 20px 0px;
+}
+
+#box_end {
+  min-height: 44px;
+  border-radius: 12px;
+  background-color: #e6e9f0;
+  padding: 10px 34px 10px 34px;
+}
+
+#box_control,
+#box_general {
+  padding: 0px 15px 0px 15px;
+}
+
+.control-box-icon {
+  margin: 0 15px 0 0;
+  padding: 5px;
+  border-radius: 15px;
+  background-color: #3e6ddc;
+  color: #ffffff;
+}
+
+.general-box-icon {
+  margin: 0 15px 0 0;
+  padding: 5px;
+  border-radius: 15px;
+  background-color: #78899d;
+  color: #ffffff;
+}
+
+#module-widget,
+#module-widget.btn_settings,
+#icon-button {
+  color: #303030;
+  border-radius: 12px;
+  background-color: #e6e9f0;
+  border: none;
+}
+
+#module-widget:hover .go-next-page,
+#back-module-widget:hover image {
+  color: #3e6ddc;
+  border: none;
+  background-color: transparent;
+}
+
+#back-module-widget {
+  min-height: 44px;
+  padding: 10px 10px 10px 10px;
+  color: #303030;
+  border-radius: 12px;
+  background-color: #e6e9f0;
+  border: none;
+  font-weight: bold;
+}
+
+#sec-module-widget {
+  min-height: 34px;
+  color: #303030;
+  border-radius: 12px;
+  border:none;
+  padding: 8px 10px 7px 10px;
+}
+
+#nimf-module-widget {
+  min-height: 34px;
+  color: #303030;
+  border-radius: 12px;
+  border:none;
+  padding: 8px 20px 7px 20px;
+  margin: 10px 3px 0px 3px;
+}
+
+#nimf-selected {
+  color: #3e6ddc;
+}
+
+#module-widget.btn_datetime_settings {
+  padding: 14px 10px 14px 10px;
+}
+
+#sec-module-widget:hover,
+#nimf-module-widget:hover,
+#module-widget.btn_datetime_settings:hover {
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.1);
+  border: none;
+}
+
+#inner_box {
+  background-color: #e6e9f0;
+  border-radius: 10px;
+  border: none;
+}
+
+#icon-button:hover,
+#module-widget.endsession:hover,
+#module-widget.endsession:hover image {
+  color: #3e6ddc;
+  background-color: transparent;
+}
+
+#icon-button.btn-shutdown,
+#icon-button.btn-shutdown:hover{
+  color: #cb011a;
+  background-color: transparent;
+}
+
+#module-widget.endsession:hover{ 
+  color: #303030;
+  background-color: transparent;
+}
+
+#box_sec_menu,
+#datetime_control_menu,
+#endsession-control {
+  min-height: 50px;
+  color: #303030;
+  border-radius: 12px;
+  background-color: #e6e9f0;
+}
+
+#control_menu.datetime { 
+  color: #303030;
+  border-radius: 12px;
+  background-color: #e6e9f0;
+  padding: 5px 5px 5px 5px;
+}
+
+calendar {
+  color: #000100;
+  border: transparent;
+  border-radius:12px;
+  background-color: #e6e9f0;
+}
+
+calendar.header,
+calendar.button {
+  color: #000100;
+  border: none;
+}
+
+calendar:selected,
+calendar.button:hover {
+  color: #1f53cf;
+}
+
+calendar.button:disabled {
+  color: rgba(92, 97, 108, 0.55);
+}
+
+calendar:indeterminate,
+calendar.highlight {
+  color: rgba(0, 1, 0, 0.5);
+}

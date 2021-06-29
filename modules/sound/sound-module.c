@@ -345,8 +345,9 @@ build_control_ui (SoundModule *module, GtkSizeGroup *size_group)
 {
 	GtkWidget *scale, *icon;
 	SoundModulePrivate *priv = module->priv;
+	GtkStyleContext *context;
 
-	priv->control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
+	priv->control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 	gtk_container_set_border_width (GTK_CONTAINER (priv->control), 0);
 
 	priv->status_button = gtk_button_new ();
@@ -360,6 +361,10 @@ build_control_ui (SoundModule *module, GtkSizeGroup *size_group)
 
 	priv->status_icon = icon = gtk_image_new_from_icon_name ("audio-volume-muted-symbolic",
                                                              GTK_ICON_SIZE_BUTTON);
+
+    context = gtk_widget_get_style_context (GTK_WIDGET (icon));
+	gtk_style_context_add_class (context, "control-box-icon");
+
 	gtk_container_add (GTK_CONTAINER (priv->status_button), icon);
 
 	priv->scale = scale = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);

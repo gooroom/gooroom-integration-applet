@@ -33,6 +33,8 @@
 
 #include "common.h"
 #include "popup-window.h"
+#include "modules/datetime/datetime-module.h"
+#include "modules/security/security-module.h"
 
 enum {
 	CONTROL_TYPE_USER = 0,
@@ -70,6 +72,10 @@ struct _PopupWindowPrivate
 
 	GtkWidget *stack;
 
+	GtkWidget *lbl_datetime;
+	GtkWidget *lbl_sec_status;
+	GtkWidget *img_status;
+
 	UserModule       *user_module;
 	SoundModule      *sound_module;
 	SecurityModule   *security_module;
@@ -78,7 +84,9 @@ struct _PopupWindowPrivate
 	EndSessionModule *endsession_module;
 	NimfModule       *nimf_module;
 
-	gboolean block_focus_out_event;
+	gboolean    block_focus_out_event;
+	gboolean    use_ampm;
+	gboolean    datetime_destroyed;
 
 	GtkSizeGroup *size_group;
 
@@ -286,7 +294,6 @@ adjust_layout (PopupWindow *window)
 
 		gtk_widget_get_preferred_height (GTK_WIDGET (window), NULL, &pref_h);
 	}
-
 #if 0
     GdkRectangle area;
     GdkMonitor *primary;
@@ -330,6 +337,33 @@ adjust_layout (PopupWindow *window)
 #endif
 }
 
+static gboolean
+set_lbl_datetime (PopupWindow *window)
+{
+	PopupWindowPrivate *priv = window->priv;
+
+	gchar *fm, *markup;
+	GDateTime *dt = NULL;
+
+	dt = g_date_time_new_now_local ();
+	if (dt) {
+		if (priv->lbl_datetime) {
+			if (priv->use_ampm) // 12-hour mode
+				fm = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %l:%M:%S %p")));
+			else
+				fm = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %T")));
+			markup = g_markup_printf_escaped ("<b>%s</b>", fm);
+			gtk_label_set_markup (GTK_LABEL (priv->lbl_datetime), markup);
+
+			g_free (fm);
+			g_free (markup);
+		}
+		g_date_time_unref (dt);
+	}
+
+	return !priv->datetime_destroyed;
+}
+
 static void
 on_endsession_back_button_clicked_cb (GtkWidget *button, gpointer data)
 {
@@ -360,6 +394,8 @@ on_datetime_back_button_clicked_cb (GtkButton *button, gpointer data)
 	PopupWindow *window = POPUP_WINDOW (data);
 	PopupWindowPrivate *priv = window->priv;
 
+	priv->datetime_destroyed = TRUE;
+
 	gtk_stack_set_visible_child_name (GTK_STACK (priv->stack), "main-page");
 	if (priv->datetime_module) {
 		datetime_module_control_menu_destroy (priv->datetime_module);
@@ -379,10 +415,43 @@ on_nimf_back_button_clicked_cb (GtkButton *button, gpointer data)
 }
 
 static void
+set_lbl_sec_security (PopupWindow *window)
+{
+	PopupWindowPrivate *priv = window->priv;
+
+	gchar *sec_stat, *icon;
+	guint last_vulnerable = last_vulnerable_get ();
+
+	if (last_vulnerable == 0) {
+		icon = "security-status-safety";
+		sec_stat = g_markup_printf_escaped ("<b><i><span foreground=\"#7ED321\">%s</span></i></b>", _("Safety"));
+	} else {
+		icon = "security-status-vulnerable";
+		sec_stat = g_markup_printf_escaped ("<b><i><span foreground=\"#ff0000\">%s</span></i></b>", _("Vulnerable"));
+	}
+
+	if (priv->lbl_sec_status)
+	{
+//		gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status), icon, GTK_ICON_SIZE_BUTTON);
+//		gtk_image_set_pixel_size (GTK_IMAGE (priv->img_status), STATUS_ICON_SIZE);
+
+		//sec_stat = get_lbl_sec_status (priv->security_module);
+		gtk_label_set_markup (GTK_LABEL (priv->lbl_sec_status),sec_stat);
+	}
+
+	g_free (sec_stat);
+}
+
+static void
 on_security_button_clicked_cb (GtkButton *button, gpointer data)
 {
 	PopupWindow *window = POPUP_WINDOW (data);
 	PopupWindowPrivate *priv = window->priv;
+	GFile *file;
+	GError *error = NULL;
+	GFileMonitor *monitor;
+
+	set_lbl_sec_security (window);
 
 	if (priv->security_module) {
 		GtkWidget *w = NULL;
@@ -394,7 +463,19 @@ on_security_button_clicked_cb (GtkButton *button, gpointer data)
 				gtk_stack_set_visible_child (GTK_STACK (priv->stack), child);
 			}
 		}
+
+		file = g_file_new_for_path (GOOROOM_SECURITY_STATUS_VULNERABLE);
+
+		error = NULL;
+		monitor = g_file_monitor_file (file, G_FILE_MONITOR_NONE, NULL, &error);
+		if (error) {
+			g_error_free (error);
+		} else {
+			g_signal_connect (monitor, "changed", G_CALLBACK (set_lbl_sec_security), window);
+		}
+		g_object_unref (file);
 	}
+
 }
 
 static void
@@ -422,6 +503,11 @@ on_datetime_button_clicked_cb (GtkButton *button, gpointer data)
 	PopupWindow *window = POPUP_WINDOW (data);
 	PopupWindowPrivate *priv = window->priv;
 
+	priv->use_ampm = get_use_ampm (priv->datetime_module);
+	priv->datetime_destroyed = FALSE;
+
+	set_lbl_datetime (window);
+
 	if (priv->datetime_module) {
 		GtkWidget *w = NULL;
 		w = datetime_module_control_menu_new (priv->datetime_module);
@@ -433,6 +519,8 @@ on_datetime_button_clicked_cb (GtkButton *button, gpointer data)
 			}
 		}
 	}
+
+	gdk_threads_add_timeout (1000, (GSourceFunc) set_lbl_datetime, window);
 }
 
 static void
@@ -445,6 +533,8 @@ on_nimf_button_clicked_cb (GtkButton *button, gpointer data)
 		GtkWidget *w = NULL;
 		w = nimf_module_control_menu_new (priv->nimf_module);
 		if (w) {
+			gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
+
 			GtkWidget *child = gtk_stack_get_child_by_name (GTK_STACK (priv->stack), "nimf-page");
 			if (child) {
 				gtk_box_pack_start (GTK_BOX (child), w, TRUE, TRUE, 0);
@@ -605,6 +695,7 @@ static void
 popup_window_init (PopupWindow *window)
 {
 	PopupWindowPrivate *priv;
+	GtkCssProvider	   *provider;
 
 	priv = window->priv = popup_window_get_instance_private (window);
 
@@ -619,9 +710,20 @@ popup_window_init (PopupWindow *window)
 	priv->nimf_module       = NULL;
 	priv->grab_pointer      = NULL;
 
+	priv->img_status        = NULL;
+
 	priv->block_focus_out_event = FALSE;
+	priv->use_ampm				= FALSE;
+	priv->datetime_destroyed    = FALSE;
 
 	priv->size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
+
+	provider = gtk_css_provider_new ();
+	gtk_css_provider_load_from_resource (provider, "/kr/gooroom/IntegrationApplet/ui/style.scss");
+	gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                               GTK_STYLE_PROVIDER (provider),
+                                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	g_object_unref (provider);
 
 	gtk_window_stick (GTK_WINDOW (window));
 	gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
@@ -750,6 +852,9 @@ popup_window_class_init (PopupWindowClass *klass)
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_datetime_back);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_nimf_back);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, stack);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_datetime);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_sec_status);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, img_status);
 }
 
 PopupWindow *
