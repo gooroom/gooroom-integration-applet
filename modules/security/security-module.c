@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -214,7 +214,7 @@ read_log_parser_result (GIOChannel   *source,
 	if (!outputs->str || outputs->len <= 0) {
 		icon = "security-status-unknown";
 		if (priv->control) {
-			markup = g_markup_printf_escaped ("<b><i><span foreground=\"#ffffff\">%s</span></i></b>", _("Unknown"));
+			markup = g_markup_printf_escaped ("<b><i><span>%s</span></i></b>", _("Unknown"));
 		}
 
 		if (priv->notification) {

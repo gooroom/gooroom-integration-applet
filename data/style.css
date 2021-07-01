@@ -3,6 +3,7 @@
   box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.3);
   background-color: rgba(255, 255, 255, 0.3);
   font-weight: normal;
+  border-radius: 12px;
 }
 
 #box_user {
@@ -80,6 +81,11 @@
   padding: 8px 10px 7px 10px;
 }
 
+.lbl_sec_status {
+  color: rgba (0, 1, 0, 0.5);
+  font-weight: bold;
+}
+
 #nimf-module-widget {
   min-height: 34px;
   color: #303030;
@@ -94,6 +100,7 @@
 }
 
 #module-widget.btn_datetime_settings {
+  background-color: transparent;
   padding: 14px 10px 14px 10px;
 }
 

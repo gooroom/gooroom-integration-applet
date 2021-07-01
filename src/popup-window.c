@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -419,14 +419,15 @@ set_lbl_sec_security (PopupWindow *window)
 {
 	PopupWindowPrivate *priv = window->priv;
 
-	gchar *sec_stat, *icon;
+	//gchar *icon;
+	gchar *sec_stat;
 	guint last_vulnerable = last_vulnerable_get ();
 
 	if (last_vulnerable == 0) {
-		icon = "security-status-safety";
+		//icon = "security-status-safety";
 		sec_stat = g_markup_printf_escaped ("<b><i><span foreground=\"#7ED321\">%s</span></i></b>", _("Safety"));
 	} else {
-		icon = "security-status-vulnerable";
+		//icon = "security-status-vulnerable";
 		sec_stat = g_markup_printf_escaped ("<b><i><span foreground=\"#ff0000\">%s</span></i></b>", _("Vulnerable"));
 	}
 
@@ -435,8 +436,8 @@ set_lbl_sec_security (PopupWindow *window)
 //		gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status), icon, GTK_ICON_SIZE_BUTTON);
 //		gtk_image_set_pixel_size (GTK_IMAGE (priv->img_status), STATUS_ICON_SIZE);
 
-		//sec_stat = get_lbl_sec_status (priv->security_module);
-		gtk_label_set_markup (GTK_LABEL (priv->lbl_sec_status),sec_stat);
+		sec_stat = get_lbl_sec_status (priv->security_module);
+		gtk_label_set_markup (GTK_LABEL (priv->lbl_sec_status), sec_stat);
 	}
 
 	g_free (sec_stat);
@@ -719,7 +720,7 @@ popup_window_init (PopupWindow *window)
 	priv->size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
 
 	provider = gtk_css_provider_new ();
-	gtk_css_provider_load_from_resource (provider, "/kr/gooroom/IntegrationApplet/ui/style.scss");
+	gtk_css_provider_load_from_resource (provider, "/kr/gooroom/IntegrationApplet/ui/style.css");
 	gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
                                                GTK_STYLE_PROVIDER (provider),
                                                GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);

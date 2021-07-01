@@ -77,7 +77,6 @@ PKG_CHECK_MODULES(UDEV, libudev >= 237)
 PKG_CHECK_MODULES(LIBNOTIFY, libnotify >= 0.7.0)
 PKG_CHECK_MODULES(ACCOUNTSSERVICE, accountsservice >= $ACCOUNTSSERVICE_REQUIRED)
 PKG_CHECK_MODULES(STARTUP_NOTIFICATION, libstartup-notification-1.0 >= 0.12)
-PKG_CHECK_MODULES(NIMF, nimf)
 PKG_CHECK_MODULES(GNOME_DESKTOP, gnome-desktop-3.0)
 
 GNOME_PANEL_MODULES_DIR=`$PKG_CONFIG --variable=modulesdir libgnome-panel`
@@ -96,7 +95,6 @@ AC_OUTPUT([
   modules/security/Makefile
   modules/security/utils/Makefile
   modules/endsession/Makefile
-  modules/nimf/Makefile
   src/Makefile
   po/Makefile.in
 ])

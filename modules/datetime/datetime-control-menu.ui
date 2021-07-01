@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkScrolledWindow" id="control_menu">
     <property name="name">datetime_control_menu</property>
     <property name="visible">True</property>
-    <property name="can_focus">True</property>
-    <property name="hscrollbar_policy">never</property>
-    <property name="vscrollbar_policy">external</property>
+    <property name="can-focus">True</property>
+    <property name="hscrollbar-policy">never</property>
+    <property name="vscrollbar-policy">external</property>
     <child>
       <object class="GtkViewport">
         <property name="name">outer_box</property>
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="shadow_type">none</property>
+        <property name="can-focus">False</property>
+        <property name="shadow-type">none</property>
         <child>
           <object class="GtkBox" id="inner_box">
             <property name="name">inner_box</property>
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <property name="spacing">5</property>
             <child>
@@ -31,18 +31,19 @@
               <object class="GtkButton" id="btn_settings">
                 <property name="name">module-widget</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
-                <property name="margin_left">10</property>
-                <property name="margin_right">10</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="margin-left">10</property>
+                <property name="margin-right">10</property>
+                <property name="relief">none</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
-                    <property name="margin_left">10</property>
+                    <property name="can-focus">False</property>
+                    <property name="margin-left">10</property>
                     <property name="label" translatable="yes">DateTime Settings</property>
                     <property name="ellipsize">end</property>
-                    <property name="max_width_chars">1</property>
+                    <property name="max-width-chars">1</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>

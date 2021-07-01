@@ -4,6 +4,6 @@
     <file preprocess="xml-stripblanks">popup-window.ui</file>
   </gresource>
   <gresource prefix="/kr/gooroom/IntegrationApplet/ui">
-	<file compressed="true" alias="style.scss">../data/style.scss</file>
+	<file compressed="true" alias="style.css">../data/style.css</file>
   </gresource>
 </gresources>
