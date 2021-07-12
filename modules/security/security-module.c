@@ -60,7 +60,7 @@ struct _SecurityModulePrivate
 	GtkWidget *btn_sec_more;
 	GtkWidget *box_sec_menu;
 	GtkWidget *btn_sec_safety;
-	GtkWidget *btn_sec_settings;
+//	GtkWidget *btn_sec_settings;
 
 	GSettings *settings;
 
@@ -77,6 +77,7 @@ struct _SecurityModulePrivate
 
 enum {
 	LAUNCH_DESKTOP,
+	STATUS_CHANGED,
 	LAST_SIGNAL
 };
 
@@ -84,20 +85,6 @@ static guint signals[LAST_SIGNAL] = { 0 };
 
 
 G_DEFINE_TYPE_WITH_PRIVATE (SecurityModule, security_module, G_TYPE_OBJECT)
-
-//GtkWidget *
-gchar *
-get_lbl_sec_status (gpointer data)
-{
-	SecurityModule *module = SECURITY_MODULE (data);
-	SecurityModulePrivate *priv = module->priv;
-
-	gchar *stat = g_strdup (gtk_label_get_text (GTK_LABEL (priv->lbl_sec_status)));
-
-    //return priv->lbl_sec_status;
-
-    return stat;
-}
 
 static void
 notify_notification (NotifyNotification *notification, guint vulnerable)
@@ -147,20 +134,8 @@ notify_notification (NotifyNotification *notification, guint vulnerable)
 	g_free (full_body);
 }
 
-static void
-last_vulnerable_update (guint vulnerable)
-{
-	gchar *pkexec = NULL, *cmd = NULL;
-
-	pkexec = g_find_program_in_path ("pkexec");
-	cmd = g_strdup_printf ("%s %s %u", pkexec, GOOROOM_SECURITY_STATUS_VULNERABLE_HELPER, vulnerable);
-
-	g_spawn_command_line_sync (cmd, NULL, NULL, NULL, NULL);
-}
-
-guint
-//static guint
-last_vulnerable_get (void)
+static guint
+get_last_vulnerable (void)
 {
 	guint vulnerable = 0;
 	gchar *str_vulnerable = NULL;
@@ -178,6 +153,18 @@ last_vulnerable_get (void)
 	g_free (str_vulnerable);
 
 	return vulnerable;
+}
+
+
+static void
+last_vulnerable_update (guint vulnerable)
+{
+	gchar *pkexec = NULL, *cmd = NULL;
+
+	pkexec = g_find_program_in_path ("pkexec");
+	cmd = g_strdup_printf ("%s %s %u", pkexec, GOOROOM_SECURITY_STATUS_VULNERABLE_HELPER, vulnerable);
+
+	g_spawn_command_line_sync (cmd, NULL, NULL, NULL, NULL);
 }
 
 static void
@@ -274,7 +261,7 @@ read_log_parser_result (GIOChannel   *source,
 		}
 	}
 
-	guint last_vulnerable = last_vulnerable_get ();
+	guint last_vulnerable = get_last_vulnerable ();
 
 	if (vulnerable == 0 && last_vulnerable == 0) {
 		icon = "security-status-safety";
@@ -313,14 +300,16 @@ read_log_parser_result (GIOChannel   *source,
 error:
 	g_string_free (outputs, TRUE);
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon, GTK_ICON_SIZE_BUTTON);
+	gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon, GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 
 	if (priv->control) {
-		gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status), icon, GTK_ICON_SIZE_BUTTON);
+		gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status), icon, GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->img_status), STATUS_ICON_SIZE);
 
 		gtk_label_set_markup (GTK_LABEL (priv->lbl_sec_status), markup);
+
+		g_signal_emit (G_OBJECT (module), signals[STATUS_CHANGED], 0, markup);
 
 		g_free (markup);
 	}
@@ -352,17 +341,19 @@ security_status_update_idle (gpointer data)
 	if (!run_security_log_parser_async (&priv->log_parser_pid, read_log_parser_result, data)) {
 		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray),
                                       "security-status-unknown",
-                                      GTK_ICON_SIZE_BUTTON);
+                                      GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 
 		if (priv->control) {
-			gchar *markup = g_markup_printf_escaped ("<b><i>%s</i></b>", _("Unknown"));
+			gchar *markup = g_markup_printf_escaped ("%s", _("Unknown"));
 
 			gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status),
-                                          "security-status-unknown", GTK_ICON_SIZE_BUTTON);
+                                          "security-status-unknown", GTK_ICON_SIZE_LARGE_TOOLBAR);
 			gtk_image_set_pixel_size (GTK_IMAGE (priv->img_status), STATUS_ICON_SIZE);
 
 			gtk_label_set_markup (GTK_LABEL (priv->lbl_sec_status), markup);
+
+			g_signal_emit (G_OBJECT (module), signals[STATUS_CHANGED], 0, markup);
 
 			g_free (markup);
 		}
@@ -419,7 +410,6 @@ file_status_changed_cb (GFileMonitor      *monitor,
                         GFileMonitorEvent  event_type,
                         gpointer           data)
 {
-	g_print("file_status_changed_cb\n");
 	SecurityModule *module = SECURITY_MODULE (data);
 	SecurityModulePrivate *priv = module->priv;
 
@@ -468,14 +458,6 @@ show_detail_cb (NotifyNotification *n, gchar *action, gpointer data)
 }
 
 static void
-on_settings_button_clicked (GtkButton *button, gpointer data)
-{
-	SecurityModule *module = SECURITY_MODULE (data);
-
-	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, SECURITY_STATUS_SETTINGS_DESKTOP);
-}
-
-static void
 on_more_button_clicked (GtkButton *button, gpointer data)
 {
 	on_security_detail_activate (NULL, data);
@@ -500,12 +482,14 @@ on_safety_measure_button_clicked (GtkButton *button, gpointer data)
 }
 
 static void
-build_control_ui (SecurityModule *module, GtkSizeGroup *size_group)
+build_control_ui (SecurityModule *module)
 {
 	GError *error = NULL;
 	SecurityModulePrivate *priv = module->priv;
 
-	gtk_builder_add_from_resource (priv->builder, "/kr/gooroom/IntegrationApplet/modules/security/security-control.ui", &error);
+	gtk_builder_add_from_resource (priv->builder,
+                                   "/kr/gooroom/IntegrationApplet/modules/security/security-control.ui",
+                                   &error);
 	if (error) {
 		g_error_free (error);
 		return;
@@ -517,11 +501,8 @@ build_control_ui (SecurityModule *module, GtkSizeGroup *size_group)
 
 	gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status),
                                   "security-status-unknown",
-                                  GTK_ICON_SIZE_BUTTON);
+                                  GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (priv->img_status), STATUS_ICON_SIZE);
-
-	if (size_group)
-		gtk_size_group_add_widget (size_group, priv->img_status);
 
 	gtk_widget_show_all (priv->control);
 }
@@ -541,11 +522,9 @@ build_control_menu_ui (SecurityModule *module)
 	priv->box_sec_menu = GET_WIDGET (priv->builder, "box_sec_menu");
 	priv->btn_sec_more = GET_WIDGET (priv->builder, "btn_sec_more");
 	priv->btn_sec_safety = GET_WIDGET (priv->builder, "btn_sec_safety");
-	priv->btn_sec_settings = GET_WIDGET (priv->builder, "btn_sec_settings");
 
 	g_signal_connect (G_OBJECT (priv->btn_sec_more), "clicked", G_CALLBACK (on_more_button_clicked), module);
 	g_signal_connect (G_OBJECT (priv->btn_sec_safety), "clicked", G_CALLBACK (on_safety_measure_button_clicked), module);
-	g_signal_connect (G_OBJECT (priv->btn_sec_settings), "clicked", G_CALLBACK (on_settings_button_clicked), module);
 
 	if (is_admin_group () && is_local_user ()) {
 		gtk_widget_show (priv->btn_sec_safety);
@@ -595,6 +574,16 @@ security_module_class_init (SecurityModuleClass *class)
                                             G_SIGNAL_RUN_LAST,
                                             G_STRUCT_OFFSET(SecurityModuleClass,
                                             launch_desktop),
+                                            NULL, NULL,
+                                            g_cclosure_marshal_VOID__STRING,
+                                            G_TYPE_NONE, 1,
+                                            G_TYPE_STRING);
+
+	signals[STATUS_CHANGED] = g_signal_new ("status-changed",
+                                            MODULE_TYPE_SECURITY,
+                                            G_SIGNAL_RUN_LAST,
+                                            G_STRUCT_OFFSET(SecurityModuleClass,
+                                            status_changed),
                                             NULL, NULL,
                                             g_cclosure_marshal_VOID__STRING,
                                             G_TYPE_NONE, 1,
@@ -666,7 +655,8 @@ security_module_tray_new (SecurityModule *module)
 	SecurityModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("security-status-unknown", GTK_ICON_SIZE_BUTTON);
+		priv->tray = gtk_image_new_from_icon_name ("security-status-unknown",
+                                                   GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -678,13 +668,13 @@ security_module_tray_new (SecurityModule *module)
 }
 
 GtkWidget *
-security_module_control_new (SecurityModule *module, GtkSizeGroup *size_group)
+security_module_control_new (SecurityModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	SecurityModulePrivate *priv = module->priv;
 
-	build_control_ui (module, size_group);
+	build_control_ui (module);
 
 	g_timeout_add (100, (GSourceFunc) security_status_update_continually_idle, module);
 
@@ -732,4 +722,10 @@ security_module_control_menu_destroy (SecurityModule *module)
 		gtk_widget_destroy (priv->box_sec_menu);
 		priv->box_sec_menu = NULL;
 	}
+}
+
+const gchar *
+security_module_get_security_status (SecurityModule *module)
+{
+	return gtk_label_get_text (GTK_LABEL (module->priv->lbl_sec_status));
 }

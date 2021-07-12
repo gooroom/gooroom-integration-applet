@@ -324,19 +324,20 @@ update_primary (UpDevice *device, PowerModule *module)
 	icon_name = get_battery_icon_name (percentage, state);
 
 	if (priv->tray && gtk_widget_get_visible (priv->tray)) {
-		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_BUTTON);
+		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
 	if (priv->bat_control && gtk_widget_get_visible (priv->bat_control)) {
 		if (priv->bat_desc) {
-			gchar *s = g_strdup_printf ("<b>%s (%d%%, %s)</b>", details1, (int)(percentage + 0.5), details2);
+			gchar *s = g_strdup_printf ("%s (%d%%, %s)", details1, (int)(percentage + 0.5), details2);
 			gtk_label_set_markup (GTK_LABEL (priv->bat_desc), s);
 			g_free (s);
 		}
 
 		if (priv->bat_icon) {
-			gtk_image_set_from_icon_name (GTK_IMAGE (priv->bat_icon), icon_name, GTK_ICON_SIZE_BUTTON);
+			gtk_image_set_from_icon_name (GTK_IMAGE (priv->bat_icon),
+                                          icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
 			gtk_image_set_pixel_size (GTK_IMAGE (priv->bat_icon), STATUS_ICON_SIZE);
 		}
 	}
@@ -471,29 +472,30 @@ on_battery_control_button_clicked_cb (GtkButton *button, gpointer data)
 }
 
 static void
-build_battery_control_ui (PowerModule *module, GtkSizeGroup *size_group)
+build_battery_control_ui (PowerModule *module)
 {
-    GtkWidget *hbox;
+    GtkWidget *hbox, *icon;
 	PowerModulePrivate *priv = module->priv;
+	GtkStyleContext *context;
 
 	priv->bat_control = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->bat_control), GTK_RELIEF_NONE);
 
-	hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
+	hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
 	gtk_container_set_border_width (GTK_CONTAINER (hbox), 0);
 
-	priv->bat_icon = gtk_image_new_from_icon_name ("battery-full-charged",
-                                                   GTK_ICON_SIZE_BUTTON);
-	if (size_group)
-		gtk_size_group_add_widget (size_group, priv->bat_icon);
+	priv->bat_icon = icon = gtk_image_new_from_icon_name ("battery-full-charged", GTK_ICON_SIZE_LARGE_TOOLBAR);
+	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
 	gtk_box_pack_start (GTK_BOX (hbox), priv->bat_icon, FALSE, FALSE, 0);
+
+	context = gtk_widget_get_style_context (icon);
+	gtk_style_context_add_class (context, "rounded-icon-style2");
 
 	priv->bat_desc = gtk_label_new ("");
 	gtk_label_set_xalign (GTK_LABEL (priv->bat_desc), 0);
 	gtk_label_set_max_width_chars (GTK_LABEL (priv->bat_desc), 1);
 	gtk_label_set_ellipsize (GTK_LABEL (priv->bat_desc), PANGO_ELLIPSIZE_END);
 	gtk_label_set_line_wrap (GTK_LABEL (priv->bat_desc), FALSE);
-
 	gtk_box_pack_start (GTK_BOX (hbox), priv->bat_desc, TRUE, TRUE, 0);
 
 	gtk_container_add (GTK_CONTAINER (priv->bat_control), hbox);
@@ -503,23 +505,24 @@ build_battery_control_ui (PowerModule *module, GtkSizeGroup *size_group)
 }
 
 static void
-build_brightness_control_ui (PowerModule *module, GtkSizeGroup *size_group)
+build_brightness_control_ui (PowerModule *module)
 {
 	GtkWidget *icon;
     GtkWidget *scale;
 	PowerModulePrivate *priv = module->priv;
+	GtkStyleContext *context;
 
-	priv->br_control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
+	priv->br_control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
 	gtk_container_set_border_width (GTK_CONTAINER (priv->br_control), 0);
 
-	icon = gtk_image_new_from_icon_name ("display-brightness-symbolic", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name ("display-brightness-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
-	if (size_group)
-		gtk_size_group_add_widget (size_group, icon);
 	gtk_box_pack_start (GTK_BOX (priv->br_control), icon, FALSE, FALSE, 0);
 
-	priv->br_scale = scale = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);
+	context = gtk_widget_get_style_context (icon);
+	gtk_style_context_add_class (context, "rounded-icon-style1");
 
+	priv->br_scale = scale = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);
 	gtk_range_set_inverted (GTK_RANGE (scale), FALSE);
 	gtk_scale_set_draw_value (GTK_SCALE (scale), FALSE);
 	gtk_range_set_round_digits (GTK_RANGE (scale), 0);
@@ -647,13 +650,9 @@ power_module_finalize (GObject *object)
 	power_module_battery_control_destroy (module);
 	power_module_brightness_control_destroy (module);
 
-	if (priv->devices) {
-		g_ptr_array_foreach (priv->devices, (GFunc) g_object_unref, NULL);
-		g_clear_pointer (&priv->devices, g_ptr_array_unref);
-	}
-
 	g_clear_object (&priv->up_client);
 	g_clear_object (&priv->screen_proxy);
+	g_clear_pointer (&priv->devices, g_ptr_array_unref);
 
 	G_OBJECT_CLASS (power_module_parent_class)->finalize (object);
 }
@@ -688,7 +687,7 @@ power_module_init (PowerModule *module)
 
 	priv->tray = NULL;
 	priv->up_client = up_client_new ();
-	priv->devices   = up_client_get_devices2 (priv->up_client);
+	priv->devices = up_client_get_devices2 (priv->up_client);
 
 	g_dbus_proxy_new_for_bus (G_BUS_TYPE_SESSION,
 			G_DBUS_PROXY_FLAGS_NONE,
@@ -738,7 +737,8 @@ power_module_tray_new (PowerModule *module)
 
 	if (has_battery (module)) {
 		if (!priv->tray) {
-			priv->tray = gtk_image_new_from_icon_name ("battery-full-charged", GTK_ICON_SIZE_BUTTON);
+			priv->tray = gtk_image_new_from_icon_name ("battery-full-charged",
+                                                       GTK_ICON_SIZE_LARGE_TOOLBAR);
 			gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 		}
 
@@ -753,13 +753,13 @@ power_module_tray_new (PowerModule *module)
 }
 
 GtkWidget *
-power_module_brightness_control_new (PowerModule *module, GtkSizeGroup *size_group)
+power_module_brightness_control_new (PowerModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	PowerModulePrivate *priv = module->priv;
 
-	build_brightness_control_ui (module, size_group);
+	build_brightness_control_ui (module);
 
 	gtk_widget_show_all (priv->br_control);
 
@@ -769,14 +769,14 @@ power_module_brightness_control_new (PowerModule *module, GtkSizeGroup *size_gro
 }
 
 GtkWidget *
-power_module_battery_control_new (PowerModule *module, GtkSizeGroup *size_group)
+power_module_battery_control_new (PowerModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	PowerModulePrivate *priv = module->priv;
 
 	if (has_battery (module)) {
-		build_battery_control_ui (module, size_group);
+		build_battery_control_ui (module);
 		gtk_widget_show_all (priv->bat_control);
 
 		up_client_changed (priv->up_client, NULL, module);
@@ -819,6 +819,6 @@ power_module_brightness_control_destroy (PowerModule *module)
 
 	if (priv->br_control) {
 		gtk_widget_destroy (priv->br_control);
-		priv->br_control= NULL;
+		priv->br_control = NULL;
 	}
 }

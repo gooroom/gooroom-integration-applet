@@ -39,15 +39,15 @@ gooroom_integration_get_applet_info (const gchar *id)
 	return info;
 }
 
-static const gchar *
-gooroom_integration_get_applet_id_from_iid (const gchar *iid)
-{
-	if (g_strcmp0 (iid, "GooroomIntegration") == 0 ||
-		g_strcmp0 (iid, "gooroom_integration::gooroom_integration") == 0)
-	return "gooroom-integration-applet";
-
-	return NULL;
-}
+//static const gchar *
+//gooroom_integration_get_applet_id_from_iid (const gchar *iid)
+//{
+//	if (g_strcmp0 (iid, "GooroomIntegration") == 0 ||
+//		g_strcmp0 (iid, "gooroom_integration::gooroom_integration") == 0)
+//	return "gooroom-integration-applet";
+//
+//	return NULL;
+//}
 
 void
 gp_module_load (GpModule *module)
@@ -66,5 +66,5 @@ gp_module_load (GpModule *module)
 	gp_module_set_applet_ids (module, "gooroom-integration-applet", NULL);
 
 	gp_module_set_get_applet_info (module, gooroom_integration_get_applet_info);
-	gp_module_set_compatibility (module, gooroom_integration_get_applet_id_from_iid);
+//	gp_module_set_compatibility (module, gooroom_integration_get_applet_id_from_iid);
 }

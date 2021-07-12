@@ -55,7 +55,6 @@ GType             endsession_module_get_type         (void) G_GNUC_CONST;
 EndSessionModule *endsession_module_new              (void);
 
 GtkWidget        *endsession_module_control_new      (EndSessionModule   *module);
-
 void              endsession_module_control_destroy  (EndSessionModule   *module);
 
 G_END_DECLS

@@ -38,6 +38,7 @@
 
 #include "common.h"
 #include "popup-window.h"
+#include "gooroom-integration-applet.h"
 
 #include "modules/user/user-module.h"
 #include "modules/sound/sound-module.h"
@@ -45,8 +46,7 @@
 #include "modules/datetime/datetime-module.h"
 #include "modules/security/security-module.h"
 #include "modules/endsession/endsession-module.h"
-
-#include "gooroom-integration-applet.h"
+#include "modules/nimf/nimf-module.h"
 
 
 
@@ -61,6 +61,8 @@ struct _GooroomIntegrationAppletPrivate
 	PowerModule      *power_module;
 	DateTimeModule   *datetime_module;
 	EndSessionModule *endsession_module;
+	UpdaterModule    *updater_module;
+	NimfModule       *nimf_module;
 };
 
 
@@ -248,6 +250,13 @@ _g_spawn_async (const gchar *command)
 		g_error_free (error);
 	}
 }
+static void
+on_destroy_popup_cb (GObject *object, gpointer data)
+{
+	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (data);
+
+	destroy_popup_window (applet);
+}
 
 static void
 on_launch_command_cb (GObject *object, const gchar *command, gpointer data)
@@ -405,12 +414,15 @@ integration_window_popup (GooroomIntegrationApplet *applet)
 	popup_window_setup_user       (priv->popup, priv->user_module);
 	popup_window_setup_sound      (priv->popup, priv->sound_module);
 	popup_window_setup_security   (priv->popup, priv->sec_module);
+	popup_window_setup_nimf       (priv->popup, priv->nimf_module);
+	popup_window_setup_updater    (priv->popup, priv->updater_module);
 	popup_window_setup_datetime   (priv->popup, priv->datetime_module);
 	popup_window_setup_power      (priv->popup, priv->power_module);
 	popup_window_setup_endsession (priv->popup, priv->endsession_module);
 
 	g_signal_connect (G_OBJECT (priv->popup), "realize", G_CALLBACK (on_popup_window_realized), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "closed", G_CALLBACK (on_popup_window_closed), applet);
+	g_signal_connect (G_OBJECT (priv->popup), "destroy_popup", G_CALLBACK (on_destroy_popup_cb), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 
@@ -501,9 +513,11 @@ gooroom_integration_applet_finalize (GObject *object)
 	if (priv->user_module) g_object_unref (priv->user_module);
 	if (priv->sound_module) g_object_unref (priv->sound_module);
 	if (priv->sec_module) g_object_unref (priv->sec_module);
+	if (priv->nimf_module) g_object_unref (priv->nimf_module);
 	if (priv->power_module) g_object_unref (priv->power_module);
 	if (priv->datetime_module) g_object_unref (priv->datetime_module);
 	if (priv->endsession_module) g_object_unref (priv->endsession_module);
+	if (priv->updater_module) g_object_unref (priv->updater_module);
 
 	G_OBJECT_CLASS (gooroom_integration_applet_parent_class)->finalize (object);
 }
@@ -521,7 +535,7 @@ gooroom_integration_applet_fill (GooroomIntegrationApplet *applet)
 static void
 gooroom_integration_applet_constructed (GObject *object)
 {
-	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (applet);
+	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (object);
 
 	gooroom_integration_applet_fill (applet);
 }
@@ -543,6 +557,8 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	priv->user_module       = user_module_new ();
 	priv->sound_module      = sound_module_new ();
 	priv->sec_module        = security_module_new ();
+	priv->updater_module    = updater_module_new ();
+	priv->nimf_module       = nimf_module_new ();
 	priv->power_module      = power_module_new ();
 	priv->datetime_module   = datetime_module_new ();
 	priv->endsession_module = endsession_module_new ();
@@ -555,6 +571,16 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 20);
 	gtk_container_add (GTK_CONTAINER (priv->button), hbox);
 	gtk_widget_show (hbox);
+
+	GtkWidget *updater_tray = updater_module_tray_new (priv->updater_module);
+	if (updater_tray) {
+		gtk_box_pack_start (GTK_BOX (hbox), updater_tray, FALSE, FALSE, 0);
+	}
+
+	GtkWidget *nimf_tray = nimf_module_tray_new (priv->nimf_module);
+	if (nimf_tray) {
+		gtk_box_pack_start (GTK_BOX (hbox), nimf_tray, FALSE, FALSE, 0);
+	}
 
 	GtkWidget *power_tray = power_module_tray_new (priv->power_module);
 	if (power_tray) {
@@ -584,8 +610,11 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	g_signal_connect (G_OBJECT (priv->button), "toggled", G_CALLBACK (on_applet_button_toggled), applet);
 
 	g_signal_connect (G_OBJECT (priv->sec_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
+	g_signal_connect (G_OBJECT (priv->updater_module), "destroy-popup", G_CALLBACK (on_destroy_popup_cb), applet);
 	g_signal_connect (G_OBJECT (priv->power_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 	g_signal_connect (G_OBJECT (priv->datetime_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
+	g_signal_connect (G_OBJECT (priv->nimf_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
+	g_signal_connect (G_OBJECT (priv->nimf_module), "change-engine-done", G_CALLBACK (on_change_engine_done_cb), applet);
 	g_signal_connect (G_OBJECT (priv->endsession_module), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 
 	g_signal_connect (gdk_display_get_default_screen (display),

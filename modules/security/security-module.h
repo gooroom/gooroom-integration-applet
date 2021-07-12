@@ -42,6 +42,7 @@ struct _SecurityModuleClass
 
 	/*< signals >*/
 	void (*launch_desktop)(SecurityModule *module, const gchar *desktop);
+	void (*status_changed)(SecurityModule *module, const gchar *status);
 };
 
 struct _SecurityModule
@@ -56,14 +57,12 @@ GType           security_module_get_type             (void) G_GNUC_CONST;
 SecurityModule *security_module_new                  (void);
 
 GtkWidget      *security_module_tray_new             (SecurityModule *module);
-GtkWidget      *security_module_control_new          (SecurityModule *module,
-                                                      GtkSizeGroup   *size_group);
+GtkWidget      *security_module_control_new          (SecurityModule *module);
 GtkWidget      *security_module_control_menu_new     (SecurityModule *module);
 
 void            security_module_control_destroy      (SecurityModule *module);
 void            security_module_control_menu_destroy (SecurityModule *module);
-gchar *         get_lbl_sec_status (gpointer data);
-guint           last_vulnerable_get (void);
+const gchar *   security_module_get_security_status  (SecurityModule *module);
 
 G_END_DECLS
 

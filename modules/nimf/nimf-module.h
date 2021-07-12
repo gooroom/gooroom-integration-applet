@@ -58,10 +58,8 @@ GType           nimf_module_get_type             (void) G_GNUC_CONST;
 NimfModule     *nimf_module_new                  (void);
 
 GtkWidget      *nimf_module_tray_new             (NimfModule   *module);
-GtkWidget      *nimf_module_control_new          (NimfModule   *module,
-                                                  GtkSizeGroup *size_group);
+GtkWidget      *nimf_module_control_new          (NimfModule   *module);
 GtkWidget      *nimf_module_control_menu_new     (NimfModule   *module);
-
 void            nimf_module_control_destroy      (NimfModule   *module);
 void            nimf_module_control_menu_destroy (NimfModule   *module);
 

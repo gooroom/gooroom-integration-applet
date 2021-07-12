@@ -9,7 +9,6 @@
     <property name="relief">none</property>
     <child>
       <object class="GtkBox">
-        <property name="name">security-control</property>
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="spacing">15</property>
@@ -34,44 +33,16 @@
             <property name="can-focus">False</property>
             <property name="spacing">6</property>
             <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Security Status</property>
-                <property name="use-markup">True</property>
-                <property name="single-line-mode">True</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">:</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="lbl_sec_status">
+              <object class="GtkLabel" id="lbl_updater_status">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Unknown</property>
                 <property name="use-markup">True</property>
+                <property name="wrap">True</property>
                 <property name="ellipsize">end</property>
-                <property name="single-line-mode">True</property>
                 <property name="max-width-chars">1</property>
+                <property name="lines">1</property>
                 <property name="xalign">0</property>
-                <style>
-                  <class name="security-status-label"/>
-                </style>
               </object>
               <packing>
                 <property name="expand">True</property>

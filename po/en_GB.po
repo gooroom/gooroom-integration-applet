@@ -1,5 +1,5 @@
 # English(USA) translations for gooroom-integration-applet package.
-# Copyright (C) 2015-2021 THE gooroom-integration-applet'S COPYRIGHT HOLDER
+# Copyright (C) 2015-2019 THE gooroom-integration-applet'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the gooroom-integration-applet package.
 #
 #, fuzzy
@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 19:12+0900\n"
+"POT-Creation-Date: 2021-08-06 12:27+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: en\n"
@@ -26,9 +26,10 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:203
-#: ../modules/security/security-module.c:345
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:204
+#: ../modules/security/security-module.c:348 ../src/popup-window.ui.h:7
 #: ../modules/security/security-control.ui.h:3
+#: ../modules/updater/updater-control.ui.h:1
 msgid "Unknown"
 msgstr "Unknown"
 
@@ -114,15 +115,6 @@ msgstr "%-d %B %Y   %l:%M:%S %p"
 msgid "%B %-d %Y   %T"
 msgstr "%B %-d %Y   %T"
 
-#. 12-hour mode
-#: ../modules/datetime/datetime-module.c:128
-msgid "%B %-d %Y   %l:%M %p"
-msgstr "%-d %B %Y   %l:%M %p"
-
-#: ../modules/datetime/datetime-module.c:130
-msgid "%B %-d %Y   %R"
-msgstr "%B %-d %Y   %R"
-
 #: ../modules/security/security-module.c:95
 msgid "Security Status Of Gooroom System"
 msgstr "Security Status Of Gooroom System"
@@ -149,43 +141,60 @@ msgstr "Trusted Booting"
 msgid "Resources Control"
 msgstr "Resources Control"
 
-#: ../modules/security/security-module.c:268
+#: ../modules/security/security-module.c:269
 msgid "Safety"
 msgstr "Safety"
 
-#: ../modules/security/security-module.c:281
+#: ../modules/security/security-module.c:282
 msgid "Vulnerable"
 msgstr "Vulnerable"
 
-#: ../modules/security/security-module.c:626
+#: ../modules/security/security-module.c:640
 msgid "Details"
 msgstr "Details"
 
-#: ../modules/nimf/nimf-module.c:406
+#: ../modules/nimf/nimf-module.c:413
 msgid "Input Method Not Running"
 msgstr "Input Method Not Running"
 
-#: ../modules/nimf/nimf-module.c:477
+#: ../modules/nimf/nimf-module.c:485
 msgid "Input Method Settings"
 msgstr "Input Method Settings"
 
-#: ../src/gooroom-integration-applet.c:175
+#: ../modules/updater/updater-module.c:262
+#: ../modules/updater/updater-module.c:276
+#: ../modules/updater/updater-module.c:355
+#: ../modules/updater/updater-module.c:430
+msgid "Gooroom Update is terminated"
+msgstr "Gooroom Update is terminated."
+
+#: ../src/gooroom-integration-applet.c:167
 msgid "Application Launching Error"
 msgstr "Application Launching Error"
 
-#: ../src/gooroom-integration-applet.c:281
+#: ../src/gooroom-integration-applet.c:280
 msgid "Could not execute command"
 msgstr "Could not execute command"
 
-#: ../src/gooroom-integration-applet.c:311
+#: ../src/gooroom-integration-applet.c:310
 #, c-format
 msgid "Could not launch '%s' program"
-msgstr "Could not launch '%s' program"
+msgstr "Could not launch '%s' program."
 
-#: ../src/gooroom-integration-applet.c:313
+#: ../src/gooroom-integration-applet.c:312
 #, c-format
 msgid "Could not launch '%s'"
 msgstr "Could not launch '%s'"
+
+#: ../src/gooroom-integration-module.c:33
+#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:1
+msgid "Gooroom Integration Applet"
+msgstr "Gooroom Integration Applet"
+
+#: ../src/gooroom-integration-module.c:34
+#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:2
+msgid "Integration applet for GNOME panel"
+msgstr "Integration applet for GNOME panel"
 
 #: ../src/popup-window.ui.h:1
 msgid "Settings"
@@ -200,20 +209,28 @@ msgid "Shut down Gooroom"
 msgstr "Shut down Gooroom"
 
 #: ../src/popup-window.ui.h:4
-msgid "Back"
-msgstr "Back"
+msgid "Power"
+msgstr "Power"
 
-#: ../modules/security/security-control.ui.h:1
-msgid "<b>Security Status</b>"
-msgstr "<b>Security Status</b>"
+#: ../src/popup-window.ui.h:5 ../modules/security/security-control.ui.h:1
+msgid "Security Status"
+msgstr "Security Status"
 
-#: ../modules/security/security-control.ui.h:2
+#: ../src/popup-window.ui.h:6 ../modules/security/security-control.ui.h:2
 msgid ":"
 msgstr ":"
 
+#: ../src/popup-window.ui.h:8
+msgid "Keyboard"
+msgstr "Keyboard"
+
+#: ../src/popup-window.ui.h:9
+msgid "Back"
+msgstr "Backward"
+
 #: ../modules/security/security-control-menu.ui.h:1
 msgid "Learn more about security status of Gooroom"
-msgstr "Learn more about security status of Gooroom"
+msgstr "Learn more about security status of Gooroom."
 
 #: ../modules/security/security-control-menu.ui.h:2
 msgid "Gooroom Security Status View"
@@ -255,10 +272,32 @@ msgstr "Restart"
 msgid "Shut Down"
 msgstr "Shut Down"
 
-#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:1
-msgid "Gooroom Integration Applet"
-msgstr "Gooroom Integration Applet"
+#: ../modules/updater/updater-control-menu.ui.h:1
+msgid "Show Gooroom Update"
+msgstr "Show Gooroom Update"
 
-#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:2
-msgid "Integration applet for GNOME panel"
-msgstr "Integration applet for GNOME panel"
+#: ../modules/updater/updater-control-menu.ui.h:2
+msgid "Show"
+msgstr "Show"
+
+#: ../modules/updater/updater-control-menu.ui.h:3
+msgid "Refresh update status of Gooroom"
+msgstr "Refresh update status of Gooroom"
+
+#: ../modules/updater/updater-control-menu.ui.h:4
+msgid "Refresh"
+msgstr "Refresh"
+
+#: ../modules/updater/updater-control-menu.ui.h:5
+msgid "Open Preferences"
+msgstr "Show Preferences"
+
+#: ../modules/updater/updater-control-menu.ui.h:6
+msgid "Preferences"
+msgstr "Preferences"
+
+#~ msgid "%B %-d %Y   %l:%M %p"
+#~ msgstr "%-d %B %Y   %l:%M %p"
+
+#~ msgid "%B %-d %Y   %R"
+#~ msgstr "%B %-d %Y   %R"

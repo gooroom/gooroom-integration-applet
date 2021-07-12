@@ -47,6 +47,7 @@ struct _DateTimeModulePrivate
 
 enum {
 	LAUNCH_DESKTOP,
+	DATETIME_CHANGED,
 	LAST_SIGNAL
 };
 
@@ -61,7 +62,7 @@ G_DEFINE_TYPE_WITH_PRIVATE (DateTimeModule, datetime_module, G_TYPE_OBJECT)
  * dcgettext(), the translation is still taken from the LC_MESSAGES
  * catalogue and not the LC_TIME one.
  */
-const gchar *
+static const gchar *
 translate_time_format_string (const char *str)
 {
   const char *locale = g_getenv ("LC_TIME");
@@ -86,16 +87,7 @@ translate_time_format_string (const char *str)
   return res;
 }
 
-gboolean
-get_use_ampm (gpointer data)
-{
-	DateTimeModule *module = DATETIME_MODULE (data);
-	DateTimeModulePrivate *priv = module->priv;
-
-	return priv->use_ampm;
-}
-
-gboolean
+static gboolean
 clock_timeout_thread (gpointer data)
 {
 	gchar *fm, *markup;
@@ -122,8 +114,11 @@ clock_timeout_thread (gpointer data)
 				fm = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %l:%M:%S %p")));
 			else
 				fm = g_date_time_format (dt, translate_time_format_string (N_("%B %-d %Y   %T")));
-			markup = g_markup_printf_escaped ("<b>%s</b>", fm);
+
+			markup = g_markup_printf_escaped ("%s", fm);
 			gtk_label_set_markup (GTK_LABEL (priv->details_label), markup);
+
+			g_signal_emit (G_OBJECT (module), signals[DATETIME_CHANGED], 0, markup);
 
 			g_free (fm);
 			g_free (markup);
@@ -154,44 +149,42 @@ on_settings_clicked_cb (GtkButton *button, gpointer data)
 }
 
 void
-build_control_ui (DateTimeModule *module, GtkSizeGroup *size_group)
+build_control_ui (DateTimeModule *module)
 {
-    GtkWidget *box, *icon, *label;
+	GtkWidget *box, *icon, *label;
 	DateTimeModulePrivate *priv = module->priv;
 	GtkStyleContext *context;
 
 	priv->control = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->control), GTK_RELIEF_NONE);
 
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
 	gtk_container_set_border_width (GTK_CONTAINER (box), 0);
 	gtk_container_add (GTK_CONTAINER (priv->control), box);
 
-	icon = gtk_image_new_from_icon_name ("preferences-system-time-symbolic", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name ("preferences-system-time-symbolic",
+                                         GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
-
-    context = gtk_widget_get_style_context (GTK_WIDGET (icon));
-	gtk_style_context_add_class (context, "general-box-icon");
-
-	if (size_group)
-		gtk_size_group_add_widget (size_group, icon);
 	gtk_box_pack_start (GTK_BOX (box), icon, FALSE, FALSE, 0);
+
+    context = gtk_widget_get_style_context (icon);
+	gtk_style_context_add_class (context, "rounded-icon-style2");
 
 	priv->details_label = label = gtk_label_new (NULL);
 	gtk_label_set_xalign (GTK_LABEL (priv->details_label), 0);
 	gtk_label_set_max_width_chars (GTK_LABEL (priv->details_label), 1);
 	gtk_label_set_ellipsize (GTK_LABEL (priv->details_label), PANGO_ELLIPSIZE_END);
 	gtk_label_set_line_wrap (GTK_LABEL (priv->details_label), FALSE);
-
 	gtk_box_pack_start (GTK_BOX (box), priv->details_label, TRUE, TRUE, 0);
 
 	icon = gtk_image_new_from_icon_name ("go-next-page-symbolic", GTK_ICON_SIZE_BUTTON);
-
-    context = gtk_widget_get_style_context (GTK_WIDGET (icon));
-	gtk_style_context_add_class (context, "go-next-page");
-
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
 	gtk_box_pack_end (GTK_BOX (box), icon, FALSE, FALSE, 0);
+
+    context = gtk_widget_get_style_context (icon);
+	gtk_style_context_add_class (context, "go-next-page");
+
+	clock_timeout_thread (module);
 }
 
 static void
@@ -201,7 +194,9 @@ build_control_menu_ui (DateTimeModule *module)
 	GtkWidget *calendar, *inner_box, *btn_settings;
 	DateTimeModulePrivate *priv = module->priv;
 
-	gtk_builder_add_from_resource (priv->builder, "/kr/gooroom/IntegrationApplet/modules/datetime/datetime-control-menu.ui", &error);
+	gtk_builder_add_from_resource (priv->builder,
+                                   "/kr/gooroom/IntegrationApplet/modules/datetime/datetime-control-menu.ui",
+                                   &error);
 	if (error) {
 		g_error_free (error);
 		return;
@@ -214,20 +209,12 @@ build_control_menu_ui (DateTimeModule *module)
 	calendar = gooroom_calendar_new ();
 	gtk_widget_show (calendar);
 
-	gtk_widget_set_name (inner_box, "inner_box");
 	gtk_box_pack_start (GTK_BOX (inner_box), calendar, FALSE, FALSE, 0);
 	gtk_box_reorder_child (GTK_BOX (inner_box), calendar, 0);
 
-	if (priv->clock_timer) {
-		g_source_remove (priv->clock_timer);
-		priv->clock_timer = 0;
-	}
+	g_signal_connect (G_OBJECT (btn_settings), "clicked", G_CALLBACK (on_settings_clicked_cb), module);
 
 	clock_timeout_thread (module);
-
-	priv->clock_timer = gdk_threads_add_timeout (1000, (GSourceFunc) clock_timeout_thread, module);
-
-	g_signal_connect (G_OBJECT (btn_settings), "clicked", G_CALLBACK (on_settings_clicked_cb), module);
 }
 
 static void
@@ -280,6 +267,16 @@ datetime_module_class_init (DateTimeModuleClass *class)
                                             g_cclosure_marshal_VOID__STRING,
                                             G_TYPE_NONE, 1,
                                             G_TYPE_STRING);
+
+	signals[DATETIME_CHANGED] = g_signal_new ("datetime-changed",
+                                              MODULE_TYPE_DATETIME,
+                                              G_SIGNAL_RUN_LAST,
+                                              G_STRUCT_OFFSET(DateTimeModuleClass,
+                                              datetime_changed),
+                                              NULL, NULL,
+                                              g_cclosure_marshal_VOID__STRING,
+                                              G_TYPE_NONE, 1,
+                                              G_TYPE_STRING);
 }
 
 static void
@@ -305,6 +302,9 @@ datetime_module_init (DateTimeModule *module)
 
 	g_signal_connect (priv->clock_settings, "changed::clock-format",
                       G_CALLBACK (clock_settings_changed_cb), module);
+
+	clock_timeout_thread (module);
+	priv->clock_timer = gdk_threads_add_timeout (1000, (GSourceFunc) clock_timeout_thread, module);
 }
 
 DateTimeModule *
@@ -320,43 +320,27 @@ datetime_module_tray_new (DateTimeModule *module)
 
 	DateTimeModulePrivate *priv = module->priv;
 
-	if (priv->clock_timer != 0) {
-		g_source_remove (priv->clock_timer);
-		priv->clock_timer = 0;
-	}
-
 	if (!priv->tray) {
 		priv->tray = gtk_label_new (NULL);
 	}
 
-	gtk_widget_show (priv->tray);
-
 	clock_timeout_thread (module);
-
-	priv->clock_timer = gdk_threads_add_timeout (1000, (GSourceFunc) clock_timeout_thread, module);
+	gtk_widget_show (priv->tray);
 
 	return priv->tray;
 }
 
 GtkWidget *
-datetime_module_control_new (DateTimeModule *module, GtkSizeGroup *size_group)
+datetime_module_control_new (DateTimeModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	DateTimeModulePrivate *priv = module->priv;
 
-	if (priv->clock_timer) {
-		g_source_remove (priv->clock_timer);
-		priv->clock_timer = 0;
-	}
-
-	build_control_ui (module, size_group);
-
-	gtk_widget_show_all (priv->control);
+	build_control_ui (module);
 
 	clock_timeout_thread (module);
-
-	priv->clock_timer = gdk_threads_add_timeout (1000, (GSourceFunc) clock_timeout_thread, module);
+	gtk_widget_show_all (priv->control);
 
 	return priv->control;
 }

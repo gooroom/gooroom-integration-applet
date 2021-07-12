@@ -212,7 +212,7 @@ tray_icon_update (SoundModule *module)
 		icon_name = "audio-volume-error-symbolic";
 	}
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_BUTTON);
+	gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 }
 
@@ -272,7 +272,7 @@ sync_volume_control (SoundModule *module)
 		gtk_range_set_value (GTK_RANGE (priv->scale), 0);
 	}
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (priv->status_icon), icon_name, GTK_ICON_SIZE_BUTTON);
+	gtk_image_set_from_icon_name (GTK_IMAGE (priv->status_icon), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (priv->status_icon), STATUS_ICON_SIZE);
 }
 
@@ -341,34 +341,34 @@ tray_icon_update_delay (gpointer data)
 }
 
 static void
-build_control_ui (SoundModule *module, GtkSizeGroup *size_group)
+build_control_ui (SoundModule *module)
 {
 	GtkWidget *scale, *icon;
 	SoundModulePrivate *priv = module->priv;
 	GtkStyleContext *context;
 
-	priv->control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+	priv->control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
 	gtk_container_set_border_width (GTK_CONTAINER (priv->control), 0);
 
 	priv->status_button = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->status_button), GTK_RELIEF_NONE);
-	gtk_widget_set_name (priv->status_button, "icon-button");
+	gtk_widget_set_valign (priv->status_button, GTK_ALIGN_CENTER);
+	gtk_widget_set_halign (priv->status_button, GTK_ALIGN_CENTER);
 	gtk_box_pack_start (GTK_BOX (priv->control), priv->status_button, FALSE, FALSE, 0);
-	if (size_group)
-		gtk_size_group_add_widget (size_group, priv->status_button);
+
+	context = gtk_widget_get_style_context (priv->status_button);
+	gtk_style_context_add_class (context, "rounded-icon-button");
 
 	g_signal_connect (G_OBJECT (priv->status_button), "clicked", G_CALLBACK (on_mute_button_clicked), module);
 
 	priv->status_icon = icon = gtk_image_new_from_icon_name ("audio-volume-muted-symbolic",
-                                                             GTK_ICON_SIZE_BUTTON);
-
-    context = gtk_widget_get_style_context (GTK_WIDGET (icon));
-	gtk_style_context_add_class (context, "control-box-icon");
-
+                                                             GTK_ICON_SIZE_LARGE_TOOLBAR);
+	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
+	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
+	gtk_widget_set_halign (icon, GTK_ALIGN_CENTER);
 	gtk_container_add (GTK_CONTAINER (priv->status_button), icon);
 
 	priv->scale = scale = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);
-
 	gtk_widget_set_can_focus (scale, FALSE);
 	gtk_range_set_inverted (GTK_RANGE (scale), FALSE);
 	gtk_scale_set_draw_value (GTK_SCALE (scale), FALSE);
@@ -434,7 +434,8 @@ sound_module_tray_new (SoundModule *module)
 	SoundModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("audio-volume-high-symbolic", GTK_ICON_SIZE_BUTTON);
+		priv->tray = gtk_image_new_from_icon_name ("audio-volume-high-symbolic",
+                                                   GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -446,13 +447,13 @@ sound_module_tray_new (SoundModule *module)
 }
 
 GtkWidget *
-sound_module_control_new (SoundModule *module, GtkSizeGroup *size_group)
+sound_module_control_new (SoundModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	SoundModulePrivate *priv = module->priv;
 
-	build_control_ui (module, size_group);
+	build_control_ui (module);
 
 	gtk_widget_show_all (priv->control);
 

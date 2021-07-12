@@ -50,11 +50,8 @@ GType        sound_module_get_type        (void) G_GNUC_CONST;
 
 SoundModule *sound_module_new             (void);
 
-
 GtkWidget   *sound_module_tray_new        (SoundModule  *module);
-GtkWidget   *sound_module_control_new     (SoundModule  *module,
-                                           GtkSizeGroup *size_group);
-
+GtkWidget   *sound_module_control_new     (SoundModule  *module);
 void         sound_module_control_destroy (SoundModule  *module);
 
 G_END_DECLS

@@ -28,10 +28,17 @@ iconsymbolicstatus_DATA =  				\
 	battery-full-charged.svg		\
 	security-status-safety.svg		\
 	security-status-unknown.svg		\
-	security-status-vulnerable.svg
+	security-status-vulnerable.svg	\
+	updater-base-apply.svg			\
+	updater-base-error2.svg			\
+	updater-base-exec.svg			\
+	updater-base-info.svg			\
+	updater-base-unkown.svg	    	\
+	updater-base.svg
 
 iconsymbolicactionsdir = $(datadir)/icons/hicolor/scalable/actions
-iconsymbolicactions_DATA =  go-next-page-symbolic.svg
+iconsymbolicactions_DATA =  go-next-page-symbolic.svg \
+                            go-prev-page-symbolic.svg
 
 
 gtk_update_icon_cache = gtk-update-icon-cache -f -t $(datadir)/icons/hicolor

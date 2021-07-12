@@ -41,6 +41,7 @@ struct _DateTimeModuleClass
 
 	/*< signals >*/
 	void (*launch_desktop)(DateTimeModule *module, const gchar *desktop);
+	void (*datetime_changed)(DateTimeModule *module, const gchar *datetime);
 };
 
 struct _DateTimeModule
@@ -55,15 +56,10 @@ GType           datetime_module_get_type             (void) G_GNUC_CONST;
 DateTimeModule *datetime_module_new                  (void);
 
 GtkWidget      *datetime_module_tray_new             (DateTimeModule *module);
-GtkWidget      *datetime_module_control_new          (DateTimeModule *module,
-                                                      GtkSizeGroup   *size_group);
+GtkWidget      *datetime_module_control_new          (DateTimeModule *module);
 GtkWidget      *datetime_module_control_menu_new     (DateTimeModule *module);
-
 void            datetime_module_control_destroy      (DateTimeModule *module);
 void            datetime_module_control_menu_destroy (DateTimeModule *module);
-gboolean		clock_timeout_thread (gpointer data);
-const gchar *   translate_time_format_string (const char *str);
-gboolean		get_use_ampm (gpointer data);
 
 G_END_DECLS
 
