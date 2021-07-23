@@ -612,7 +612,7 @@ security_module_init (SecurityModule *module)
 	priv->builder = gtk_builder_new ();
 	gtk_builder_set_translation_domain (priv->builder, GETTEXT_PACKAGE);
 
-	schema = g_settings_schema_source_lookup (g_settings_schema_source_get_default (), "apps.gooroom-security-status", TRUE);
+	schema = g_settings_schema_source_lookup (g_settings_schema_source_get_default (), "apps.gooroom-security-utils", TRUE);
 	if (schema) {
 		priv->settings = g_settings_new_full (schema, NULL, NULL);
 		g_signal_connect (priv->settings, "changed",

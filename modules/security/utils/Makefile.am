@@ -1,6 +1,6 @@
 libutils_la_CPPFLAGS = \
-	-DGOOROOM_LOGPARSER_SEEKTIME_HELPER=\"$(libexecdir)/gooroom-security-status-tools/gooroom-logparser-seektime-helper\" \
-	-DGOOROOM_SECURITY_LOGPARSER_WRAPPER=\"$(libexecdir)/gooroom-security-status-tools/gooroom-security-logparser-wrapper\" \
+	-DGOOROOM_LOGPARSER_SEEKTIME_HELPER=\"/usr/lib/gooroom-security-utils/gooroom-logparser-seektime-helper\" \
+	-DGOOROOM_SECURITY_LOGPARSER_WRAPPER=\"/usr/lib/gooroom-security-utils/gooroom-security-logparser-wrapper\" \
 	$(AM_CPPFLAGS)
 
 noinst_LTLIBRARIES = libutils.la
