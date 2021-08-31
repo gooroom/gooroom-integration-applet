@@ -233,8 +233,8 @@ msgid "Learn more about security status of Gooroom"
 msgstr "구름 보안상태를 자세히 봅니다"
 
 #: ../modules/security/security-control-menu.ui.h:2
-msgid "Gooroom Security Status View"
-msgstr "구름 보안상태 보기"
+msgid "Gooroom Security Status Tool"
+msgstr "구름 보안상태 도구"
 
 #: ../modules/security/security-control-menu.ui.h:3
 msgid "Settings for Gooroom management"

@@ -38,8 +38,7 @@
 
 #define SECURITY_STATUS_UPDATE_TIMEOUT      5000
 
-#define SECURITY_STATUS_VIEW_DESKTOP        "gooroom-security-status-view.desktop"
-#define SECURITY_STATUS_SETTINGS_DESKTOP    "gooroom-security-status-settings.desktop"
+#define SECURITY_STATUS_TOOL_DESKTOP        "gooroom-security-status-tool.desktop"
 
 #define GET_WIDGET(builder, x) GTK_WIDGET (gtk_builder_get_object (builder, x))
 
@@ -60,7 +59,6 @@ struct _SecurityModulePrivate
 	GtkWidget *btn_sec_more;
 	GtkWidget *box_sec_menu;
 	GtkWidget *btn_sec_safety;
-//	GtkWidget *btn_sec_settings;
 
 	GSettings *settings;
 
@@ -446,7 +444,7 @@ on_security_detail_activate (GtkMenuItem *menu_item, gpointer data)
 {
 	SecurityModule *module = SECURITY_MODULE (data);
 
-	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, SECURITY_STATUS_VIEW_DESKTOP);
+	g_signal_emit (G_OBJECT (module), signals[LAUNCH_DESKTOP], 0, SECURITY_STATUS_TOOL_DESKTOP);
 }
 
 static void

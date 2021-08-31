@@ -19,7 +19,7 @@
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Gooroom Security Status View</property>
+            <property name="label" translatable="yes">Gooroom Security Status Tool</property>
             <property name="ellipsize">end</property>
             <property name="single-line-mode">True</property>
             <property name="max-width-chars">1</property>
