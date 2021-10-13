@@ -12,7 +12,7 @@ libsecurity_module_la_SOURCES = \
 	security-module.h
 
 libsecurity_module_la_CPPFLAGS = \
-	-DGOOROOM_SECURITY_STATUS_VULNERABLE_HELPER=\"/usr/share/gooroom-security-utils/gooroom-security-status-vulnerable-helper\" \
+	-DGOOROOM_SECURITY_STATUS_VULNERABLE_HELPER=\"/usr/lib/gooroom-security-utils/gooroom-security-status-vulnerable-helper\" \
 	-I$(srcdir)/utils \
 	-I$(top_srcdir)/common	\
 	$(AM_CPPFLAGS)
