@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.1.8+grm2u1) unstable; urgency=medium
+
+  [ boyeon.choi ]
+  * [d48617e9] Corrected the wrong path of gooroom-security-status-vulnerable-helper
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Wed, 20 Oct 2021 11:22:31 +0900
+
 gooroom-integration-applet (0.1.7+grm2u1) unstable; urgency=medium
 
   [ subin.kim ]
