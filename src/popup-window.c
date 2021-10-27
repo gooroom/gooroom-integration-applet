@@ -459,7 +459,7 @@ on_system_button_clicked_cb (GtkButton *button, gpointer data)
 		}
 		g_signal_emit (G_OBJECT (window), signals[LAUNCH_DESKTOP], 0, "gnome-control-center.desktop");
 	} else if (button == GTK_BUTTON (priv->btn_screenlock)) {
-		g_signal_emit (G_OBJECT (window), signals[LAUNCH_COMMAND], 0, "gnome-screensaver-command -l");
+		g_signal_emit (G_OBJECT (window), signals[LAUNCH_COMMAND], 0, "xdg-screensaver lock");
 	}
 }
 
