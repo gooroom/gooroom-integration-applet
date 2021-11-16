@@ -40,6 +40,7 @@
 #define UPDATER_SERVICE_INTERFACE          "kr.gooroom.Update"
 
 #define GET_WIDGET(builder, x) GTK_WIDGET (gtk_builder_get_object (builder, x))
+#define READ_BUFFER_SIZE 4096
 
 
 struct _UpdaterModulePrivate
@@ -65,6 +66,7 @@ struct _UpdaterModulePrivate
 
 enum {
 	DESTROY_POPUP,
+	STATUS_CHANGED,
 	LAST_SIGNAL
 };
 
@@ -123,6 +125,41 @@ updater_status_update_idle (gpointer data)
 	update_status_string (module);
 
 	return FALSE;
+}
+
+static void
+check_synaptic (UpdaterModule *module)
+{
+	UpdaterModulePrivate *priv = module->priv;
+
+	GSubprocess *process;
+	GInputStream *stream;
+
+	guchar *buffer;
+	gchar *str_output = "";
+
+	buffer = g_new0 (guchar, READ_BUFFER_SIZE);
+
+	process = g_subprocess_new(G_SUBPROCESS_FLAGS_STDOUT_PIPE, NULL, "ps", "-U", "root", "-o", "comm", NULL);
+	stream = g_subprocess_get_stdout_pipe(process);
+	g_input_stream_read(stream, buffer, READ_BUFFER_SIZE, NULL, NULL);
+
+	str_output = g_strdup (buffer);
+
+	if (g_strrstr (str_output, "synaptic") != NULL)
+	{
+		gchar *markup = g_markup_printf_escaped ("%s", _("Please quit Synaptic to control Update Manager."));
+		gtk_widget_set_sensitive (priv->btn_view, FALSE);
+		gtk_widget_set_sensitive (priv->btn_pref, FALSE);
+		gtk_widget_set_sensitive (priv->btn_show, FALSE);
+
+		g_signal_emit (G_OBJECT (module), signals[STATUS_CHANGED], 0, markup);
+
+		g_free (markup);
+	}
+
+	g_free (buffer);
+	g_free (str_output);
 }
 
 static void
@@ -483,6 +520,16 @@ updater_module_class_init (UpdaterModuleClass *class)
                                            g_cclosure_marshal_VOID__VOID,
                                            G_TYPE_NONE, 0,
                                            G_TYPE_NONE);
+
+	signals[STATUS_CHANGED] = g_signal_new ("status-changed",
+                                            MODULE_TYPE_UPDATER,
+                                            G_SIGNAL_RUN_LAST,
+                                            G_STRUCT_OFFSET(UpdaterModuleClass,
+                                            status_changed),
+                                            NULL, NULL,
+                                            g_cclosure_marshal_VOID__STRING,
+                                            G_TYPE_NONE, 1,
+                                            G_TYPE_STRING);
 }
 
 static void
@@ -565,6 +612,8 @@ build_control_menu_ui (UpdaterModule *module)
                       G_CALLBACK (on_pref_button_clicked), module);
 	g_signal_connect (G_OBJECT (priv->btn_show), "clicked",
                       G_CALLBACK (on_show_button_clicked), module);
+
+	check_synaptic (module);
 }
 
 UpdaterModule *

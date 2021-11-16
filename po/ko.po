@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 12:27+0900\n"
+"POT-Creation-Date: 2021-11-16 16:08+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: ko\n"
@@ -26,8 +26,8 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:204
-#: ../modules/security/security-module.c:348 ../src/popup-window.ui.h:7
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:202
+#: ../modules/security/security-module.c:346 ../src/popup-window.ui.h:7
 #: ../modules/security/security-control.ui.h:3
 #: ../modules/updater/updater-control.ui.h:1
 msgid "Unknown"
@@ -115,41 +115,41 @@ msgstr "%Y년 %B %-d일   %p %l:%M:%S"
 msgid "%B %-d %Y   %T"
 msgstr "%Y년 %B %-d일   %T"
 
-#: ../modules/security/security-module.c:95
+#: ../modules/security/security-module.c:93
 msgid "Security Status Of Gooroom System"
 msgstr "구름 시스템 보안 상태"
 
-#: ../modules/security/security-module.c:96
+#: ../modules/security/security-module.c:94
 msgid "A security vulnerability has been detected."
 msgstr "보안위협이 탐지되었습니다."
 
-#: ../modules/security/security-module.c:107
+#: ../modules/security/security-module.c:105
 #, c-format
 msgid "Protecting OS"
 msgstr "운영체제 보호"
 
-#: ../modules/security/security-module.c:111
+#: ../modules/security/security-module.c:109
 msgid "Protect executable files"
 msgstr "실행파일 검증"
 
-#: ../modules/security/security-module.c:115
+#: ../modules/security/security-module.c:113
 msgid "Trusted Booting"
 msgstr "신뢰부팅"
 
-#: ../modules/security/security-module.c:119
+#: ../modules/security/security-module.c:117
 #, c-format
 msgid "Resources Control"
 msgstr "매체제어"
 
-#: ../modules/security/security-module.c:269
+#: ../modules/security/security-module.c:267
 msgid "Safety"
 msgstr "안전"
 
-#: ../modules/security/security-module.c:282
+#: ../modules/security/security-module.c:280
 msgid "Vulnerable"
 msgstr "취약"
 
-#: ../modules/security/security-module.c:640
+#: ../modules/security/security-module.c:628
 msgid "Details"
 msgstr "자세히 보기"
 
@@ -161,10 +161,10 @@ msgstr "입력기 작동이 중지됨"
 msgid "Input Method Settings"
 msgstr "입력기 설정"
 
-#: ../modules/updater/updater-module.c:262
-#: ../modules/updater/updater-module.c:276
-#: ../modules/updater/updater-module.c:355
-#: ../modules/updater/updater-module.c:430
+#: ../modules/updater/updater-module.c:293
+#: ../modules/updater/updater-module.c:307
+#: ../modules/updater/updater-module.c:386
+#: ../modules/updater/updater-module.c:461
 msgid "Gooroom Update is terminated"
 msgstr "구름 업데이트가 종료되었습니다"
 
@@ -237,14 +237,6 @@ msgid "Gooroom Security Status Tool"
 msgstr "구름 보안상태 도구"
 
 #: ../modules/security/security-control-menu.ui.h:3
-msgid "Settings for Gooroom management"
-msgstr "구름 관리를 위한 설정"
-
-#: ../modules/security/security-control-menu.ui.h:4
-msgid "Gooroom Management Settings"
-msgstr "구름 관리 설정"
-
-#: ../modules/security/security-control-menu.ui.h:5
 msgid "Take Safety Measures"
 msgstr "안전 조치 실행"
 
@@ -295,6 +287,16 @@ msgstr "설정 열기"
 #: ../modules/updater/updater-control-menu.ui.h:6
 msgid "Preferences"
 msgstr "설정"
+
+#: ../modules/updater/updater-control-menu.ui.h:7
+msgid "Please quit Synaptic to control Update Manager."
+msgstr "시냅틱 패키지 관리자가 실행 중입니다."
+
+#~ msgid "Settings for Gooroom management"
+#~ msgstr "구름 관리를 위한 설정"
+
+#~ msgid "Gooroom Management Settings"
+#~ msgstr "구름 관리 설정"
 
 #~ msgid "Gooroom Update was terminated abnormally"
 #~ msgstr "구름 업데이트가 비정상적으로 종료되었습니다"

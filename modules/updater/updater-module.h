@@ -42,6 +42,7 @@ struct _UpdaterModuleClass
 	/*< signals >*/
 	void (*destroy_popup)(UpdaterModule *module);
 	void (*launch_desktop)(UpdaterModule *module, const gchar *desktop);
+	void (*status_changed)(UpdaterModule *module, const gchar *status);
 };
 
 struct _UpdaterModule

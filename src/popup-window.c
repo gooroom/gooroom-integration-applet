@@ -77,6 +77,7 @@ struct _PopupWindowPrivate
 
 	GtkWidget *lbl_datetime;
 	GtkWidget *lbl_sec_status;
+	GtkWidget *lbl_updater;
 
 	UserModule       *user_module;
 	SoundModule      *sound_module;
@@ -421,6 +422,16 @@ on_nimf_button_clicked_cb (GtkButton *button, gpointer data)
 }
 
 static void
+updater_status_changed_cb (UpdaterModule *module, const gchar *updater, gpointer data)
+{
+	PopupWindow *window = POPUP_WINDOW (data);
+	PopupWindowPrivate *priv = window->priv;
+
+	if (priv->lbl_updater)
+		gtk_label_set_markup (GTK_LABEL (priv->lbl_updater), updater);
+}
+
+static void
 on_updater_button_clicked_cb (GtkButton *button, gpointer data)
 {
 	PopupWindow *window = POPUP_WINDOW (data);
@@ -507,6 +518,8 @@ destroy_control_widget (PopupWindow *window)
 	if (priv->updater_module) {
 		updater_module_control_destroy (priv->updater_module);
 		updater_module_control_menu_destroy (priv->updater_module);
+		g_signal_handlers_disconnect_by_func (priv->updater_module,
+                                              G_CALLBACK (updater_status_changed_cb), window);
 	}
 }
 
@@ -844,6 +857,7 @@ popup_window_class_init (PopupWindowClass *klass)
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, stack);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_datetime);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_sec_status);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_updater);
 }
 
 PopupWindow *
@@ -1041,6 +1055,8 @@ popup_window_setup_updater (PopupWindow    *window,
 				g_signal_connect (G_OBJECT (w), "clicked",
 						G_CALLBACK (on_updater_button_clicked_cb), window);
 			}
+			g_signal_connect (G_OBJECT (priv->updater_module), "status-changed",
+                              G_CALLBACK (updater_status_changed_cb), window);
 		}
 	}
 }
