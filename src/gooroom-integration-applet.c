@@ -354,6 +354,25 @@ set_popup_window_position (GooroomIntegrationApplet *applet)
 
 	get_monitor_geometry (applet, &geometry);
 
+	switch (orientation) {
+		case GTK_ORIENTATION_HORIZONTAL:
+			if (x + popup_width > geometry.x + geometry.width)
+				x -= ((x + popup_width) - (geometry.x + geometry.width));
+			//y += applet_height;
+			y -= popup_height;
+		break;
+
+		case GTK_ORIENTATION_VERTICAL:
+			if (y + popup_height > geometry.y + geometry.height)
+				y -= ((y + popup_height) - (geometry.y + geometry.height));
+			//x += applet_width;
+			x -= popup_width;
+		break;
+
+		default:
+			g_assert_not_reached ();
+	}
+
 //	switch (orientation) {
 //		case PANEL_APPLET_ORIENT_DOWN:
 //			if (x + popup_width > geometry.x + geometry.width)
