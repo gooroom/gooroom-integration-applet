@@ -172,7 +172,8 @@ get_nimf_status_done_cb (GDBusProxy   *proxy,
                          gpointer      data)
 {
 	GVariant *result;
-	const gchar *engine_id, *icon_name;
+	const gchar *engine_id;
+	const gchar *icon_name = NULL;
 	GError *error = NULL;
 
 	NimfModule *module = NIMF_MODULE (data);

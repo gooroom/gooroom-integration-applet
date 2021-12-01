@@ -141,7 +141,10 @@ get_last_vulnerable (void)
 	if (g_file_test (GOOROOM_SECURITY_STATUS_VULNERABLE, G_FILE_TEST_EXISTS)) {
 		g_file_get_contents (GOOROOM_SECURITY_STATUS_VULNERABLE, &str_vulnerable, NULL, NULL);
 
-		if (1 == sscanf (str_vulnerable, "%"G_GUINT32_FORMAT, &vulnerable)) {
+		vulnerable = atoi (str_vulnerable);
+
+		//if (1 == sscanf (str_vulnerable, "%"G_GUINT32_FORMAT, &vulnerable)) {
+		if(vulnerable)
 			if ((vulnerable < (1 << 0)) || (vulnerable >= (1 << 4))) { // 1 <= vulnerable < 16
 				vulnerable = 0;
 			}

@@ -69,7 +69,8 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 {
 	g_return_if_fail (data != NULL);
 
-	const char *user_name, *icon_name;
+	const char *user_name;
+	const char *icon_name = NULL;
 
 	UserModule *module = USER_MODULE (data);
 	UserModulePrivate *priv = module->priv;
