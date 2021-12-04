@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -29,7 +29,7 @@
 #include <gio/gio.h>
 #include <gio/gdesktopappinfo.h>
 
-#include <panel-applet.h>
+#include <libgnome-panel/gp-applet.h>
 #include <libnotify/notify.h>
 
 #define GNOME_DESKTOP_USE_UNSTABLE_API
@@ -38,6 +38,7 @@
 
 #include "common.h"
 #include "popup-window.h"
+#include "gooroom-integration-applet.h"
 
 #include "modules/user/user-module.h"
 #include "modules/sound/sound-module.h"
@@ -46,8 +47,6 @@
 #include "modules/security/security-module.h"
 #include "modules/endsession/endsession-module.h"
 #include "modules/nimf/nimf-module.h"
-
-#include "gooroom-integration-applet.h"
 
 
 
@@ -62,12 +61,13 @@ struct _GooroomIntegrationAppletPrivate
 	PowerModule      *power_module;
 	DateTimeModule   *datetime_module;
 	EndSessionModule *endsession_module;
+	UpdaterModule    *updater_module;
 	NimfModule       *nimf_module;
 };
 
 
 
-G_DEFINE_TYPE_WITH_PRIVATE (GooroomIntegrationApplet, gooroom_integration_applet, PANEL_TYPE_APPLET)
+G_DEFINE_TYPE_WITH_PRIVATE (GooroomIntegrationApplet, gooroom_integration_applet, GP_TYPE_APPLET)
 
 
 
@@ -97,24 +97,16 @@ get_workarea (GooroomIntegrationApplet *applet, GdkRectangle *workarea)
 	gtk_widget_get_preferred_width (GTK_WIDGET (applet), NULL, &applet_width);
 	gtk_widget_get_preferred_height (GTK_WIDGET (applet), NULL, &applet_height);
 
-	orientation = panel_applet_get_gtk_orientation (PANEL_APPLET (applet));
+	orientation = gp_applet_get_orientation (GP_APPLET (applet));
 
 	switch (orientation) {
-		case PANEL_APPLET_ORIENT_DOWN:
+		case GTK_ORIENTATION_HORIZONTAL:
 			workarea->y += applet_height;
 			workarea->height -= applet_height;
 		break;
 
-		case PANEL_APPLET_ORIENT_UP:
-			workarea->height -= applet_height;
-		break;
-
-		case PANEL_APPLET_ORIENT_RIGHT:
+		case GTK_ORIENTATION_VERTICAL:
 			workarea->x += applet_width;
-			workarea->width -= applet_width;
-		break;
-
-		case PANEL_APPLET_ORIENT_LEFT:
 			workarea->width -= applet_width;
 		break;
 
@@ -258,6 +250,13 @@ _g_spawn_async (const gchar *command)
 		g_error_free (error);
 	}
 }
+static void
+on_destroy_popup_cb (GObject *object, gpointer data)
+{
+	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (data);
+
+	destroy_popup_window (applet);
+}
 
 static void
 on_launch_command_cb (GObject *object, const gchar *command, gpointer data)
@@ -334,7 +333,7 @@ static gboolean
 set_popup_window_position (GooroomIntegrationApplet *applet)
 {
 	GdkRectangle geometry;
-	PanelAppletOrient orientation;
+	GtkOrientation orientation;
 	gint x, y;
 	gint popup_width, popup_height;
 	gint applet_width, applet_height;
@@ -343,7 +342,7 @@ set_popup_window_position (GooroomIntegrationApplet *applet)
 
 	g_return_val_if_fail (priv->popup != NULL, FALSE);
 
-	orientation = panel_applet_get_orient (PANEL_APPLET (applet));
+	orientation = gp_applet_get_orientation(GP_APPLET (applet));
 
 	gdk_window_get_origin (gtk_widget_get_window (GTK_WIDGET (applet)), &x, &y);
 
@@ -356,33 +355,52 @@ set_popup_window_position (GooroomIntegrationApplet *applet)
 	get_monitor_geometry (applet, &geometry);
 
 	switch (orientation) {
-		case PANEL_APPLET_ORIENT_DOWN:
+		case GTK_ORIENTATION_HORIZONTAL:
 			if (x + popup_width > geometry.x + geometry.width)
 				x -= ((x + popup_width) - (geometry.x + geometry.width));
-			y += applet_height;
-			break;
-
-		case PANEL_APPLET_ORIENT_UP:
-			if (x + popup_width > geometry.x + geometry.width)
-				x -= ((x + popup_width) - (geometry.x + geometry.width));
+			//y += applet_height;
 			y -= popup_height;
-			break;
+		break;
 
-		case PANEL_APPLET_ORIENT_RIGHT:
-			x += applet_width;
+		case GTK_ORIENTATION_VERTICAL:
 			if (y + popup_height > geometry.y + geometry.height)
 				y -= ((y + popup_height) - (geometry.y + geometry.height));
-			break;
-
-		case PANEL_APPLET_ORIENT_LEFT:
+			//x += applet_width;
 			x -= popup_width;
-			if (y + popup_height > geometry.y + geometry.height)
-				y -= ((y + popup_height) - (geometry.y + geometry.height));
-			break;
+		break;
 
 		default:
 			g_assert_not_reached ();
 	}
+
+//	switch (orientation) {
+//		case PANEL_APPLET_ORIENT_DOWN:
+//			if (x + popup_width > geometry.x + geometry.width)
+//				x -= ((x + popup_width) - (geometry.x + geometry.width));
+//			y += applet_height;
+//			break;
+//
+//		case PANEL_APPLET_ORIENT_UP:
+//			if (x + popup_width > geometry.x + geometry.width)
+//				x -= ((x + popup_width) - (geometry.x + geometry.width));
+//			y -= popup_height;
+//			break;
+//
+//		case PANEL_APPLET_ORIENT_RIGHT:
+//			x += applet_width;
+//			if (y + popup_height > geometry.y + geometry.height)
+//				y -= ((y + popup_height) - (geometry.y + geometry.height));
+//			break;
+//
+//		case PANEL_APPLET_ORIENT_LEFT:
+//			x -= popup_width;
+//			if (y + popup_height > geometry.y + geometry.height)
+//				y -= ((y + popup_height) - (geometry.y + geometry.height));
+//			break;
+//
+//		default:
+//			g_assert_not_reached ();
+//	}
 
 	gtk_window_move (GTK_WINDOW (priv->popup), x, y);
 
@@ -416,12 +434,14 @@ integration_window_popup (GooroomIntegrationApplet *applet)
 	popup_window_setup_sound      (priv->popup, priv->sound_module);
 	popup_window_setup_security   (priv->popup, priv->sec_module);
 	popup_window_setup_nimf       (priv->popup, priv->nimf_module);
+	popup_window_setup_updater    (priv->popup, priv->updater_module);
 	popup_window_setup_datetime   (priv->popup, priv->datetime_module);
 	popup_window_setup_power      (priv->popup, priv->power_module);
 	popup_window_setup_endsession (priv->popup, priv->endsession_module);
 
 	g_signal_connect (G_OBJECT (priv->popup), "realize", G_CALLBACK (on_popup_window_realized), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "closed", G_CALLBACK (on_popup_window_closed), applet);
+	g_signal_connect (G_OBJECT (priv->popup), "destroy_popup", G_CALLBACK (on_destroy_popup_cb), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 	g_signal_connect (G_OBJECT (priv->popup), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 
@@ -487,7 +507,7 @@ gooroom_integration_applet_size_allocate (GtkWidget     *widget,
 	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (widget);
 	GooroomIntegrationAppletPrivate *priv = applet->priv;
 
-	orientation = panel_applet_get_gtk_orientation (PANEL_APPLET (applet));
+	orientation = gp_applet_get_orientation (GP_APPLET (applet));
 
 	if (orientation == GTK_ORIENTATION_HORIZONTAL)
 		size = allocation->height;
@@ -516,8 +536,27 @@ gooroom_integration_applet_finalize (GObject *object)
 	if (priv->power_module) g_object_unref (priv->power_module);
 	if (priv->datetime_module) g_object_unref (priv->datetime_module);
 	if (priv->endsession_module) g_object_unref (priv->endsession_module);
+	if (priv->updater_module) g_object_unref (priv->updater_module);
 
 	G_OBJECT_CLASS (gooroom_integration_applet_parent_class)->finalize (object);
+}
+
+static gboolean
+gooroom_integration_applet_fill (GooroomIntegrationApplet *applet)
+{
+	g_return_val_if_fail (GP_IS_APPLET (applet), FALSE);
+
+	gtk_widget_show (GTK_WIDGET (applet));
+
+	return TRUE;
+}
+
+static void
+gooroom_integration_applet_constructed (GObject *object)
+{
+	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (object);
+
+	gooroom_integration_applet_fill (applet);
 }
 
 static void
@@ -528,11 +567,7 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 
 	priv = applet->priv = gooroom_integration_applet_get_instance_private (applet);
 
-	/* Initialize i18n */
-	bindtextdomain (GETTEXT_PACKAGE, GNOMELOCALEDIR);
-	bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
-
-	panel_applet_set_flags (PANEL_APPLET (applet), PANEL_APPLET_EXPAND_MINOR);
+	gp_applet_set_flags (GP_APPLET (applet), GP_APPLET_FLAGS_EXPAND_MINOR);
 
 	display = gdk_display_get_default ();
 
@@ -541,6 +576,7 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	priv->user_module       = user_module_new ();
 	priv->sound_module      = sound_module_new ();
 	priv->sec_module        = security_module_new ();
+	priv->updater_module    = updater_module_new ();
 	priv->nimf_module       = nimf_module_new ();
 	priv->power_module      = power_module_new ();
 	priv->datetime_module   = datetime_module_new ();
@@ -554,6 +590,11 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	GtkWidget *hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 20);
 	gtk_container_add (GTK_CONTAINER (priv->button), hbox);
 	gtk_widget_show (hbox);
+
+	GtkWidget *updater_tray = updater_module_tray_new (priv->updater_module);
+	if (updater_tray) {
+		gtk_box_pack_start (GTK_BOX (hbox), updater_tray, FALSE, FALSE, 0);
+	}
 
 	GtkWidget *nimf_tray = nimf_module_tray_new (priv->nimf_module);
 	if (nimf_tray) {
@@ -588,6 +629,7 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	g_signal_connect (G_OBJECT (priv->button), "toggled", G_CALLBACK (on_applet_button_toggled), applet);
 
 	g_signal_connect (G_OBJECT (priv->sec_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
+	g_signal_connect (G_OBJECT (priv->updater_module), "destroy-popup", G_CALLBACK (on_destroy_popup_cb), applet);
 	g_signal_connect (G_OBJECT (priv->power_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 	g_signal_connect (G_OBJECT (priv->datetime_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 	g_signal_connect (G_OBJECT (priv->nimf_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
@@ -596,7 +638,6 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 
 	g_signal_connect (gdk_display_get_default_screen (display),
                       "monitors-changed", G_CALLBACK (monitors_changed_cb), applet);
-
 }
 
 static void
@@ -608,38 +649,10 @@ gooroom_integration_applet_class_init (GooroomIntegrationAppletClass *class)
 	object_class = G_OBJECT_CLASS (class);
 	widget_class = GTK_WIDGET_CLASS (class);
 
+	object_class->constructed = gooroom_integration_applet_constructed;
 	object_class->finalize = gooroom_integration_applet_finalize;
 
 	widget_class->realize       = gooroom_integration_applet_realize;
 	widget_class->unrealize     = gooroom_integration_applet_unrealize;
 	widget_class->size_allocate = gooroom_integration_applet_size_allocate;
 }
-
-static gboolean
-gooroom_integration_applet_fill (GooroomIntegrationApplet *applet)
-{
-	g_return_val_if_fail (PANEL_IS_APPLET (applet), FALSE);
-
-	gtk_widget_show (GTK_WIDGET (applet));
-
-	return TRUE;
-}
-
-static gboolean
-gooroom_integration_applet_factory (PanelApplet *applet,
-                                    const gchar *iid,
-                                    gpointer     data)
-{
-	gboolean retval = FALSE;
-
-	if (!g_strcmp0 (iid, "GooroomIntegrationApplet"))
-		retval = gooroom_integration_applet_fill (GOOROOM_INTEGRATION_APPLET (applet));
-
-	return retval;
-}
-
-PANEL_APPLET_IN_PROCESS_FACTORY ("GooroomIntegrationAppletFactory",
-                                 GOOROOM_TYPE_INTEGRATION_APPLET,
-                                 gooroom_integration_applet_factory,
-                                 NULL)
-

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -69,7 +69,8 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 {
 	g_return_if_fail (data != NULL);
 
-	const char *user_name, *icon_name;
+	const char *user_name;
+	const char *icon_name = NULL;
 
 	UserModule *module = USER_MODULE (data);
 	UserModulePrivate *priv = module->priv;
@@ -99,7 +100,7 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 	if (priv->control) {
 		if (priv->user_name) {
 			const gchar *s = user_name ? user_name : _("Unknown");
-			gchar *markup = g_strdup_printf ("<b>%s</b>", s);
+			gchar *markup = g_strdup_printf ("%s", s);
 			gtk_label_set_markup (GTK_LABEL (priv->user_name), markup);
 			g_free (markup);
 		}
@@ -114,11 +115,9 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 }
 
 static void
-build_control_ui (UserModule *module, GtkSizeGroup *size_group)
+build_control_ui (UserModule *module)
 {
 	GError *error = NULL;
-	GtkWidget *btn_face;
-
 	UserModulePrivate *priv = module->priv;
 
 	gtk_builder_add_from_resource (priv->builder, "/kr/gooroom/IntegrationApplet/modules/user/user-control.ui", &error);
@@ -128,12 +127,8 @@ build_control_ui (UserModule *module, GtkSizeGroup *size_group)
 	}
 
 	priv->control = GET_WIDGET (priv->builder, "control");
-	btn_face = GET_WIDGET (priv->builder, "btn_face");
 	priv->user_name = GET_WIDGET (priv->builder, "lbl_user_name");
 	priv->img_status = GET_WIDGET (priv->builder, "img_status");
-
-	if (size_group)
-		gtk_size_group_add_widget (size_group, btn_face);
 }
 
 static void
@@ -192,7 +187,8 @@ user_module_tray_new (UserModule *module)
 	UserModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("avatar-default", GTK_ICON_SIZE_BUTTON);
+		priv->tray = gtk_image_new_from_icon_name ("avatar-default-symbolic",
+                                                   GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -207,13 +203,13 @@ user_module_tray_new (UserModule *module)
 }
 
 GtkWidget *
-user_module_control_new (UserModule *module, GtkSizeGroup *size_group)
+user_module_control_new (UserModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	UserModulePrivate *priv = module->priv;
 
-	build_control_ui (module, size_group);
+	build_control_ui (module);
 
 	gboolean loaded = FALSE;
 	g_object_get (priv->um, "is-loaded", &loaded, NULL);

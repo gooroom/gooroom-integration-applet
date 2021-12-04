@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-03-25 19:12+0900\n"
+"POT-Creation-Date: 2021-11-16 16:08+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: ko\n"
@@ -26,9 +26,10 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:203
-#: ../modules/security/security-module.c:345
+#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:202
+#: ../modules/security/security-module.c:346 ../src/popup-window.ui.h:7
 #: ../modules/security/security-control.ui.h:3
+#: ../modules/updater/updater-control.ui.h:1
 msgid "Unknown"
 msgstr "알수없음"
 
@@ -114,78 +115,86 @@ msgstr "%Y년 %B %-d일   %p %l:%M:%S"
 msgid "%B %-d %Y   %T"
 msgstr "%Y년 %B %-d일   %T"
 
-#. 12-hour mode
-#: ../modules/datetime/datetime-module.c:128
-msgid "%B %-d %Y   %l:%M %p"
-msgstr "%Y년 %B %-d일   %p %l:%M"
-
-#: ../modules/datetime/datetime-module.c:130
-msgid "%B %-d %Y   %R"
-msgstr "%Y년 %B %-d일   %R"
-
-#: ../modules/security/security-module.c:95
+#: ../modules/security/security-module.c:93
 msgid "Security Status Of Gooroom System"
 msgstr "구름 시스템 보안 상태"
 
-#: ../modules/security/security-module.c:96
+#: ../modules/security/security-module.c:94
 msgid "A security vulnerability has been detected."
 msgstr "보안위협이 탐지되었습니다."
 
-#: ../modules/security/security-module.c:107
+#: ../modules/security/security-module.c:105
 #, c-format
 msgid "Protecting OS"
 msgstr "운영체제 보호"
 
-#: ../modules/security/security-module.c:111
+#: ../modules/security/security-module.c:109
 msgid "Protect executable files"
 msgstr "실행파일 검증"
 
-#: ../modules/security/security-module.c:115
+#: ../modules/security/security-module.c:113
 msgid "Trusted Booting"
 msgstr "신뢰부팅"
 
-#: ../modules/security/security-module.c:119
+#: ../modules/security/security-module.c:117
 #, c-format
 msgid "Resources Control"
 msgstr "매체제어"
 
-#: ../modules/security/security-module.c:268
+#: ../modules/security/security-module.c:267
 msgid "Safety"
 msgstr "안전"
 
-#: ../modules/security/security-module.c:281
+#: ../modules/security/security-module.c:280
 msgid "Vulnerable"
 msgstr "취약"
 
-#: ../modules/security/security-module.c:626
+#: ../modules/security/security-module.c:628
 msgid "Details"
 msgstr "자세히 보기"
 
-#: ../modules/nimf/nimf-module.c:406
+#: ../modules/nimf/nimf-module.c:413
 msgid "Input Method Not Running"
 msgstr "입력기 작동이 중지됨"
 
-#: ../modules/nimf/nimf-module.c:477
+#: ../modules/nimf/nimf-module.c:485
 msgid "Input Method Settings"
 msgstr "입력기 설정"
 
-#: ../src/gooroom-integration-applet.c:175
+#: ../modules/updater/updater-module.c:293
+#: ../modules/updater/updater-module.c:307
+#: ../modules/updater/updater-module.c:386
+#: ../modules/updater/updater-module.c:461
+msgid "Gooroom Update is terminated"
+msgstr "구름 업데이트가 종료되었습니다"
+
+#: ../src/gooroom-integration-applet.c:167
 msgid "Application Launching Error"
 msgstr "어플리케이션 실행 에러"
 
-#: ../src/gooroom-integration-applet.c:281
+#: ../src/gooroom-integration-applet.c:280
 msgid "Could not execute command"
 msgstr "명령을 실행할 수 없습니다."
 
-#: ../src/gooroom-integration-applet.c:311
+#: ../src/gooroom-integration-applet.c:310
 #, c-format
 msgid "Could not launch '%s' program"
 msgstr "'%s' 프로그램을 실행할 수 없습니다."
 
-#: ../src/gooroom-integration-applet.c:313
+#: ../src/gooroom-integration-applet.c:312
 #, c-format
 msgid "Could not launch '%s'"
 msgstr "'%s'를 실행할 수 없습니다."
+
+#: ../src/gooroom-integration-module.c:33
+#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:1
+msgid "Gooroom Integration Applet"
+msgstr "구름 통합 애플릿"
+
+#: ../src/gooroom-integration-module.c:34
+#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:2
+msgid "Integration applet for GNOME panel"
+msgstr "GNOME 패널용 통합 애플릿"
 
 #: ../src/popup-window.ui.h:1
 msgid "Settings"
@@ -200,34 +209,34 @@ msgid "Shut down Gooroom"
 msgstr "구름 종료"
 
 #: ../src/popup-window.ui.h:4
-msgid "Back"
-msgstr "뒤로"
+msgid "Power"
+msgstr "전원"
 
-#: ../modules/security/security-control.ui.h:1
-msgid "<b>Security Status</b>"
-msgstr "<b>보안 상태</b>"
+#: ../src/popup-window.ui.h:5 ../modules/security/security-control.ui.h:1
+msgid "Security Status"
+msgstr "보안 상태"
 
-#: ../modules/security/security-control.ui.h:2
+#: ../src/popup-window.ui.h:6 ../modules/security/security-control.ui.h:2
 msgid ":"
 msgstr ":"
+
+#: ../src/popup-window.ui.h:8
+msgid "Keyboard"
+msgstr "키보드"
+
+#: ../src/popup-window.ui.h:9
+msgid "Back"
+msgstr "뒤로"
 
 #: ../modules/security/security-control-menu.ui.h:1
 msgid "Learn more about security status of Gooroom"
 msgstr "구름 보안상태를 자세히 봅니다"
 
 #: ../modules/security/security-control-menu.ui.h:2
-msgid "Gooroom Security Status View"
-msgstr "구름 보안상태 보기"
+msgid "Gooroom Security Status Tool"
+msgstr "구름 보안상태 도구"
 
 #: ../modules/security/security-control-menu.ui.h:3
-msgid "Settings for Gooroom management"
-msgstr "구름 관리를 위한 설정"
-
-#: ../modules/security/security-control-menu.ui.h:4
-msgid "Gooroom Management Settings"
-msgstr "구름 관리 설정"
-
-#: ../modules/security/security-control-menu.ui.h:5
 msgid "Take Safety Measures"
 msgstr "안전 조치 실행"
 
@@ -255,10 +264,48 @@ msgstr "시스템 재시작"
 msgid "Shut Down"
 msgstr "시스템 종료"
 
-#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:1
-msgid "Gooroom Integration Applet"
-msgstr "구름 통합 애플릿"
+#: ../modules/updater/updater-control-menu.ui.h:1
+msgid "Show Gooroom Update"
+msgstr "구름 업데이트를 자세히 봅니다"
 
-#: ../data/kr.gooroom.IntegrationApplet.panel-applet.in.in.h:2
-msgid "Integration applet for GNOME panel"
-msgstr "GNOME 패널용 통합 애플릿"
+#: ../modules/updater/updater-control-menu.ui.h:2
+msgid "Show"
+msgstr "구름 업데이트 보이기"
+
+#: ../modules/updater/updater-control-menu.ui.h:3
+msgid "Refresh update status of Gooroom"
+msgstr "구름 업데이트의 상태를 새로고침 합니다"
+
+#: ../modules/updater/updater-control-menu.ui.h:4
+msgid "Refresh"
+msgstr "새로고침"
+
+#: ../modules/updater/updater-control-menu.ui.h:5
+msgid "Open Preferences"
+msgstr "설정 열기"
+
+#: ../modules/updater/updater-control-menu.ui.h:6
+msgid "Preferences"
+msgstr "설정"
+
+#: ../modules/updater/updater-control-menu.ui.h:7
+msgid "Please quit Synaptic to control Update Manager."
+msgstr "시냅틱 패키지 관리자가 실행 중입니다."
+
+#~ msgid "Settings for Gooroom management"
+#~ msgstr "구름 관리를 위한 설정"
+
+#~ msgid "Gooroom Management Settings"
+#~ msgstr "구름 관리 설정"
+
+#~ msgid "Gooroom Update was terminated abnormally"
+#~ msgstr "구름 업데이트가 비정상적으로 종료되었습니다"
+
+#~ msgid "Update blocking function has been enabled"
+#~ msgstr "업데이트 차단 기능이 활성화 되었습니다"
+
+#~ msgid "%B %-d %Y   %l:%M %p"
+#~ msgstr "%Y년 %B %-d일   %p %l:%M"
+
+#~ msgid "%B %-d %Y   %R"
+#~ msgstr "%Y년 %B %-d일   %R"

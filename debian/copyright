@@ -2,7 +2,7 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Source: https://github.com/gooroom/gooroom-integration-applet/
 
 Files: *
-Copyright: 2015-2019 Gooroom <gooroom@gooroom.kr>
+Copyright: 2015-2021 Gooroom <gooroom@gooroom.kr>
 License: GPL-2+
 
 Files: common/panel-glib.*
@@ -11,7 +11,7 @@ License: GPL-2+
 
 Files: modules/nimf/nimf-gooroom.c
 Copyright: 2015-2019 Hodong Kim <cogniti@gmail.com>
-           2015-2019 gooroom <gooroom@gooroom.kr>
+           2015-2021 gooroom <gooroom@gooroom.kr>
 License: GPL-2+
 
 License: GPL-2+

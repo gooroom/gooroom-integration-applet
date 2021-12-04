@@ -1,30 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkBox" id="control">
     <property name="visible">True</property>
-    <property name="can_focus">False</property>
+    <property name="can-focus">False</property>
     <property name="orientation">vertical</property>
     <property name="spacing">10</property>
+    <property name="baseline-position">top</property>
     <child>
       <object class="GtkButton" id="btn_logout">
-        <property name="name">module-widget</property>
         <property name="visible">True</property>
-        <property name="can_focus">True</property>
-        <property name="receives_default">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="spacing">10</property>
+            <property name="can-focus">False</property>
+            <property name="spacing">20</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="pixel_size">24</property>
-                <property name="icon_name">system-log-out-symbolic</property>
+                <property name="can-focus">False</property>
+                <property name="pixel-size">24</property>
+                <property name="icon-name">system-log-out-symbolic</property>
+                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -35,9 +36,9 @@
             <child>
               <object class="GtkLabel" id="lbl_logout">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Log Out</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -57,21 +58,21 @@
     </child>
     <child>
       <object class="GtkButton" id="btn_hibernate">
-        <property name="name">module-widget</property>
-        <property name="can_focus">True</property>
-        <property name="receives_default">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="spacing">10</property>
+            <property name="can-focus">False</property>
+            <property name="spacing">20</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="pixel_size">24</property>
-                <property name="icon_name">system-hibernate-symbolic</property>
+                <property name="can-focus">False</property>
+                <property name="pixel-size">24</property>
+                <property name="icon-name">system-hibernate-symbolic</property>
+                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -82,9 +83,9 @@
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Hibernate</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -104,21 +105,21 @@
     </child>
     <child>
       <object class="GtkButton" id="btn_suspend">
-        <property name="name">module-widget</property>
-        <property name="can_focus">True</property>
-        <property name="receives_default">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="spacing">10</property>
+            <property name="can-focus">False</property>
+            <property name="spacing">20</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="pixel_size">24</property>
-                <property name="icon_name">system-suspend-symbolic</property>
+                <property name="can-focus">False</property>
+                <property name="pixel-size">24</property>
+                <property name="icon-name">system-suspend-symbolic</property>
+                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -129,9 +130,9 @@
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Suspend</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -151,21 +152,20 @@
     </child>
     <child>
       <object class="GtkButton" id="btn_restart">
-        <property name="name">module-widget</property>
-        <property name="can_focus">True</property>
-        <property name="receives_default">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="spacing">10</property>
+            <property name="can-focus">False</property>
+            <property name="spacing">20</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="pixel_size">24</property>
-                <property name="icon_name">system-restart-symbolic</property>
+                <property name="can-focus">False</property>
+                <property name="pixel-size">24</property>
+                <property name="icon-name">system-restart-symbolic</property>
                 <property name="icon_size">3</property>
               </object>
               <packing>
@@ -177,9 +177,9 @@
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Restart</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -199,21 +199,20 @@
     </child>
     <child>
       <object class="GtkButton" id="btn_shutdown">
-        <property name="name">module-widget</property>
-        <property name="can_focus">True</property>
-        <property name="receives_default">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
-            <property name="spacing">10</property>
+            <property name="can-focus">False</property>
+            <property name="spacing">20</property>
             <child>
               <object class="GtkImage">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="pixel_size">24</property>
-                <property name="icon_name">system-shutdown-symbolic</property>
+                <property name="can-focus">False</property>
+                <property name="pixel-size">24</property>
+                <property name="icon-name">system-shutdown-symbolic</property>
                 <property name="icon_size">3</property>
               </object>
               <packing>
@@ -225,9 +224,9 @@
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
+                <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Shut Down</property>
-                <property name="use_markup">True</property>
+                <property name="use-markup">True</property>
                 <property name="xalign">0</property>
               </object>
               <packing>
@@ -238,6 +237,9 @@
             </child>
           </object>
         </child>
+        <style>
+          <class name="btn-shutdown"/>
+        </style>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -245,5 +247,8 @@
         <property name="position">4</property>
       </packing>
     </child>
+    <style>
+      <class name="module-menu-box"/>
+    </style>
   </object>
 </interface>

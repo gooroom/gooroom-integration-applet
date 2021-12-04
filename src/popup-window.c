@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -34,6 +34,8 @@
 #include "common.h"
 #include "popup-window.h"
 
+#define MODULE_BOX_NAME "module-box"
+
 enum {
 	CONTROL_TYPE_USER = 0,
 	CONTROL_TYPE_VOLUME,
@@ -41,6 +43,7 @@ enum {
 	CONTROL_TYPE_BRIGHTNESS,
 	CONTROL_TYPE_BATTERY,
 	CONTROL_TYPE_DATETIME,
+	CONTROL_TYPE_UPDATER,
 	CONTROL_TYPE_NIMF
 };
 
@@ -53,6 +56,7 @@ struct _PopupWindowPrivate
 	GtkWidget *page_3;
 	GtkWidget *page_4;
 	GtkWidget *page_5;
+	GtkWidget *page_6;
 
 	GtkWidget *box_user;
 	GtkWidget *box_middle;
@@ -64,11 +68,16 @@ struct _PopupWindowPrivate
 	GtkWidget *btn_security_back;
 	GtkWidget *btn_nimf_back;
 	GtkWidget *btn_datetime_back;
+	GtkWidget *btn_updater_back;
 	GtkWidget *btn_settings;
 	GtkWidget *btn_screenlock;
 	GtkWidget *btn_endsession;
 
 	GtkWidget *stack;
+
+	GtkWidget *lbl_datetime;
+	GtkWidget *lbl_sec_status;
+	GtkWidget *lbl_updater;
 
 	UserModule       *user_module;
 	SoundModule      *sound_module;
@@ -77,10 +86,9 @@ struct _PopupWindowPrivate
 	DateTimeModule   *datetime_module;
 	EndSessionModule *endsession_module;
 	NimfModule       *nimf_module;
+	UpdaterModule    *updater_module;
 
-	gboolean block_focus_out_event;
-
-	GtkSizeGroup *size_group;
+	gboolean    block_focus_out_event;
 
 	int x;
 	int y;
@@ -99,12 +107,11 @@ enum {
     CLOSED,
     LAUNCH_DESKTOP,
     LAUNCH_COMMAND,
+    DESTROY_POPUP,
     LAST_SIGNAL
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
-
-#define CONTROL_WIDGET_NAME "module-widget"
 
 
 G_DEFINE_TYPE_WITH_PRIVATE (PopupWindow, popup_window, GTK_TYPE_WINDOW)
@@ -148,88 +155,12 @@ ungrab_pointer (PopupWindow *window)
 }
 
 static void
-destroy_control_widget (PopupWindow *window)
-{
-	PopupWindowPrivate *priv = window->priv;
-
-	if (priv->user_module) {
-		user_module_control_destroy (priv->user_module);
-	}
-
-	if (priv->sound_module) {
-		sound_module_control_destroy (priv->sound_module);
-	}
-
-	if (priv->security_module) {
-		security_module_control_destroy (priv->security_module);
-		security_module_control_menu_destroy (priv->security_module);
-	}
-
-	if (priv->power_module) {
-		power_module_brightness_control_destroy (priv->power_module);
-		power_module_battery_control_destroy (priv->power_module);
-	}
-
-	if (priv->datetime_module) {
-		datetime_module_control_destroy (priv->datetime_module);
-	}
-
-	if (priv->endsession_module) {
-		endsession_module_control_destroy (priv->endsession_module);
-	}
-
-	if (priv->nimf_module) {
-		nimf_module_control_destroy (priv->nimf_module);
-		nimf_module_control_menu_destroy (priv->nimf_module);
-	}
-}
-
-static void
-add_control_widget (PopupWindow *window,
-                    GtkWidget   *control,
-                    gint         type)
-{
-	PopupWindowPrivate *priv = window->priv;
-
-	if (!control) return;
-
-	switch (type)
-	{
-		case CONTROL_TYPE_USER:
-		{
-			gtk_box_pack_start (GTK_BOX (priv->box_user), control, TRUE, FALSE, 0);
-			gtk_widget_show (control);
-			break;
-		}
-
-		case CONTROL_TYPE_VOLUME:
-		case CONTROL_TYPE_BRIGHTNESS:
-		{
-			gtk_box_pack_start (GTK_BOX (priv->box_control), control, TRUE, FALSE, 0);
-			break;
-		}
-
-		case CONTROL_TYPE_SECURITY:
-		case CONTROL_TYPE_BATTERY:
-		case CONTROL_TYPE_DATETIME:
-		case CONTROL_TYPE_NIMF:
-		{
-			gtk_box_pack_start (GTK_BOX (priv->box_general), control, TRUE, FALSE, 0);
-			break;
-		}
-
-		default:
-		break;
-	}
-}
-
-static void
 adjust_layout (PopupWindow *window)
 {
 	int pref_h;
 	int top, end, bottom, start;
 	int box_end_spacing, box_middle_spacing, box_control_spacing, box_general_spacing;
-	int page_spacing[5] = {0, };
+	int page_spacing[6] = {0, };
 
 	PopupWindowPrivate *priv = window->priv;
 
@@ -251,6 +182,7 @@ adjust_layout (PopupWindow *window)
 	page_spacing[2] = gtk_box_get_spacing (GTK_BOX (priv->page_3));
 	page_spacing[3] = gtk_box_get_spacing (GTK_BOX (priv->page_4));
 	page_spacing[4] = gtk_box_get_spacing (GTK_BOX (priv->page_5));
+	page_spacing[5] = gtk_box_get_spacing (GTK_BOX (priv->page_6));
 
 	while (pref_h > priv->workarea.height) {
 		--top;
@@ -266,6 +198,7 @@ adjust_layout (PopupWindow *window)
 		--page_spacing[2];
 		--page_spacing[3];
 		--page_spacing[4];
+		--page_spacing[5];
 
 		gtk_widget_set_margin_top (priv->stack, top);
 		gtk_widget_set_margin_end (priv->stack, end);
@@ -283,10 +216,10 @@ adjust_layout (PopupWindow *window)
 		gtk_box_set_spacing (GTK_BOX (priv->page_3), page_spacing[2]);
 		gtk_box_set_spacing (GTK_BOX (priv->page_4), page_spacing[3]);
 		gtk_box_set_spacing (GTK_BOX (priv->page_5), page_spacing[4]);
+		gtk_box_set_spacing (GTK_BOX (priv->page_6), page_spacing[5]);
 
 		gtk_widget_get_preferred_height (GTK_WIDGET (window), NULL, &pref_h);
 	}
-
 #if 0
     GdkRectangle area;
     GdkMonitor *primary;
@@ -327,6 +260,7 @@ adjust_layout (PopupWindow *window)
 	gtk_box_set_spacing (GTK_BOX (priv->page_3), box_spacing1);
 	gtk_box_set_spacing (GTK_BOX (priv->page_4), box_spacing1);
 	gtk_box_set_spacing (GTK_BOX (priv->page_5), box_spacing1);
+	gtk_box_set_spacing (GTK_BOX (priv->page_6), box_spacing1);
 #endif
 }
 
@@ -379,6 +313,28 @@ on_nimf_back_button_clicked_cb (GtkButton *button, gpointer data)
 }
 
 static void
+on_updater_back_button_clicked_cb (GtkButton *button, gpointer data)
+{
+	PopupWindow *window = POPUP_WINDOW (data);
+	PopupWindowPrivate *priv = window->priv;
+
+	gtk_stack_set_visible_child_name (GTK_STACK (priv->stack), "main-page");
+	if (priv->updater_module) {
+		updater_module_control_menu_destroy (priv->updater_module);
+	}
+}
+
+static void
+security_status_changed_cb (SecurityModule *module, const gchar *status, gpointer data)
+{
+	PopupWindow *window = POPUP_WINDOW (data);
+	PopupWindowPrivate *priv = window->priv;
+
+	if (priv->lbl_sec_status)
+		gtk_label_set_markup (GTK_LABEL (priv->lbl_sec_status), status);
+}
+
+static void
 on_security_button_clicked_cb (GtkButton *button, gpointer data)
 {
 	PopupWindow *window = POPUP_WINDOW (data);
@@ -417,6 +373,16 @@ on_endsession_button_clicked_cb (GtkButton *button, gpointer data)
 }
 
 static void
+datetime_changed_cb (SecurityModule *module, const gchar *datetime, gpointer data)
+{
+	PopupWindow *window = POPUP_WINDOW (data);
+	PopupWindowPrivate *priv = window->priv;
+
+	if (priv->lbl_datetime)
+		gtk_label_set_markup (GTK_LABEL (priv->lbl_datetime), datetime);
+}
+
+static void
 on_datetime_button_clicked_cb (GtkButton *button, gpointer data)
 {
 	PopupWindow *window = POPUP_WINDOW (data);
@@ -442,13 +408,44 @@ on_nimf_button_clicked_cb (GtkButton *button, gpointer data)
 	PopupWindowPrivate *priv = window->priv;
 
 	if (priv->nimf_module) {
-		GtkWidget *w = NULL;
-		w = nimf_module_control_menu_new (priv->nimf_module);
+		GtkWidget *w = nimf_module_control_menu_new (priv->nimf_module);
 		if (w) {
 			GtkWidget *child = gtk_stack_get_child_by_name (GTK_STACK (priv->stack), "nimf-page");
 			if (child) {
 				gtk_box_pack_start (GTK_BOX (child), w, TRUE, TRUE, 0);
 				gtk_stack_set_visible_child (GTK_STACK (priv->stack), child);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
+			}
+		}
+	}
+}
+
+static void
+updater_status_changed_cb (UpdaterModule *module, const gchar *updater, gpointer data)
+{
+	PopupWindow *window = POPUP_WINDOW (data);
+	PopupWindowPrivate *priv = window->priv;
+
+	if (priv->lbl_updater)
+		gtk_label_set_markup (GTK_LABEL (priv->lbl_updater), updater);
+}
+
+static void
+on_updater_button_clicked_cb (GtkButton *button, gpointer data)
+{
+	PopupWindow *window = POPUP_WINDOW (data);
+	PopupWindowPrivate *priv = window->priv;
+
+	if (priv->updater_module) {
+		GtkWidget *w = updater_module_control_menu_new (priv->updater_module);
+		if (w) {
+			GtkWidget *child = gtk_stack_get_child_by_name (GTK_STACK (priv->stack), "updater-page");
+			if (child) {
+				gtk_box_pack_start (GTK_BOX (child), w, TRUE, TRUE, 0);
+				gtk_stack_set_visible_child (GTK_STACK (priv->stack), child);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
 		}
 	}
@@ -473,7 +470,96 @@ on_system_button_clicked_cb (GtkButton *button, gpointer data)
 		}
 		g_signal_emit (G_OBJECT (window), signals[LAUNCH_DESKTOP], 0, "gnome-control-center.desktop");
 	} else if (button == GTK_BUTTON (priv->btn_screenlock)) {
-		g_signal_emit (G_OBJECT (window), signals[LAUNCH_COMMAND], 0, "gnome-screensaver-command -l");
+		g_signal_emit (G_OBJECT (window), signals[LAUNCH_COMMAND], 0, "xdg-screensaver lock");
+	}
+}
+
+static void
+destroy_control_widget (PopupWindow *window)
+{
+	PopupWindowPrivate *priv = window->priv;
+
+	if (priv->user_module) {
+		user_module_control_destroy (priv->user_module);
+	}
+
+	if (priv->sound_module) {
+		sound_module_control_destroy (priv->sound_module);
+	}
+
+	if (priv->security_module) {
+		security_module_control_destroy (priv->security_module);
+		security_module_control_menu_destroy (priv->security_module);
+		g_signal_handlers_disconnect_by_func (priv->security_module,
+                                              G_CALLBACK (security_status_changed_cb), window);
+	}
+
+	if (priv->power_module) {
+		power_module_brightness_control_destroy (priv->power_module);
+		power_module_battery_control_destroy (priv->power_module);
+	}
+
+	if (priv->datetime_module) {
+		datetime_module_control_destroy (priv->datetime_module);
+		datetime_module_control_menu_destroy (priv->datetime_module);
+		g_signal_handlers_disconnect_by_func (priv->datetime_module,
+                                              G_CALLBACK (datetime_changed_cb), window);
+	}
+
+	if (priv->endsession_module) {
+		endsession_module_control_destroy (priv->endsession_module);
+	}
+
+	if (priv->nimf_module) {
+		nimf_module_control_destroy (priv->nimf_module);
+		nimf_module_control_menu_destroy (priv->nimf_module);
+	}
+
+	if (priv->updater_module) {
+		updater_module_control_destroy (priv->updater_module);
+		updater_module_control_menu_destroy (priv->updater_module);
+		g_signal_handlers_disconnect_by_func (priv->updater_module,
+                                              G_CALLBACK (updater_status_changed_cb), window);
+	}
+}
+
+static void
+add_control_widget (PopupWindow *window,
+                    GtkWidget   *control,
+                    gint         type)
+{
+	PopupWindowPrivate *priv = window->priv;
+
+	if (!control) return;
+
+	switch (type)
+	{
+		case CONTROL_TYPE_USER:
+		{
+			gtk_box_pack_start (GTK_BOX (priv->box_user), control, TRUE, FALSE, 0);
+			gtk_widget_show (control);
+			break;
+		}
+
+		case CONTROL_TYPE_VOLUME:
+		case CONTROL_TYPE_BRIGHTNESS:
+		{
+			gtk_box_pack_start (GTK_BOX (priv->box_control), control, TRUE, FALSE, 0);
+			break;
+		}
+
+		case CONTROL_TYPE_SECURITY:
+		case CONTROL_TYPE_UPDATER:
+		case CONTROL_TYPE_BATTERY:
+		case CONTROL_TYPE_DATETIME:
+		case CONTROL_TYPE_NIMF:
+		{
+			gtk_box_pack_start (GTK_BOX (priv->box_general), control, TRUE, FALSE, 0);
+			break;
+		}
+
+		default:
+		break;
 	}
 }
 
@@ -605,6 +691,7 @@ static void
 popup_window_init (PopupWindow *window)
 {
 	PopupWindowPrivate *priv;
+	GtkCssProvider	   *provider;
 
 	priv = window->priv = popup_window_get_instance_private (window);
 
@@ -618,10 +705,14 @@ popup_window_init (PopupWindow *window)
 	priv->endsession_module = NULL;
 	priv->nimf_module       = NULL;
 	priv->grab_pointer      = NULL;
-
 	priv->block_focus_out_event = FALSE;
 
-	priv->size_group = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
+	provider = gtk_css_provider_new ();
+	gtk_css_provider_load_from_resource (provider, "/kr/gooroom/IntegrationApplet/ui/style.css");
+	gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
+                                               GTK_STYLE_PROVIDER (provider),
+                                               GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+	g_object_unref (provider);
 
 	gtk_window_stick (GTK_WINDOW (window));
 	gtk_window_set_decorated (GTK_WINDOW (window), FALSE);
@@ -656,6 +747,8 @@ popup_window_init (PopupWindow *window)
 			G_CALLBACK (on_nimf_back_button_clicked_cb), window);
 	g_signal_connect (G_OBJECT (priv->btn_datetime_back), "clicked",
 			G_CALLBACK (on_datetime_back_button_clicked_cb), window);
+	g_signal_connect (G_OBJECT (priv->btn_updater_back), "clicked",
+			G_CALLBACK (on_updater_back_button_clicked_cb), window);
 }
 
 static void
@@ -699,6 +792,16 @@ popup_window_class_init (PopupWindowClass *klass)
 	widget_class->key_press_event = popup_window_key_press_event;
 	widget_class->size_allocate = popup_window_size_allocate;
 
+	signals[DESTROY_POPUP] = g_signal_new ("destroy-popup",
+                                           WINDOW_TYPE_POPUP,
+                                           G_SIGNAL_RUN_LAST,
+                                           G_STRUCT_OFFSET(PopupWindowClass,
+                                           destroy_popup),
+                                           NULL, NULL,
+                                           g_cclosure_marshal_VOID__INT,
+                                           G_TYPE_NONE, 1,
+                                           G_TYPE_INT);
+
 	signals[CLOSED] = g_signal_new ("closed",
                                     WINDOW_TYPE_POPUP,
                                     G_SIGNAL_RUN_LAST,
@@ -737,6 +840,7 @@ popup_window_class_init (PopupWindowClass *klass)
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_3);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_4);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_5);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_6);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_user);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_middle);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_control);
@@ -749,7 +853,11 @@ popup_window_class_init (PopupWindowClass *klass)
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_security_back);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_datetime_back);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_nimf_back);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_updater_back);
 	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, stack);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_datetime);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_sec_status);
+	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_updater);
 }
 
 PopupWindow *
@@ -790,10 +898,11 @@ popup_window_setup_user (PopupWindow *window,
 	if (MODULE_IS_USER (module)) {
 		if (!priv->user_module) {
 			priv->user_module = module;
-			GtkWidget *w = user_module_control_new (priv->user_module, priv->size_group);
+			GtkWidget *w = user_module_control_new (priv->user_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_USER);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
 		}
 	}
@@ -808,10 +917,11 @@ popup_window_setup_sound (PopupWindow *window,
 	if (MODULE_IS_SOUND (module)) {
 		if (!priv->sound_module) {
 			priv->sound_module = module;
-			GtkWidget *w = sound_module_control_new (priv->sound_module, priv->size_group);
+			GtkWidget *w = sound_module_control_new (priv->sound_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_VOLUME);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
 		}
 	}
@@ -826,14 +936,17 @@ popup_window_setup_security (PopupWindow    *window,
 	if (MODULE_IS_SECURITY (module)) {
 		if (!priv->security_module) {
 			priv->security_module = module;
-			GtkWidget *w = security_module_control_new (priv->security_module, priv->size_group);
+			GtkWidget *w = security_module_control_new (priv->security_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_SECURITY);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 
 				g_signal_connect (G_OBJECT (w), "clicked",
-						G_CALLBACK (on_security_button_clicked_cb), window);
+                                  G_CALLBACK (on_security_button_clicked_cb), window);
 			}
+			g_signal_connect (G_OBJECT (priv->security_module), "status-changed",
+                              G_CALLBACK (security_status_changed_cb), window);
 		}
 	}
 }
@@ -848,16 +961,18 @@ popup_window_setup_power (PopupWindow *window,
 		if (!priv->power_module) {
 			priv->power_module = module;
 			GtkWidget *w = NULL;
-			w = power_module_brightness_control_new (priv->power_module, priv->size_group);
+			w = power_module_brightness_control_new (priv->power_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_BRIGHTNESS);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
 
-			w = power_module_battery_control_new (priv->power_module, priv->size_group);
+			w = power_module_battery_control_new (priv->power_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_BATTERY);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
 		}
 	}
@@ -872,14 +987,17 @@ popup_window_setup_datetime (PopupWindow    *window,
 	if (MODULE_IS_DATETIME (module)) {
 		if (!priv->datetime_module) {
 			priv->datetime_module = module;
-			GtkWidget *w = datetime_module_control_new (priv->datetime_module, priv->size_group);
+			GtkWidget *w = datetime_module_control_new (priv->datetime_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_DATETIME);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 
 				g_signal_connect (G_OBJECT (w), "clicked",
 						G_CALLBACK (on_datetime_button_clicked_cb), window);
 			}
+			g_signal_connect (G_OBJECT (priv->datetime_module), "datetime-changed",
+                              G_CALLBACK (datetime_changed_cb), window);
 		}
 	}
 }
@@ -906,14 +1024,39 @@ popup_window_setup_nimf (PopupWindow *window,
 	if (MODULE_IS_NIMF (module)) {
 		if (!priv->nimf_module) {
 			priv->nimf_module = module;
-			GtkWidget *w = nimf_module_control_new (priv->nimf_module, priv->size_group);
+			GtkWidget *w = nimf_module_control_new (priv->nimf_module);
 			if (w) {
-				gtk_widget_set_name (w, CONTROL_WIDGET_NAME);
 				add_control_widget (window, w, CONTROL_TYPE_NIMF);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 
 				g_signal_connect (G_OBJECT (w), "clicked",
 						G_CALLBACK (on_nimf_button_clicked_cb), window);
 			}
+		}
+	}
+}
+
+void
+popup_window_setup_updater (PopupWindow    *window,
+                            UpdaterModule  *module)
+{
+	PopupWindowPrivate *priv = window->priv;
+
+	if (MODULE_IS_UPDATER (module)) {
+		if (!priv->updater_module) {
+			priv->updater_module = module;
+			GtkWidget *w = updater_module_control_new (priv->updater_module);
+			if (w) {
+				add_control_widget (window, w, CONTROL_TYPE_UPDATER);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
+
+				g_signal_connect (G_OBJECT (w), "clicked",
+						G_CALLBACK (on_updater_button_clicked_cb), window);
+			}
+			g_signal_connect (G_OBJECT (priv->updater_module), "status-changed",
+                              G_CALLBACK (updater_status_changed_cb), window);
 		}
 	}
 }

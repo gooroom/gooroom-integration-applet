@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -44,6 +44,7 @@ static void
 gooroom_calendar_init (GooroomCalendar *calendar)
 {
 	GDateTime *dt;
+	GtkStyleContext *context;
 
 	dt = g_date_time_new_now_local ();
 
@@ -55,6 +56,9 @@ gooroom_calendar_init (GooroomCalendar *calendar)
                              g_date_time_get_day_of_month (dt));
 
 	g_date_time_unref (dt);
+
+    context = gtk_widget_get_style_context (GTK_WIDGET (calendar));
+	gtk_style_context_add_class (context, "applet-calendar");
 }
 
 static void

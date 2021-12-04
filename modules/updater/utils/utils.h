@@ -24,25 +24,9 @@
 #include <glib.h>
 #include <gio/gio.h>
 
-#include <json-c/json.h>
-
-#define GOOROOM_SECURITY_LOGPARSER_SEEKTIME      "/var/tmp/GOOROOM-SECURITY-LOGPARSER-SEEKTIME"
-#define GOOROOM_SECURITY_STATUS_VULNERABLE       "/var/tmp/GOOROOM-SECURITY-STATUS-VULNERABLE"
-#define GOOROOM_SECURITY_LOGPARSER_NEXT_SEEKTIME "/var/tmp/GOOROOM-SECURITY-LOGPARSER-NEXT-SEEKTIME"
-
 G_BEGIN_DECLS
 
-
-json_object *JSON_OBJECT_GET                       (json_object *obj,
-                                                    const gchar *key);
-
-gboolean     run_security_log_parser_async         (GPid     *pid,
-                                                    GIOFunc   callback_func,
-                                                    gpointer  data);
-
 void         send_taking_measures_signal_to_agent  (void);
-void         send_taking_measure_signal_to_self    (void);
-
 
 G_END_DECLS
 

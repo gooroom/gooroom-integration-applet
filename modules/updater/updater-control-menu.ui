@@ -2,28 +2,27 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkBox" id="box_sec_menu">
+  <object class="GtkBox" id="box_updater_menu">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="orientation">vertical</property>
     <property name="spacing">10</property>
     <property name="baseline-position">top</property>
     <child>
-      <object class="GtkButton" id="btn_sec_more">
+      <object class="GtkButton" id="btn_show">
+        <property name="name">sec-module-widget</property>
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="receives-default">True</property>
-        <property name="tooltip-text" translatable="yes">Learn more about security status of Gooroom</property>
+        <property name="tooltip-text" translatable="yes">Show Gooroom Update</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Gooroom Security Status Tool</property>
-            <property name="ellipsize">end</property>
+            <property name="label" translatable="yes">Show</property>
             <property name="single-line-mode">True</property>
-            <property name="max-width-chars">1</property>
-            <property name="xalign">2.2351741291171123e-10</property>
+            <property name="xalign">0</property>
           </object>
         </child>
       </object>
@@ -34,20 +33,18 @@
       </packing>
     </child>
     <child>
-      <object class="GtkButton" id="btn_sec_safety">
+      <object class="GtkButton" id="btn_view">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="receives-default">True</property>
-        <property name="tooltip-text" translatable="yes">Take Safety Measures</property>
+        <property name="tooltip-text" translatable="yes">Refresh update status of Gooroom</property>
         <property name="relief">none</property>
         <child>
           <object class="GtkLabel">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="label" translatable="yes">Take Safety Measures</property>
-            <property name="ellipsize">end</property>
+            <property name="label" translatable="yes">Refresh</property>
             <property name="single-line-mode">True</property>
-            <property name="max-width-chars">1</property>
             <property name="xalign">2.2351741291171123e-10</property>
           </object>
         </child>
@@ -56,6 +53,29 @@
         <property name="expand">False</property>
         <property name="fill">True</property>
         <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkButton" id="btn_pref">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+        <property name="receives-default">True</property>
+        <property name="tooltip-text" translatable="yes">Open Preferences</property>
+        <property name="relief">none</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="label" translatable="yes">Preferences</property>
+            <property name="single-line-mode">True</property>
+            <property name="xalign">0</property>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">2</property>
       </packing>
     </child>
     <style>

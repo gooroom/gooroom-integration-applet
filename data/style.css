@@ -1,0 +1,156 @@
+* {
+  outline-color: transparent;
+/*  transition: none; */
+  text-shadow: none;
+/*  -gtk-icon-effect: none; */
+  -gtk-icon-shadow: none; }
+
+
+.main-box {
+  padding: 5px;
+  min-width: 340px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.2);
+  background-color: rgba(0, 0, 0, 0.2);}
+
+.box-start {
+  min-height: 74px;
+  border-radius: 12px;
+  background-color: white;
+  padding: 0 10px; }
+
+.box-middle {
+  border-radius: 12px;
+  background-color: white;
+  padding: 20px 10px; }
+
+.box-end {
+  min-height: 64px;
+  border-radius: 12px;
+  background-color: white;
+  padding: 0 64px; }
+  .box-end button {
+    border: none;
+    border-radius: 50%;
+    padding: 8px;
+    color: #000100;
+    animation: none;
+    box-shadow: none;
+    background: transparent; }
+  .box-end button:hover {
+    background-color: rgba(255, 255, 255, 0.7);
+    color: #3e6ddc; }
+  .box-end button:active,
+  .box-end button:checked {
+    color: #000100; }
+  .box-end .btn-endsession,
+  .box-end .btn-endsession:hover {
+    color: #cb011a; }
+  .box-end .btn-endsession:active,
+  .box-end .btn-endsession:checked {
+    color: #000100; }
+
+.module-box {
+  padding: 5px;
+  color: #000100;
+  border-radius: 12px;
+  background-color: transparent;
+  font-weight: normal;
+  border: none; }
+  .module-box .security-status-label {
+    color: rgba (0, 1, 0, 0.5); }
+  .module-box:hover {
+    background-color: rgba(0, 0, 0, 0.1); }
+  .module-box:hover .go-next-page {
+    color: #3e6ddc; }
+  .module-box:disabled {
+    color: #000100;
+    opacity: 0.5; }
+
+.module-menu-box {
+  border: none;
+  color: #000100;
+  border-radius: 12px;
+  background-color: white;
+  padding: 20px 10px; }
+  .module-menu-box button {
+    border: none;
+    color: #000100;
+    border-radius: 10px;
+    padding: 10px; }
+  .module-menu-box button:hover {
+    background-color: rgba(0, 0, 0, 0.1); }
+  .module-menu-box button:hover image {
+    color: #3e6ddc; }
+  .module-menu-box .btn-shutdown image {
+    color: #cb011a; }
+  .module-menu-box .btn-shutdown:hover image {
+    color: #cb011a; }
+
+.module-menu-backward-box {
+  min-height: 74px;
+  padding: 0 20px;
+  border: none;
+  color: #000100;
+  border-radius: 12px;
+  font-weight: normal;
+  background-color: white; }
+  .module-menu-backward-box:hover {
+    color: #3e6ddc; }
+
+.rounded-icon-button {
+  min-width: 16px;
+  min-height: 16px;
+  padding: 5px;
+  color: #ffffff;
+  border-radius: 15px;
+  border: none;
+  background-color: #3e6ddc 
+}
+
+.circle-icon {
+  padding: 5px;
+  border-radius: 50%;
+  background-color: transparent;
+  color: #ffffff;
+}
+
+.rounded-icon-style1 {
+  padding: 5px;
+  border-radius: 15px;
+  background-color: #3e6ddc;
+  color: #ffffff;
+}
+
+.rounded-icon-style2 {
+  padding: 5px;
+  border-radius: 15px;
+  background-color: #78899d;
+  color: #ffffff; }
+
+calendar {
+  color: #000100;
+  border: transparent;
+  border-radius:12px;
+  background-color: transparent;
+}
+
+calendar.header,
+calendar.button {
+  color: #000100;
+  border: none;
+}
+
+calendar:selected,
+calendar.button:hover {
+  color: #1f53cf;
+}
+
+calendar.button:disabled {
+  color: rgba(92, 97, 108, 0.55);
+}
+
+calendar:indeterminate,
+calendar.highlight {
+  color: rgba(0, 1, 0, 0.5);
+}

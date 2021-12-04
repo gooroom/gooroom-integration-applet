@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>.
+ * Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,8 +26,10 @@
 #include "modules/power/power-module.h"
 #include "modules/datetime/datetime-module.h"
 #include "modules/security/security-module.h"
+#include "modules/security/utils/utils.h"
 #include "modules/endsession/endsession-module.h"
 #include "modules/nimf/nimf-module.h"
+#include "modules/updater/updater-module.h"
 
 G_BEGIN_DECLS
 
@@ -53,6 +55,8 @@ struct _PopupWindowClass
 
 	/*< signals >*/
 	void (*closed)(PopupWindow *window, gint reason);
+    
+	void (*destroy_popup)(PopupWindow *window);
 
 	void (*launch_desktop)(PopupWindow *window, const gchar *desktop);
 	void (*launch_command)(PopupWindow *window, const gchar *command);
@@ -94,6 +98,9 @@ void popup_window_setup_endsession (PopupWindow      *window,
 
 void popup_window_setup_nimf       (PopupWindow *window,
                                     NimfModule  *module);
+
+void popup_window_setup_updater    (PopupWindow    *window,
+                                    UpdaterModule  *module);
 
 G_END_DECLS
 

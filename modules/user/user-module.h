@@ -1,5 +1,5 @@
 /* 
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -53,9 +53,7 @@ GType        user_module_get_type         (void) G_GNUC_CONST;
 UserModule  *user_module_new              (void);
 
 GtkWidget   *user_module_tray_new         (UserModule   *module);
-GtkWidget   *user_module_control_new      (UserModule   *module,
-                                           GtkSizeGroup *size_group);
-
+GtkWidget   *user_module_control_new      (UserModule   *module);
 void         user_module_control_destroy  (UserModule   *module);
 
 G_END_DECLS

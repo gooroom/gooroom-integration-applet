@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -162,7 +162,7 @@ update_tray (GtkWidget *tray, const gchar *icon_name)
 {
 	g_return_if_fail (tray != NULL);
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (tray), icon_name, GTK_ICON_SIZE_BUTTON);
+	gtk_image_set_from_icon_name (GTK_IMAGE (tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (tray), TRAY_ICON_SIZE);
 }
 
@@ -172,7 +172,8 @@ get_nimf_status_done_cb (GDBusProxy   *proxy,
                          gpointer      data)
 {
 	GVariant *result;
-	const gchar *engine_id, *icon_name;
+	const gchar *engine_id;
+	const gchar *icon_name = NULL;
 	GError *error = NULL;
 
 	NimfModule *module = NIMF_MODULE (data);
@@ -241,13 +242,14 @@ name_appeared_cb (GDBusConnection *connection,
                   const gchar     *name_owner,
                   gpointer         data)
 {
-	GError *error;
+	GError *error = NULL;
 
 	NimfModule *module = NIMF_MODULE (data);
 	NimfModulePrivate *priv = module->priv;
 
 	priv->nimf_stopped = FALSE;
 
+	g_clear_object (&priv->proxy);
 	priv->proxy = g_dbus_proxy_new_sync (connection,
                                          G_DBUS_PROXY_FLAGS_NONE,
                                          NULL,
@@ -286,10 +288,15 @@ name_vanished_cb (GDBusConnection *connection,
 
 	priv->nimf_stopped = TRUE;
 
-	g_free (priv->engine_id);
-	priv->engine_id = NULL;
-
 	update_tray (priv->tray, "gpm-brightness-kbd-invalid");
+
+	g_clear_pointer (&priv->engine_id, g_free);
+
+	if (priv->proxy) {
+		g_signal_handlers_disconnect_by_func (priv->proxy,
+                                              G_CALLBACK (nimf_service_signal_cb), module);
+		g_clear_object (&priv->proxy);
+	}
 }
 
 static void
@@ -357,7 +364,6 @@ menu_button_new (const gchar *text, gboolean checked)
 	GtkWidget *button, *box, *image, *label;
 
 	button = gtk_button_new ();
-	gtk_widget_set_name (button, "module-widget");
 	gtk_button_set_relief (GTK_BUTTON (button), GTK_RELIEF_NONE);
 
 	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 10);
@@ -365,9 +371,9 @@ menu_button_new (const gchar *text, gboolean checked)
 	gtk_widget_show (box);
 
 	if (checked) {
-		image = gtk_image_new_from_icon_name ("object-select-symbolic", GTK_ICON_SIZE_BUTTON);
+		image = gtk_image_new_from_icon_name ("object-select-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	} else {
-		image = gtk_image_new_from_icon_name ("", GTK_ICON_SIZE_BUTTON);
+		image = gtk_image_new_from_icon_name ("", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	}
 	gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
 	gtk_widget_show (image);
@@ -381,14 +387,16 @@ menu_button_new (const gchar *text, gboolean checked)
 }
 
 static void
-build_control_ui (NimfModule *module, GtkSizeGroup *size_group)
+build_control_ui (NimfModule *module)
 {
 	GError *error = NULL;
 	gchar *engine_name = NULL;
 	GtkWidget *lbl_engine_id, *img_icon_name;
 	NimfModulePrivate *priv = module->priv;
 
-	gtk_builder_add_from_resource (priv->builder,"/kr/gooroom/IntegrationApplet/modules/nimf/nimf-control.ui", &error);
+	gtk_builder_add_from_resource (priv->builder,
+                                   "/kr/gooroom/IntegrationApplet/modules/nimf/nimf-control.ui",
+                                   &error);
 	if (error) {
 		g_error_free (error);
 		return;
@@ -399,7 +407,7 @@ build_control_ui (NimfModule *module, GtkSizeGroup *size_group)
 	img_icon_name = GET_WIDGET (priv->builder, "img_icon_name");
 
 	gtk_image_set_from_icon_name (GTK_IMAGE (img_icon_name),
-                                  "nimf-system-keyboard", GTK_ICON_SIZE_BUTTON);
+                                  "nimf-system-keyboard", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (img_icon_name), STATUS_ICON_SIZE);
 
 	if (priv->nimf_stopped) {
@@ -413,14 +421,11 @@ build_control_ui (NimfModule *module, GtkSizeGroup *size_group)
 		}
 	}
 
-	gchar *markup = g_markup_printf_escaped ("<b>%s</b>", engine_name);
+	gchar *markup = g_markup_printf_escaped ("%s", engine_name);
 	gtk_label_set_markup (GTK_LABEL (lbl_engine_id), markup);
 
 	g_free (markup);
 	g_free (engine_name);
-
-	if (size_group)
-		gtk_size_group_add_widget (size_group, img_icon_name);
 
 	gtk_widget_show_all (priv->control);
 }
@@ -439,7 +444,11 @@ build_control_menu_ui (NimfModule *module)
 	priv->control_menu = gtk_scrolled_window_new (NULL, NULL);
 	gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (priv->control_menu),
                                     GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 10);
+
+	GtkStyleContext *context = gtk_widget_get_style_context (priv->control_menu);
+	gtk_style_context_add_class (context, "module-menu-box");
+
+	GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
 	gtk_container_add (GTK_CONTAINER (priv->control_menu), vbox);
 	gtk_widget_show (vbox);
 
@@ -492,7 +501,11 @@ nimf_module_finalize (GObject *object)
 		priv->watcher_id = 0;
 	}
 
-	g_clear_object (&priv->proxy);
+	if (priv->proxy) {
+		g_signal_handlers_disconnect_by_func (priv->proxy,
+                                              G_CALLBACK (nimf_service_signal_cb), module);
+		g_clear_object (&priv->proxy);
+	}
 	g_clear_object (&priv->builder);
 
 	G_OBJECT_CLASS (nimf_module_parent_class)->finalize (object);
@@ -564,7 +577,7 @@ nimf_module_tray_new (NimfModule *module)
 	NimfModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("nimf-focus-out", GTK_ICON_SIZE_BUTTON);
+		priv->tray = gtk_image_new_from_icon_name ("nimf-focus-out", GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -574,11 +587,11 @@ nimf_module_tray_new (NimfModule *module)
 }
 
 GtkWidget *
-nimf_module_control_new (NimfModule *module, GtkSizeGroup *size_group)
+nimf_module_control_new (NimfModule *module)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
-	build_control_ui (module, size_group);
+	build_control_ui (module);
 
 	return module->priv->control;
 }

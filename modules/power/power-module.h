@@ -1,5 +1,5 @@
 /* 
- *  Copyright (C) 2015-2019 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -54,13 +54,9 @@ GType        power_module_get_type       (void) G_GNUC_CONST;
 
 PowerModule *power_module_new            (void);
 
-
 GtkWidget *power_module_tray_new                   (PowerModule  *module);
-GtkWidget *power_module_brightness_control_new     (PowerModule  *module,
-                                                    GtkSizeGroup *size_group);
-GtkWidget *power_module_battery_control_new        (PowerModule  *module,
-                                                    GtkSizeGroup *size_group);
-
+GtkWidget *power_module_brightness_control_new     (PowerModule  *module);
+GtkWidget *power_module_battery_control_new        (PowerModule  *module);
 void       power_module_battery_control_destroy    (PowerModule  *module);
 void       power_module_brightness_control_destroy (PowerModule  *module);
 

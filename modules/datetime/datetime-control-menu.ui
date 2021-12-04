@@ -1,63 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
-  <object class="GtkCalendar" id="calendar">
-    <property name="visible">True</property>
-    <property name="can_focus">True</property>
-    <property name="year">2019</property>
-    <property name="month">8</property>
-    <property name="day">26</property>
-  </object>
   <object class="GtkScrolledWindow" id="control_menu">
     <property name="visible">True</property>
-    <property name="can_focus">True</property>
-    <property name="hscrollbar_policy">never</property>
-    <property name="window_placement_set">False</property>
+    <property name="can-focus">True</property>
+    <property name="border-width">0</property>
+    <property name="hscrollbar-policy">never</property>
     <child>
       <object class="GtkViewport">
         <property name="visible">True</property>
-        <property name="can_focus">False</property>
-        <property name="margin_right">10</property>
-        <property name="shadow_type">none</property>
+        <property name="can-focus">False</property>
+        <property name="shadow-type">none</property>
         <child>
           <object class="GtkBox" id="inner_box">
             <property name="visible">True</property>
-            <property name="can_focus">False</property>
+            <property name="can-focus">False</property>
             <property name="orientation">vertical</property>
             <property name="spacing">5</property>
-            <child>
-              <object class="GtkLabel" id="lbl_datetime">
-                <property name="name">module-widget</property>
-                <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="use_markup">True</property>
-                <property name="ellipsize">end</property>
-                <property name="max_width_chars">1</property>
-                <property name="xalign">0</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
             <child>
               <placeholder/>
             </child>
             <child>
               <object class="GtkButton" id="btn_settings">
-                <property name="name">module-widget</property>
                 <property name="visible">True</property>
-                <property name="can_focus">True</property>
-                <property name="receives_default">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="relief">none</property>
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
-                    <property name="can_focus">False</property>
+                    <property name="can-focus">False</property>
                     <property name="label" translatable="yes">DateTime Settings</property>
                     <property name="ellipsize">end</property>
-                    <property name="max_width_chars">1</property>
+                    <property name="max-width-chars">1</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
@@ -72,5 +48,8 @@
         </child>
       </object>
     </child>
+    <style>
+      <class name="module-menu-box"/>
+    </style>
   </object>
 </interface>

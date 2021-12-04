@@ -4,5 +4,6 @@ SUBDIRS = \
 	datetime \
 	user \
 	security \
-	endsession \
-	nimf
+	updater \
+	nimf \
+	endsession
