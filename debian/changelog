@@ -1,3 +1,25 @@
+gooroom-integration-applet (0.3.0+grm3u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [4133e073] porting to gooroom-3.0 without nimf
+  * [0fd0762e] included nimf
+  * [32368802] Modified UI for gooroom-3.0
+  * [7c226a4c] Modified UI for gooroom-3.0 without nimf
+  * [4682c36e] Modified UI for gooroom-3.0 without nimf with updater
+  * [281f8a04] renamed gooroom-security-status-view to gooroom-security-status-tool
+  * [6609ec22] [Bug:3880] Changed screen lock command
+  * [fe34c087] [Bug:4216] Disabled updater control menu when synaptic is on
+  * [8ca5467a] Moved up the popup window when auto-hide is on
+  * [02c07c5e] Fixed static code analysis issue
+
+  [ cjheo ]
+  * [01334e26] [Bug:2591] 스피커 좌우 밸런스 조정시 볼륨아이콘이 변경되는 오류 및 보안상태 업데이트 주기 변경 오류 수정
+  * [11d13a65] g_settings_schema_source_lookup 함수에서 recursive 인자를 TRUE로 변경[스키마를 못찾는 경우 발생]
+  * [34051d23] gooroom-security-logparser-wrapper 스크립트 변경으로 인한 업데이트
+  * [d3b6f7b2] [Bug:3056,3364] 언어 및 시간변경에 따른 날짜와시간 표시오류 수정
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sat, 04 Dec 2021 17:26:24 +0900
+
 gooroom-integration-applet (0.1.5+grm2u1) unstable; urgency=medium
 
   [ cjheo ]
