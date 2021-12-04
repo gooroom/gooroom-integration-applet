@@ -144,7 +144,7 @@ get_last_vulnerable (void)
 		vulnerable = atoi (str_vulnerable);
 
 		//if (1 == sscanf (str_vulnerable, "%"G_GUINT32_FORMAT, &vulnerable)) {
-		if(vulnerable)
+		if (vulnerable) {
 			if ((vulnerable < (1 << 0)) || (vulnerable >= (1 << 4))) { // 1 <= vulnerable < 16
 				vulnerable = 0;
 			}
