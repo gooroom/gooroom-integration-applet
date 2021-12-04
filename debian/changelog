@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.3.0+grm3u2) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [220c4b2c] Fixed syntax error
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sat, 04 Dec 2021 21:48:10 +0900
+
 gooroom-integration-applet (0.3.0+grm3u1) unstable; urgency=medium
 
   [ subin.kim ]
