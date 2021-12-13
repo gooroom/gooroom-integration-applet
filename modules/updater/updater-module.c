@@ -111,6 +111,8 @@ update_status_string (UpdaterModule *module)
 		if (priv->status_string) {
 			gchar *markup = g_markup_printf_escaped ("%s", priv->status_string);
 			gtk_label_set_markup (GTK_LABEL (priv->lbl_updater_status), markup);
+			gtk_widget_set_tooltip_text (priv->control, markup);
+
 			g_clear_pointer (&markup, g_free);
 		}
 	}
