@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.3.1+grm3u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [19733817] Added updater control tooltip
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Sun, 27 Feb 2022 14:46:05 +0900
+
 gooroom-integration-applet (0.3.0+grm3u2) unstable; urgency=medium
 
   [ subin.kim ]
