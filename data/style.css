@@ -86,6 +86,9 @@
     color: #cb011a; }
   .module-menu-box .btn-shutdown:hover image {
     color: #cb011a; }
+  .module-menu-box:disabled {
+    color: #000100;
+    opacity: 0.5; }
 
 .module-menu-backward-box {
   min-height: 74px;

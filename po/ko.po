@@ -242,7 +242,7 @@ msgstr "안전 조치 실행"
 
 #: ../modules/datetime/datetime-control-menu.ui.h:1
 msgid "DateTime Settings"
-msgstr "날짜 및 시간 설정"
+msgstr "날짜 및 시각 설정"
 
 #: ../modules/endsession/endsession-control.ui.h:1
 msgid "Log Out"
