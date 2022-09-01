@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-06 12:27+0900\n"
+"POT-Creation-Date: 2022-08-31 17:20+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: en\n"
@@ -26,8 +26,8 @@ msgstr ""
 "Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
 "\"."
 
-#: ../modules/user/user-module.c:101 ../modules/security/security-module.c:204
-#: ../modules/security/security-module.c:348 ../src/popup-window.ui.h:7
+#: ../modules/user/user-module.c:104 ../modules/security/security-module.c:205
+#: ../modules/security/security-module.c:349 ../src/popup-window.ui.h:7
 #: ../modules/security/security-control.ui.h:3
 #: ../modules/updater/updater-control.ui.h:1
 msgid "Unknown"
@@ -115,56 +115,60 @@ msgstr "%-d %B %Y   %l:%M:%S %p"
 msgid "%B %-d %Y   %T"
 msgstr "%B %-d %Y   %T"
 
-#: ../modules/security/security-module.c:95
+#: ../modules/security/security-module.c:93
 msgid "Security Status Of Gooroom System"
 msgstr "Security Status Of Gooroom System"
 
-#: ../modules/security/security-module.c:96
+#: ../modules/security/security-module.c:94
 msgid "A security vulnerability has been detected."
 msgstr "A security vulnerability has been detected."
 
-#: ../modules/security/security-module.c:107
+#: ../modules/security/security-module.c:105
 #, c-format
 msgid "Protecting OS"
 msgstr "Protecting OS"
 
-#: ../modules/security/security-module.c:111
+#: ../modules/security/security-module.c:109
 msgid "Protect executable files"
 msgstr "Protect executable files"
 
-#: ../modules/security/security-module.c:115
+#: ../modules/security/security-module.c:113
 msgid "Trusted Booting"
 msgstr "Trusted Booting"
 
-#: ../modules/security/security-module.c:119
+#: ../modules/security/security-module.c:117
 #, c-format
 msgid "Resources Control"
 msgstr "Resources Control"
 
-#: ../modules/security/security-module.c:269
+#: ../modules/security/security-module.c:270
 msgid "Safety"
 msgstr "Safety"
 
-#: ../modules/security/security-module.c:282
+#: ../modules/security/security-module.c:283
 msgid "Vulnerable"
 msgstr "Vulnerable"
 
-#: ../modules/security/security-module.c:640
+#: ../modules/security/security-module.c:631
 msgid "Details"
 msgstr "Details"
 
-#: ../modules/nimf/nimf-module.c:413
+#: ../modules/nimf/nimf-module.c:414
 msgid "Input Method Not Running"
 msgstr "Input Method Not Running"
 
-#: ../modules/nimf/nimf-module.c:485
+#: ../modules/nimf/nimf-module.c:486
 msgid "Input Method Settings"
 msgstr "Input Method Settings"
 
-#: ../modules/updater/updater-module.c:262
-#: ../modules/updater/updater-module.c:276
-#: ../modules/updater/updater-module.c:355
-#: ../modules/updater/updater-module.c:430
+#: ../modules/updater/updater-module.c:153
+msgid "Please quit Synaptic to control Update Manager."
+msgstr ""
+
+#: ../modules/updater/updater-module.c:302
+#: ../modules/updater/updater-module.c:316
+#: ../modules/updater/updater-module.c:395
+#: ../modules/updater/updater-module.c:470
 msgid "Gooroom Update is terminated"
 msgstr "Gooroom Update is terminated."
 
@@ -228,23 +232,20 @@ msgstr "Keyboard"
 msgid "Back"
 msgstr "Backward"
 
+#: ../modules/user/user-control.ui.h:1
+msgid "Cleanmode on"
+msgstr ""
+
 #: ../modules/security/security-control-menu.ui.h:1
 msgid "Learn more about security status of Gooroom"
 msgstr "Learn more about security status of Gooroom."
 
 #: ../modules/security/security-control-menu.ui.h:2
-msgid "Gooroom Security Status View"
+#, fuzzy
+msgid "Gooroom Security Status Tool"
 msgstr "Gooroom Security Status View"
 
 #: ../modules/security/security-control-menu.ui.h:3
-msgid "Settings for Gooroom management"
-msgstr "Settings for gooroom management"
-
-#: ../modules/security/security-control-menu.ui.h:4
-msgid "Gooroom Management Settings"
-msgstr "Gooroom Management Settings"
-
-#: ../modules/security/security-control-menu.ui.h:5
 msgid "Take Safety Measures"
 msgstr "Take Safety Messures"
 
@@ -295,6 +296,12 @@ msgstr "Show Preferences"
 #: ../modules/updater/updater-control-menu.ui.h:6
 msgid "Preferences"
 msgstr "Preferences"
+
+#~ msgid "Settings for Gooroom management"
+#~ msgstr "Settings for gooroom management"
+
+#~ msgid "Gooroom Management Settings"
+#~ msgstr "Gooroom Management Settings"
 
 #~ msgid "%B %-d %Y   %l:%M %p"
 #~ msgstr "%-d %B %Y   %l:%M %p"

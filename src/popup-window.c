@@ -34,6 +34,7 @@
 #include "common.h"
 #include "popup-window.h"
 
+#define CLEANMODE "/tmp/.cleanmode"
 #define MODULE_BOX_NAME "module-box"
 
 enum {
@@ -536,6 +537,10 @@ add_control_widget (PopupWindow *window,
 	{
 		case CONTROL_TYPE_USER:
 		{
+			if (g_file_test (CLEANMODE, G_FILE_TEST_EXISTS)) {
+				const GdkRGBA color = {0, 0, 0, 0.5};
+				gtk_widget_override_background_color (priv->box_user, GTK_STATE_FLAG_NORMAL, &color);
+			}
 			gtk_box_pack_start (GTK_BOX (priv->box_user), control, TRUE, FALSE, 0);
 			gtk_widget_show (control);
 			break;

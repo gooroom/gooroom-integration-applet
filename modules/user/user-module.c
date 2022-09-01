@@ -30,6 +30,7 @@
 #include "common.h"
 #include "user-module.h"
 
+#define CLEANMODE "/tmp/.cleanmode"
 #define GET_WIDGET(builder, x) GTK_WIDGET (gtk_builder_get_object (builder, x))
 
 
@@ -39,6 +40,7 @@ struct _UserModulePrivate
 
 	GtkWidget  *tray;
 	GtkWidget  *user_name;
+	GtkWidget  *lbl_cleanmode;
 	GtkWidget  *img_status;
 	GtkWidget  *control;
 
@@ -95,14 +97,21 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 			gtk_image_set_from_pixbuf (GTK_IMAGE (priv->tray), pix);
 			g_object_unref (G_OBJECT (pix));
 		}
+		if (priv->lbl_cleanmode) {
+			if (g_file_test (CLEANMODE, G_FILE_TEST_EXISTS)) {
+				gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray),
+                                              "cleanmode",
+                                              GTK_ICON_SIZE_LARGE_TOOLBAR);
+			}
+		}
 	}
 
 	if (priv->control) {
+		gchar *markup = NULL;
 		if (priv->user_name) {
 			const gchar *s = user_name ? user_name : _("Unknown");
-			gchar *markup = g_strdup_printf ("%s", s);
+			markup = g_strdup_printf ("%s", s);
 			gtk_label_set_markup (GTK_LABEL (priv->user_name), markup);
-			g_free (markup);
 		}
 		if (priv->img_status) {
 			GdkPixbuf *pix = get_user_face (icon_name, 24);
@@ -111,6 +120,17 @@ user_info_update (ActUserManager *um, GParamSpec *pspec, gpointer data)
 				g_object_unref (G_OBJECT (pix));
 			}
 		}
+		if (priv->lbl_cleanmode) {
+			if (g_file_test (CLEANMODE, G_FILE_TEST_EXISTS)) {
+				markup = g_markup_printf_escaped ("<b><span foreground=\"#ffffff\">%s</span></b>", user_name);
+				gtk_label_set_markup (GTK_LABEL (priv->user_name), markup);
+				gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status),
+                                              "cleanmode",
+                                              GTK_ICON_SIZE_LARGE_TOOLBAR);
+				gtk_widget_show (priv->lbl_cleanmode);
+			}
+		}
+		g_free (markup);
 	}
 }
 
@@ -128,6 +148,7 @@ build_control_ui (UserModule *module)
 
 	priv->control = GET_WIDGET (priv->builder, "control");
 	priv->user_name = GET_WIDGET (priv->builder, "lbl_user_name");
+	priv->lbl_cleanmode = GET_WIDGET (priv->builder, "lbl_cleanmode");
 	priv->img_status = GET_WIDGET (priv->builder, "img_status");
 }
 
@@ -150,9 +171,10 @@ user_module_init (UserModule *module)
 	UserModulePrivate *priv;
 	module->priv = priv = user_module_get_instance_private (module);
 
-	priv->tray         = NULL;
-	priv->user_name    = NULL;
-	priv->control      = NULL;
+	priv->tray          = NULL;
+	priv->user_name     = NULL;
+	priv->lbl_cleanmode = NULL;
+	priv->control       = NULL;
 
 	priv->builder = gtk_builder_new ();
 	gtk_builder_set_translation_domain (priv->builder, GETTEXT_PACKAGE);
@@ -187,8 +209,13 @@ user_module_tray_new (UserModule *module)
 	UserModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("avatar-default-symbolic",
-                                                   GTK_ICON_SIZE_LARGE_TOOLBAR);
+		if (!g_file_test (CLEANMODE, G_FILE_TEST_EXISTS))
+			priv->tray = gtk_image_new_from_icon_name ("avatar-default-symbolic",
+                                                       GTK_ICON_SIZE_LARGE_TOOLBAR);
+		else
+			priv->tray = gtk_image_new_from_icon_name ("cleanmode",
+                                                       GTK_ICON_SIZE_LARGE_TOOLBAR);
+
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 

@@ -1,5 +1,6 @@
 iconsymbolicstatusdir = $(datadir)/icons/hicolor/scalable/status
 iconsymbolicstatus_DATA =  				\
+	cleanmode.svg						\
 	audio-volume-error-symbolic.svg		\
 	audio-volume-high-symbolic.svg		\
 	audio-volume-low-symbolic.svg		\
@@ -33,7 +34,7 @@ iconsymbolicstatus_DATA =  				\
 	updater-base-error2.svg			\
 	updater-base-exec.svg			\
 	updater-base-info.svg			\
-	updater-base-unkown.svg	    	\
+	updater-base-unkown.svg			\
 	updater-base.svg
 
 iconsymbolicactionsdir = $(datadir)/icons/hicolor/scalable/actions
