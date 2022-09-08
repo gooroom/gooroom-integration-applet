@@ -1,3 +1,11 @@
+gooroom-integration-applet (0.3.3+grm3u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [d8e0ebb2] Updated po content&style.css
+  * [d170c900] Cleanmode version added & UI updated
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Thu, 08 Sep 2022 15:31:06 +0900
+
 gooroom-integration-applet (0.3.2+grm3u1) unstable; urgency=medium
 
   [ subin.kim ]
