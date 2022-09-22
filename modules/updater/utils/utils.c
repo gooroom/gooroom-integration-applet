@@ -34,7 +34,7 @@ update_operation_cb (GDBusProxy  *proxy,
     {
     }
 }
-`
+
 void
 get_update_operation_signal_from_agent (void)
 {
