@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.3.4+grm3u1) unstable; urgency=medium
+
+  [ subin.kim ]
+  * [5fa1a15a] Fixed static code analysis issue
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 23 Sep 2022 12:07:23 +0900
+
 gooroom-integration-applet (0.3.3+grm3u1) unstable; urgency=medium
 
   [ subin.kim ]
