@@ -71,6 +71,7 @@ struct _SecurityModulePrivate
 	gboolean updating_sec_status;
 
 	NotifyNotification *notification;
+	GString *title;
 };
 
 enum {
@@ -85,7 +86,7 @@ static guint signals[LAST_SIGNAL] = { 0 };
 G_DEFINE_TYPE_WITH_PRIVATE (SecurityModule, security_module, G_TYPE_OBJECT)
 
 static void
-notify_notification (NotifyNotification *notification, guint vulnerable)
+notify_notification (NotifyNotification *notification, guint vulnerable, gpointer data)
 {
 	GdkPixbuf *pix = NULL;
 	gchar *full_body = NULL;
@@ -98,32 +99,38 @@ notify_notification (NotifyNotification *notification, guint vulnerable)
                                     48, GTK_ICON_LOOKUP_FORCE_SIZE,
                                     NULL);
 
-	GString *outputs = g_string_new ("");
+	//GString *outputs = g_string_new ("");
+	SecurityModule *module = SECURITY_MODULE (data);
+	SecurityModulePrivate *priv = module->priv;
 
-	if (vulnerable & SECURITY_ITEM_OS_VULNERABLE) {
-		if (outputs->len > 0) g_string_append_c (outputs, ',');
-		g_string_append_printf (outputs, _("Protecting OS"));
+	if ((vulnerable & SECURITY_ITEM_OS_VULNERABLE) \
+			&& g_strrstr (priv->title->str, _("Protecting OS")) == 0) {
+		if (priv->title->len > 0) g_string_append_c (priv->title, ',');
+		g_string_append_printf (priv->title, _("Protecting OS"));
 	}
-	if (vulnerable & SECURITY_ITEM_EXE_VULNERABLE) {
-		if (outputs->len > 0) g_string_append_c (outputs, ',');
-		g_string_append (outputs, _("Protect executable files"));
+	if ((vulnerable & SECURITY_ITEM_EXE_VULNERABLE) \
+			&& g_strrstr (priv->title->str, _("Protecting OS")) == 0 ) {
+		if (priv->title->len > 0) g_string_append_c (priv->title, ',');
+		g_string_append (priv->title, _("Protect executable files"));
 	}
-	if (vulnerable & SECURITY_ITEM_BOOT_VULNERABLE) {
-		if (outputs->len > 0) g_string_append_c (outputs, ',');
-		g_string_append (outputs, _("Trusted Booting"));
+	if ((vulnerable & SECURITY_ITEM_BOOT_VULNERABLE) \
+			&& g_strrstr (priv->title->str, _("Trusted Booting")) == 0 ) {
+		if (priv->title->len > 0) g_string_append_c (priv->title, ',');
+		g_string_append (priv->title, _("Trusted Booting"));
 	}
-	if (vulnerable & SECURITY_ITEM_MEDIA_VULNERABLE) {
-		if (outputs->len > 0) g_string_append_c (outputs, ',');
-		g_string_append_printf (outputs, _("Resources Control"));
+	if ((vulnerable & SECURITY_ITEM_MEDIA_VULNERABLE) \
+			&& g_strrstr (priv->title->str, _("Resources Control")) == 0 ) {
+		if (priv->title->len > 0) g_string_append_c (priv->title, ',');
+		g_string_append_printf (priv->title, _("Resources Control"));
 	}
 
-	if (outputs->len > 0) {
-		full_body = g_strdup_printf ("[%s] %s", outputs->str, body);
+	if (priv->title->len > 0) {
+		full_body = g_strdup_printf ("[%s] %s", priv->title->str, body);
 	} else {
 		full_body = g_strdup (body);
 	}
 
-	g_string_free (outputs, TRUE);
+	//g_string_free (outputs, TRUE);
 
 	notify_notification_update (notification, summary, full_body, NULL);
 	notify_notification_set_image_from_pixbuf (notification, pix);
@@ -208,6 +215,8 @@ read_log_parser_result (GIOChannel   *source,
 		if (priv->notification) {
 			notify_notification_close (priv->notification, NULL);
 			priv->notification_show = FALSE;
+
+			g_string_erase (priv->title, 0, -1);
 		}
 
 		goto error;
@@ -272,6 +281,8 @@ read_log_parser_result (GIOChannel   *source,
 		if (priv->notification) {
 			notify_notification_close (priv->notification, NULL);
 			priv->notification_show = FALSE;
+
+			g_string_erase (priv->title, 0, -1);
 		}
 	} else {
 		if (vulnerable != 0)
@@ -289,10 +300,10 @@ read_log_parser_result (GIOChannel   *source,
 					adn = g_settings_get_boolean (priv->settings, "allow-duplicate-notifications");
 				}
 				if (adn) {
-					notify_notification (priv->notification, vulnerable);
+					notify_notification (priv->notification, vulnerable, module);
 				}
 			} else {
-				notify_notification (priv->notification, vulnerable);
+				notify_notification (priv->notification, vulnerable, module);
 				priv->notification_show = TRUE;
 			}
 		}
@@ -367,6 +378,8 @@ security_status_update_idle (gpointer data)
 		if (priv->notification) {
 			notify_notification_close (priv->notification, NULL);
 			priv->notification_show = FALSE;
+
+			g_string_erase (priv->title, 0, -1);
 		}
 
 		priv->updating_sec_status = FALSE;
@@ -556,6 +569,8 @@ security_module_finalize (GObject *object)
 		notify_notification_close (priv->notification, NULL);
 		g_object_unref (priv->notification);
 		priv->notification = NULL;
+
+		g_string_free (priv->title, TRUE);
 	}
 
 	G_OBJECT_CLASS (security_module_parent_class)->finalize (object);
@@ -627,6 +642,7 @@ security_module_init (SecurityModule *module)
 	}
 
 	priv->notification = notify_notification_new (NULL, NULL, NULL);
+	priv->title = g_string_new ("");
 	notify_notification_set_timeout (priv->notification, NOTIFY_EXPIRES_NEVER);
 	notify_notification_add_action (priv->notification, "details-action", _("Details"), show_detail_cb, module, NULL);
 
