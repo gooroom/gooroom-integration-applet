@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.3.5+grm3u1) unstable; urgency=medium
+
+  [ boyeon.choi ]
+  * [76220f16] Resolve security alert title initialization issues
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Thu, 15 Jun 2023 13:40:42 +0900
+
 gooroom-integration-applet (0.3.4+grm3u1) unstable; urgency=medium
 
   [ subin.kim ]
