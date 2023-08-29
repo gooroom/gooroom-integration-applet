@@ -1,8 +1,8 @@
 dnl ***************************
 dnl *** Initialize autoconf ***
 dnl ***************************
-AC_INIT([gooroom-integration-applet], [0.1.0])
-AC_PREREQ(2.63)
+AC_INIT([gooroom-integration-applet],[0.1.0])
+AC_PREREQ([2.71])
 
 dnl ***********************
 dnl Initialize automake ***
@@ -15,16 +15,16 @@ m4_ifdef([AM_SILENT_RULES],[AM_SILENT_RULES([yes])])
 dnl *******************************
 dnl *** Check for UNIX variants ***
 dnl *******************************
-AC_AIX()
-AC_ISC_POSIX()
-AC_MINIX()
+AC_USE_SYSTEM_EXTENSIONS
+AC_SEARCH_LIBS([strerror],[cposix])
+AC_USE_SYSTEM_EXTENSIONS
 
 dnl ********************************
 dnl *** Check for basic programs ***
 dnl ********************************
 AC_PROG_CC()
 AM_PROG_CC_C_O()
-AC_PROG_LD()
+LT_PATH_LD([])
 AC_PROG_INSTALL()
 IT_PROG_INTLTOOL([0.35.2])
 
@@ -38,7 +38,6 @@ LT_LIB_M
 dnl **********************************
 dnl *** Check for standard headers ***
 dnl **********************************
-AC_HEADER_STDC()
 AC_CHECK_HEADERS([stdlib.h string.h errno.h unistd.h])
 
 dnl ******************************
@@ -47,7 +46,6 @@ dnl ******************************
 GETTEXT_PACKAGE=gooroom-integration-applet
 AC_SUBST(GETTEXT_PACKAGE)
 AC_DEFINE_UNQUOTED(GETTEXT_PACKAGE, "$GETTEXT_PACKAGE", [Gettext Package])
-AM_GLIB_GNU_GETTEXT
 
 dnl ***********************************
 dnl *** Check for required packages ***
@@ -83,7 +81,7 @@ PKG_CHECK_MODULES(GNOME_DESKTOP, gnome-desktop-3.0)
 GNOME_PANEL_MODULES_DIR=`$PKG_CONFIG --variable=modulesdir libgnome-panel`
 AC_SUBST([GNOME_PANEL_MODULES_DIR], [$GNOME_PANEL_MODULES_DIR])
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
   Makefile
   data/Makefile
   icons/Makefile
@@ -101,3 +99,4 @@ AC_OUTPUT([
   src/Makefile
   po/Makefile.in
 ])
+AC_OUTPUT

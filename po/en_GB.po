@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gooroom-integration-applet 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-31 17:20+0900\n"
+"POT-Creation-Date: 2023-08-29 14:59+0900\n"
 "PO-Revision-Date: 2019-01-22 12:54+0900\n"
 "Language-Team: Gooroom <gooroom@gooroom.kr>\n"
 "Language: en\n"
@@ -17,17 +17,17 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #. print warning for user
-#: ../common/common.c:319
+#: ../common/common.c:321
 #, c-format
 msgid ""
-"Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
-"\"."
+"Working directory \"%s\" does not exist. It won't be used when spawning "
+"\"%s\"."
 msgstr ""
-"Working directory \"%s\" does not exist. It won't be used when spawning \"%s"
-"\"."
+"Working directory \"%s\" does not exist. It won't be used when spawning "
+"\"%s\"."
 
-#: ../modules/user/user-module.c:104 ../modules/security/security-module.c:205
-#: ../modules/security/security-module.c:349 ../src/popup-window.ui.h:7
+#: ../modules/user/user-module.c:112 ../modules/security/security-module.c:212
+#: ../modules/security/security-module.c:360 ../src/popup-window.ui.h:7
 #: ../modules/security/security-control.ui.h:3
 #: ../modules/updater/updater-control.ui.h:1
 msgid "Unknown"
@@ -115,41 +115,45 @@ msgstr "%-d %B %Y   %l:%M:%S %p"
 msgid "%B %-d %Y   %T"
 msgstr "%B %-d %Y   %T"
 
-#: ../modules/security/security-module.c:93
+#: ../modules/security/security-module.c:94
 msgid "Security Status Of Gooroom System"
 msgstr "Security Status Of Gooroom System"
 
-#: ../modules/security/security-module.c:94
+#: ../modules/security/security-module.c:95
 msgid "A security vulnerability has been detected."
 msgstr "A security vulnerability has been detected."
 
-#: ../modules/security/security-module.c:105
+#: ../modules/security/security-module.c:107
+#: ../modules/security/security-module.c:109
+#: ../modules/security/security-module.c:112
 #, c-format
 msgid "Protecting OS"
 msgstr "Protecting OS"
 
-#: ../modules/security/security-module.c:109
+#: ../modules/security/security-module.c:114
 msgid "Protect executable files"
 msgstr "Protect executable files"
 
-#: ../modules/security/security-module.c:113
+#: ../modules/security/security-module.c:117
+#: ../modules/security/security-module.c:119
 msgid "Trusted Booting"
 msgstr "Trusted Booting"
 
-#: ../modules/security/security-module.c:117
+#: ../modules/security/security-module.c:122
+#: ../modules/security/security-module.c:124
 #, c-format
 msgid "Resources Control"
 msgstr "Resources Control"
 
-#: ../modules/security/security-module.c:270
+#: ../modules/security/security-module.c:279
 msgid "Safety"
 msgstr "Safety"
 
-#: ../modules/security/security-module.c:283
+#: ../modules/security/security-module.c:294
 msgid "Vulnerable"
 msgstr "Vulnerable"
 
-#: ../modules/security/security-module.c:631
+#: ../modules/security/security-module.c:647
 msgid "Details"
 msgstr "Details"
 
@@ -241,9 +245,8 @@ msgid "Learn more about security status of Gooroom"
 msgstr "Learn more about security status of Gooroom."
 
 #: ../modules/security/security-control-menu.ui.h:2
-#, fuzzy
 msgid "Gooroom Security Status Tool"
-msgstr "Gooroom Security Status View"
+msgstr "Gooroom Security Status Tool"
 
 #: ../modules/security/security-control-menu.ui.h:3
 msgid "Take Safety Measures"
@@ -296,15 +299,3 @@ msgstr "Show Preferences"
 #: ../modules/updater/updater-control-menu.ui.h:6
 msgid "Preferences"
 msgstr "Preferences"
-
-#~ msgid "Settings for Gooroom management"
-#~ msgstr "Settings for gooroom management"
-
-#~ msgid "Gooroom Management Settings"
-#~ msgstr "Gooroom Management Settings"
-
-#~ msgid "%B %-d %Y   %l:%M %p"
-#~ msgstr "%-d %B %Y   %l:%M %p"
-
-#~ msgid "%B %-d %Y   %R"
-#~ msgstr "%B %-d %Y   %R"

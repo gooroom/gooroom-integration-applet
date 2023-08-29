@@ -67,17 +67,17 @@ static gboolean
 xfce_spawn_startup_timeout (gpointer user_data)
 {
   XfceSpawnData *spawn_data = user_data;
-  GTimeVal       now;
   gdouble        elapsed;
   glong          tv_sec;
   glong          tv_usec;
+  gint64         ct;
 
   g_return_val_if_fail (spawn_data->sn_launcher != NULL, FALSE);
 
   /* determine the amount of elapsed time */
-  g_get_current_time (&now);
+  ct = g_get_real_time ();
   sn_launcher_context_get_last_active_time (spawn_data->sn_launcher, &tv_sec, &tv_usec);
-  elapsed = now.tv_sec - tv_sec + ((gdouble) (now.tv_usec - tv_usec) / G_USEC_PER_SEC);
+  elapsed = tv_sec - (ct / G_USEC_PER_SEC) + ((gdouble) (ct - tv_usec) / G_USEC_PER_SEC);
 
   return elapsed < XFCE_SPAWN_STARTUP_TIMEOUT;
 }
@@ -170,6 +170,7 @@ xfce_spawn_startup_watch_destroy (gpointer user_data)
 static gint
 xfce_spawn_get_active_workspace_number (GdkScreen *screen)
 {
+  GdkDisplay *display;
   GdkWindow *root;
   gulong     bytes_after_ret = 0;
   gulong     nitems_ret = 0;
@@ -180,7 +181,8 @@ xfce_spawn_get_active_workspace_number (GdkScreen *screen)
   gint       format_ret;
   gint       ws_num = 0;
 
-  gdk_error_trap_push ();
+  display = gdk_screen_get_display (screen);
+  gdk_x11_display_error_trap_push (display);
 
   root = gdk_screen_get_root_window (screen);
 
@@ -215,7 +217,7 @@ xfce_spawn_get_active_workspace_number (GdkScreen *screen)
       XFree (prop_ret);
     }
 
-  gdk_error_trap_pop_ignored ();
+  gdk_x11_display_error_trap_pop_ignored (display);
 
   return ws_num;
 }
@@ -265,16 +267,16 @@ xfce_spawn_on_screen_with_child_watch (GdkScreen    *screen,
     }
 
   /* add the real display name for the screen */
+G_GNUC_BEGIN_IGNORE_DEPRECATIONS
   display_name = gdk_screen_make_display_name (screen);
+G_GNUC_END_IGNORE_DEPRECATIONS
   cenvp[n_cenvp++] = g_strconcat ("DISPLAY=", display_name, NULL);
   g_free (display_name);
 
   /* initialize the sn launcher context */
   if (G_LIKELY (startup_notify))
     {
-      sn_display = sn_display_new (GDK_SCREEN_XDISPLAY (screen),
-                                   (SnDisplayErrorTrapPush) (void (*)(void)) gdk_error_trap_push,
-                                   (SnDisplayErrorTrapPop) (void (*)(void)) gdk_error_trap_pop);
+      sn_display = sn_display_new (GDK_SCREEN_XDISPLAY (screen), NULL, NULL);
 
       if (G_LIKELY (sn_display != NULL))
         {
