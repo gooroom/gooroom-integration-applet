@@ -1,7 +1,7 @@
 /*
  * Copyright (c) 2009 Brian Tarricone <brian@terricone.org>
  * Copyright (C) 1999 Olivier Fourdan <fourdan@xfce.org>
- * Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ * Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -45,7 +45,8 @@
 
 #include <libsn/sn.h>
 
-
+#define TABLET_MODE_PATH           "/etc/gooroom"
+#define TABLET_MODE_FILE           ".tablet-mode"
 #define XFCE_SPAWN_STARTUP_TIMEOUT (30)
 
 typedef struct
@@ -719,6 +720,19 @@ is_systemd_service_active (const gchar *service_name)
 done:
 	if (error)
 		g_error_free (error);
+
+	return ret;
+}
+
+gboolean
+is_tablet_mode (void)
+{
+	gchar *file = NULL;
+	gboolean ret = FALSE;
+
+	file = g_build_filename (TABLET_MODE_PATH, TABLET_MODE_FILE, NULL);
+	ret = g_file_test (file, G_FILE_TEST_EXISTS);
+	g_clear_pointer (&file, g_free);
 
 	return ret;
 }

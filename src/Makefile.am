@@ -16,8 +16,8 @@ libgooroom_integration_applet_la_SOURCES = \
 	popup-window.h	\
 	popup-window.c	\
 	gooroom-integration-applet.c \
-	gooroom-integration-module.c \
-	gooroom-integration-applet.h
+	gooroom-integration-applet.h \
+	gooroom-integration-module.c
 
 libgooroom_integration_applet_la_CFLAGS = \
 	$(LIBGNOMEPANEL_CFLAGS) \
@@ -38,14 +38,15 @@ libgooroom_integration_applet_la_LIBADD = \
 	$(GTK_LIBS)	\
 	$(LIBNOTIFY_LIBS) \
 	$(top_builddir)/common/libcommon.la	\
-	$(top_builddir)/modules/sound/libsound-module.la	\
-	$(top_builddir)/modules/power/libpower-module.la	\
-	$(top_builddir)/modules/user/libuser-module.la	\
-	$(top_builddir)/modules/datetime/libdatetime-module.la	\
-	$(top_builddir)/modules/security/libsecurity-module.la	\
+	$(top_builddir)/modules/sound/libsound-module.la \
+	$(top_builddir)/modules/power/libpower-module.la \
+	$(top_builddir)/modules/user/libuser-module.la \
+	$(top_builddir)/modules/datetime/libdatetime-module.la \
+	$(top_builddir)/modules/security/libsecurity-module.la \
 	$(top_builddir)/modules/endsession/libendsession-module.la \
 	$(top_builddir)/modules/updater/libupdater-module.la \
-	$(top_builddir)/modules/nimf/libnimf-module.la
+	$(top_builddir)/modules/nimf/libnimf-module.la \
+	$(top_builddir)/modules/tablet/libtablet-module.la
 
 resource_files = $(shell glib-compile-resources --sourcedir=$(srcdir) --generate-dependencies $(srcdir)/gresource.xml)
 applet-resources.c: gresource.xml $(resource_files)

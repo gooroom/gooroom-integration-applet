@@ -1,5 +1,5 @@
 /* 
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -57,7 +57,8 @@ GType          updater_module_get_type             (void) G_GNUC_CONST;
 UpdaterModule *updater_module_new                  (void);
 
 GtkWidget     *updater_module_tray_new             (UpdaterModule *module);
-GtkWidget     *updater_module_control_new          (UpdaterModule *module);
+GtkWidget     *updater_module_control_new          (UpdaterModule *module,
+                                                    GtkSizeGroup  *size_group);
 GtkWidget     *updater_module_control_menu_new     (UpdaterModule *module);
 void           updater_module_control_destroy      (UpdaterModule *module);
 void           updater_module_control_menu_destroy (UpdaterModule *module);

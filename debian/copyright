@@ -2,7 +2,7 @@ Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Source: https://github.com/gooroom/gooroom-integration-applet/
 
 Files: *
-Copyright: 2015-2021 Gooroom <gooroom@gooroom.kr>
+Copyright: 2015-2023 Gooroom <gooroom@gooroom.kr>
 License: GPL-2+
 
 Files: common/panel-glib.*
@@ -11,8 +11,19 @@ License: GPL-2+
 
 Files: modules/nimf/nimf-gooroom.c
 Copyright: 2015-2019 Hodong Kim <cogniti@gmail.com>
-           2015-2021 gooroom <gooroom@gooroom.kr>
+           2015-2023 Gooroom <gooroom@gooroom.kr>
 License: GPL-2+
+
+Files: icons/integrationapplet-system-*.svg
+       icons/integrationapplet-audio-*.svg
+       icons/integrationapplet-battery-*.svg
+       icons/integrationapplet-display-*.svg
+       icons/integrationapplet-date-time.svg
+       icons/integrationapplet-security-*.svg
+       icons/integrationapplet-tablet.svg
+       icons/integrationapplet-users-*.svg
+Copyright: Copyright: Vince Liuice <vinceliuice@hotmail.com>
+License: GPL-3
 
 License: GPL-2+
  This program is free software; you can redistribute it and/or modify
@@ -27,3 +38,20 @@ License: GPL-2+
  .
  On Debian systems, the complete text of the GNU General Public License
  version 2 can be found in /usr/share/common-licenses/GPL-2.
+
+License: GPL-3
+ This program is free software: you can redistribute it and/or modify
+ it under the terms of the GNU General Public License version 3 as
+ published by the Free Software Foundation.
+ .
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+ .
+ You should have received a copy of the GNU General Public License along with
+ this program; if not, write to the Free Software Foundation, Inc., 51
+ Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ .
+ On Debian systems, the complete text of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL-3’.

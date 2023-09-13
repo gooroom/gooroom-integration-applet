@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.24"/>
   <object class="GtkBox" id="control">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="orientation">vertical</property>
-    <property name="spacing">10</property>
+    <property name="spacing">8</property>
     <property name="baseline-position">top</property>
     <child>
       <object class="GtkButton" id="btn_logout">
@@ -25,7 +25,6 @@
                 <property name="can-focus">False</property>
                 <property name="pixel-size">24</property>
                 <property name="icon-name">system-log-out-symbolic</property>
-                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -72,7 +71,6 @@
                 <property name="can-focus">False</property>
                 <property name="pixel-size">24</property>
                 <property name="icon-name">system-hibernate-symbolic</property>
-                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -119,7 +117,6 @@
                 <property name="can-focus">False</property>
                 <property name="pixel-size">24</property>
                 <property name="icon-name">system-suspend-symbolic</property>
-                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -166,7 +163,6 @@
                 <property name="can-focus">False</property>
                 <property name="pixel-size">24</property>
                 <property name="icon-name">system-restart-symbolic</property>
-                <property name="icon_size">3</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -212,8 +208,7 @@
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="pixel-size">24</property>
-                <property name="icon-name">system-shutdown-symbolic</property>
-                <property name="icon_size">3</property>
+                <property name="icon-name">integrationapplet-system-shutdown-symbolic</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -237,9 +232,6 @@
             </child>
           </object>
         </child>
-        <style>
-          <class name="btn-shutdown"/>
-        </style>
       </object>
       <packing>
         <property name="expand">False</property>

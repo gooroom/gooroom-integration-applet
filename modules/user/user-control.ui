@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.38.2 -->
+<!-- Generated with glade 3.40.0 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.24"/>
   <object class="GtkBox" id="control">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
-    <property name="spacing">15</property>
+    <property name="spacing">8</property>
     <child>
       <object class="GtkImage" id="img_status">
         <property name="visible">True</property>
@@ -13,10 +13,7 @@
         <property name="halign">center</property>
         <property name="valign">center</property>
         <property name="pixel-size">24</property>
-        <property name="icon-name">avatar-default-symbolic</property>
-        <style>
-          <class name="circle-icon"/>
-        </style>
+        <property name="icon-name">integrationapplet-users-symbolic</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -40,21 +37,37 @@
       </packing>
     </child>
     <child>
-      <object class="GtkLabel" id="lbl_cleanmode">
+      <object class="GtkLabel" id="lbl_tablet_mode">
         <property name="can-focus">False</property>
         <property name="no-show-all">True</property>
-        <property name="label" translatable="yes">Cleanmode on</property>
-        <property name="justify">right</property>
+        <property name="label" translatable="yes">Tablet Mode</property>
         <property name="single-line-mode">True</property>
-        <property name="max-width-chars">1</property>
         <style>
-          <class name="lbl-cleanmode"/>
+          <class name="round-label"/>
         </style>
       </object>
       <packing>
         <property name="expand">False</property>
-        <property name="fill">False</property>
+        <property name="fill">True</property>
+        <property name="pack-type">end</property>
         <property name="position">2</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel" id="lbl_clean_mode">
+        <property name="can-focus">False</property>
+        <property name="no-show-all">True</property>
+        <property name="label" translatable="yes">Clean Mode</property>
+        <property name="single-line-mode">True</property>
+        <style>
+          <class name="round-label"/>
+        </style>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="pack-type">end</property>
+        <property name="position">3</property>
       </packing>
     </child>
   </object>

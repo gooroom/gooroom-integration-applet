@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -149,26 +149,24 @@ on_settings_clicked_cb (GtkButton *button, gpointer data)
 }
 
 void
-build_control_ui (DateTimeModule *module)
+build_control_ui (DateTimeModule *module, GtkSizeGroup *size_group)
 {
 	GtkWidget *box, *icon, *label;
 	DateTimeModulePrivate *priv = module->priv;
-	GtkStyleContext *context;
 
 	priv->control = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->control), GTK_RELIEF_NONE);
 
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_container_set_border_width (GTK_CONTAINER (box), 0);
 	gtk_container_add (GTK_CONTAINER (priv->control), box);
 
-	icon = gtk_image_new_from_icon_name ("preferences-system-time-symbolic",
-                                         GTK_ICON_SIZE_LARGE_TOOLBAR);
+	icon = gtk_image_new_from_icon_name ("integrationapplet-date-time", GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
+	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
+	gtk_widget_set_halign (icon, GTK_ALIGN_CENTER);
 	gtk_box_pack_start (GTK_BOX (box), icon, FALSE, FALSE, 0);
-
-    context = gtk_widget_get_style_context (icon);
-	gtk_style_context_add_class (context, "rounded-icon-style2");
+	gtk_size_group_add_widget (size_group, icon);
 
 	priv->details_label = label = gtk_label_new (NULL);
 	gtk_label_set_xalign (GTK_LABEL (priv->details_label), 0);
@@ -177,12 +175,11 @@ build_control_ui (DateTimeModule *module)
 	gtk_label_set_line_wrap (GTK_LABEL (priv->details_label), FALSE);
 	gtk_box_pack_start (GTK_BOX (box), priv->details_label, TRUE, TRUE, 0);
 
-	icon = gtk_image_new_from_icon_name ("go-next-page-symbolic", GTK_ICON_SIZE_BUTTON);
+	icon = gtk_image_new_from_icon_name ("go-next-page-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
+	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
+	gtk_widget_set_halign (icon, GTK_ALIGN_CENTER);
 	gtk_box_pack_end (GTK_BOX (box), icon, FALSE, FALSE, 0);
-
-    context = gtk_widget_get_style_context (icon);
-	gtk_style_context_add_class (context, "go-next-page");
 
 	clock_timeout_thread (module);
 }
@@ -207,10 +204,9 @@ build_control_menu_ui (DateTimeModule *module)
 	btn_settings       = GET_WIDGET (priv->builder, "btn_settings");
 
 	calendar = gooroom_calendar_new ();
-	gtk_widget_show (calendar);
-
 	gtk_box_pack_start (GTK_BOX (inner_box), calendar, FALSE, FALSE, 0);
 	gtk_box_reorder_child (GTK_BOX (inner_box), calendar, 0);
+	gtk_widget_show (calendar);
 
 	g_signal_connect (G_OBJECT (btn_settings), "clicked", G_CALLBACK (on_settings_clicked_cb), module);
 
@@ -331,13 +327,13 @@ datetime_module_tray_new (DateTimeModule *module)
 }
 
 GtkWidget *
-datetime_module_control_new (DateTimeModule *module)
+datetime_module_control_new (DateTimeModule *module, GtkSizeGroup *size_group)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	DateTimeModulePrivate *priv = module->priv;
 
-	build_control_ui (module);
+	build_control_ui (module, size_group);
 
 	clock_timeout_thread (module);
 	gtk_widget_show_all (priv->control);

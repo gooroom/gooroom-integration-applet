@@ -1,6 +1,6 @@
 /*
  *  Copyright (C) 2015-2019 Hodong Kim <cogniti@gmail.com>
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -84,12 +84,12 @@ on_nimf_engine_changed_cb (NimfServer  *server,
 
 	if (ng->connection) {
 		g_dbus_connection_emit_signal (ng->connection,
-                                       NULL,
-                                       "/kr/gooroom/nimf/Service",
-                                       "kr.gooroom.nimf.Service",
-                                       "EngineChanged",
-                                       g_variant_new ("(ss)", ng->engine_id, ng->icon_name),
-                                       NULL);
+                                               NULL,
+                                               "/kr/gooroom/nimf/Service",
+                                               "kr.gooroom.nimf.Service",
+                                               "EngineChanged",
+                                               g_variant_new ("(ss)", ng->engine_id, ng->icon_name),
+                                               NULL);
 	}
 }
 
@@ -106,12 +106,12 @@ on_nimf_engine_status_changed_cb (NimfServer  *server,
 
 	if (g_str_equal (ng->engine_id, engine_id)) {
 		g_dbus_connection_emit_signal (ng->connection,
-                                       NULL,
-                                       "/kr/gooroom/nimf/Service",
-                                       "kr.gooroom.nimf.Service",
-                                       "EngineStatusChanged",
-                                       g_variant_new ("(ss)", engine_id, icon_name),
-                                       NULL);
+                                               NULL,
+                                               "/kr/gooroom/nimf/Service",
+                                               "kr.gooroom.nimf.Service",
+                                               "EngineStatusChanged",
+                                               g_variant_new ("(ss)", engine_id, icon_name),
+                                               NULL);
 	}
 }
 
@@ -196,11 +196,11 @@ on_bus_acquired (GDBusConnection *connection,
 	introspection_data = g_dbus_node_info_new_for_xml (introspection_xml, NULL);
 
 	ng->reg_id = g_dbus_connection_register_object (ng->connection,
-                                                    "/kr/gooroom/nimf/Service",
-                                                    introspection_data->interfaces[0],
-                                                    &interface_vtable,
-                                                    ng, NULL,
-                                                    NULL);
+                                                        "/kr/gooroom/nimf/Service",
+                                                        introspection_data->interfaces[0],
+                                                        &interface_vtable,
+                                                        ng, NULL,
+                                                        NULL);
 }
 
 static void
@@ -230,7 +230,7 @@ nimf_gooroom_dbus_init (NimfGooroom *ng)
 
 	g_signal_connect (server, "engine-changed", G_CALLBACK (on_nimf_engine_changed_cb), ng);
 	g_signal_connect (server, "engine-status-changed",
-                      G_CALLBACK (on_nimf_engine_status_changed_cb), ng);
+                          G_CALLBACK (on_nimf_engine_status_changed_cb), ng);
 }
 
 static gboolean

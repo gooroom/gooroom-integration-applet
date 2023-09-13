@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <gtk/gtk.h>

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.40.0 -->
+<interface>
+  <requires lib="gtk+" version="3.24"/>
+  <object class="GtkBox" id="control">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="spacing">8</property>
+    <child>
+      <object class="GtkImage" id="icon_tablet">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="halign">center</property>
+        <property name="valign">center</property>
+        <property name="pixel-size">24</property>
+        <property name="icon-name">integrationapplet-tablet</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">0</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="label" translatable="yes">Tablet Mode</property>
+        <property name="use-markup">True</property>
+        <property name="single-line-mode">True</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="position">1</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkSwitch" id="sw_tablet">
+        <property name="visible">True</property>
+        <property name="can-focus">True</property>
+      </object>
+      <packing>
+        <property name="expand">False</property>
+        <property name="fill">True</property>
+        <property name="pack-type">end</property>
+        <property name="position">2</property>
+      </packing>
+    </child>
+  </object>
+</interface>

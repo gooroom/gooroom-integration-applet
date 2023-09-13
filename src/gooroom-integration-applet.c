@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as
@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -47,6 +47,7 @@
 #include "modules/security/security-module.h"
 #include "modules/endsession/endsession-module.h"
 #include "modules/nimf/nimf-module.h"
+#include "modules/tablet/tablet-module.h"
 
 
 
@@ -63,6 +64,7 @@ struct _GooroomIntegrationAppletPrivate
 	EndSessionModule *endsession_module;
 	UpdaterModule    *updater_module;
 	NimfModule       *nimf_module;
+	TabletModule     *tablet_module;
 };
 
 
@@ -436,6 +438,7 @@ integration_window_popup (GooroomIntegrationApplet *applet)
 	popup_window_setup_nimf       (priv->popup, priv->nimf_module);
 	popup_window_setup_updater    (priv->popup, priv->updater_module);
 	popup_window_setup_datetime   (priv->popup, priv->datetime_module);
+	popup_window_setup_tablet     (priv->popup, priv->tablet_module);
 	popup_window_setup_power      (priv->popup, priv->power_module);
 	popup_window_setup_endsession (priv->popup, priv->endsession_module);
 
@@ -537,6 +540,7 @@ gooroom_integration_applet_finalize (GObject *object)
 	if (priv->datetime_module) g_object_unref (priv->datetime_module);
 	if (priv->endsession_module) g_object_unref (priv->endsession_module);
 	if (priv->updater_module) g_object_unref (priv->updater_module);
+	if (priv->tablet_module) g_object_unref (priv->tablet_module);
 
 	G_OBJECT_CLASS (gooroom_integration_applet_parent_class)->finalize (object);
 }
@@ -581,6 +585,7 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	priv->power_module      = power_module_new ();
 	priv->datetime_module   = datetime_module_new ();
 	priv->endsession_module = endsession_module_new ();
+	priv->tablet_module     = tablet_module_new ();
 
 	priv->button = gtk_toggle_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->button), GTK_RELIEF_NONE);
@@ -635,6 +640,7 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	g_signal_connect (G_OBJECT (priv->nimf_module), "launch-desktop", G_CALLBACK (on_launch_desktop_cb), applet);
 	g_signal_connect (G_OBJECT (priv->nimf_module), "change-engine-done", G_CALLBACK (on_change_engine_done_cb), applet);
 	g_signal_connect (G_OBJECT (priv->endsession_module), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
+	g_signal_connect (G_OBJECT (priv->tablet_module), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 
 	g_signal_connect (gdk_display_get_default_screen (display),
                       "monitors-changed", G_CALLBACK (monitors_changed_cb), applet);

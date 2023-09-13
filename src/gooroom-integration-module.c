@@ -1,4 +1,5 @@
 /*
+ * Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  * Copyright (C) 2016-2018 Alberts Muktupāvels
  *
  * This program is free software: you can redistribute it and/or modify
@@ -15,7 +16,9 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "config.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
 
 #include <glib/gi18n-lib.h>
 #include <libgnome-panel/gp-module.h>

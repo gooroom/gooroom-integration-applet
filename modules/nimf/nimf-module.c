@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -33,7 +33,7 @@
 #define NIMF_GOOROOM_SERVICE_PATH       "/kr/gooroom/nimf/Service"
 #define NIMF_GOOROOM_SERVICE_INTERFACE  "kr.gooroom.nimf.Service"
 
-#define NIMF_SETTINGS_DESKTOP			"nimf-settings.desktop"
+#define NIMF_SETTINGS_DESKTOP           "nimf-settings.desktop"
 
 #define GET_WIDGET(builder, x) GTK_WIDGET (gtk_builder_get_object (builder, x))
 
@@ -61,6 +61,16 @@ enum {
 };
 
 static guint signals[LAST_SIGNAL] = { 0 };
+
+static const char *AVATAR_TRAY_ICONS[][2] = {
+	{ "nimf-system-keyboard",        "integrationapplet-nimf-system-keyboard"  },
+	{ "nimf-focus-out",              "integrationapplet-nimf-focus-out"        },
+	{ "nimf-libhangul",              "integrationapplet-nimf-libhangul"        },
+	{ "nimf-anthy",                  "integrationapplet-nimf-anthy"            },
+	{ "nimf-m17n-vi",                "integrationapplet-nimf-m17n-vi"          },
+	{ "nimf-rime-simplified",        "integrationapplet-nimf-rime-simplified"  },
+	{ "nimf-rime-traditional",       "integrationapplet-nimf-rime-traditional" }
+};
 
 
 G_DEFINE_TYPE_WITH_PRIVATE (NimfModule, nimf_module, G_TYPE_OBJECT)
@@ -162,7 +172,20 @@ update_tray (GtkWidget *tray, const gchar *icon_name)
 {
 	g_return_if_fail (tray != NULL);
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+	gsize i = 0;
+	const gchar *r_icon_name = NULL;
+	for (i = 0; i < G_N_ELEMENTS (AVATAR_TRAY_ICONS); i++) {
+		if (g_str_equal (icon_name, AVATAR_TRAY_ICONS[i][0])) {
+			r_icon_name = g_strdup (AVATAR_TRAY_ICONS[i][1]);
+			break;
+		}
+	}
+
+	if (r_icon_name) {
+		gtk_image_set_from_icon_name (GTK_IMAGE (tray), r_icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+	} else {
+		gtk_image_set_from_icon_name (GTK_IMAGE (tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+	}
 	gtk_image_set_pixel_size (GTK_IMAGE (tray), TRAY_ICON_SIZE);
 }
 
@@ -185,7 +208,7 @@ get_nimf_status_done_cb (GDBusProxy   *proxy,
 		g_warning ("Failed to get nimf engine id : %s\n", error->message);
 		g_error_free (error);
 		priv->nimf_stopped = TRUE;
-		icon_name = "gpm-brightness-kbd-invalid";
+		icon_name = "integrationapplet-nimf-invalid";
 	} else {
 		priv->nimf_stopped = FALSE;
 		if (g_variant_is_of_type (result, G_VARIANT_TYPE ("(ss)"))) {
@@ -231,7 +254,7 @@ nimf_service_signal_cb (GDBusProxy  *proxy,
 		update_tray (priv->tray, icon_name);
 	} else if (g_str_equal (signal_name, "Stopped")) {
 		priv->nimf_stopped = TRUE;
-		update_tray (priv->tray, "gpm-brightness-kbd-invalid");
+		update_tray (priv->tray, "integrationapplet-nimf-invalid");
 	} else {
 	}
 }
@@ -262,7 +285,7 @@ name_appeared_cb (GDBusConnection *connection,
 		g_warning ("Failed to get gooroom nimf service proxy: %s\n", error->message);
 		g_error_free (error);
 		priv->nimf_stopped = TRUE;
-		update_tray (priv->tray, "gpm-brightness-kbd-invalid");
+		update_tray (priv->tray, "integrationapplet-nimf-invalid");
 		return;
 	}
 
@@ -288,7 +311,7 @@ name_vanished_cb (GDBusConnection *connection,
 
 	priv->nimf_stopped = TRUE;
 
-	update_tray (priv->tray, "gpm-brightness-kbd-invalid");
+	update_tray (priv->tray, "integrationapplet-nimf-invalid");
 
 	g_clear_pointer (&priv->engine_id, g_free);
 
@@ -371,9 +394,9 @@ menu_button_new (const gchar *text, gboolean checked)
 	gtk_widget_show (box);
 
 	if (checked) {
-		image = gtk_image_new_from_icon_name ("object-select-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
+		image = gtk_image_new_from_icon_name ("object-select-symbolic", GTK_ICON_SIZE_BUTTON);
 	} else {
-		image = gtk_image_new_from_icon_name ("", GTK_ICON_SIZE_LARGE_TOOLBAR);
+		image = gtk_image_new_from_icon_name ("", GTK_ICON_SIZE_BUTTON);
 	}
 	gtk_box_pack_start (GTK_BOX (box), image, FALSE, FALSE, 0);
 	gtk_widget_show (image);
@@ -387,10 +410,11 @@ menu_button_new (const gchar *text, gboolean checked)
 }
 
 static void
-build_control_ui (NimfModule *module)
+build_control_ui (NimfModule *module, GtkSizeGroup *size_group)
 {
 	GError *error = NULL;
 	gchar *engine_name = NULL;
+	const gchar *icon_name = NULL;
 	GtkWidget *lbl_engine_id, *img_icon_name;
 	NimfModulePrivate *priv = module->priv;
 
@@ -406,20 +430,23 @@ build_control_ui (NimfModule *module)
 	lbl_engine_id = GET_WIDGET (priv->builder, "lbl_engine_id");
 	img_icon_name = GET_WIDGET (priv->builder, "img_icon_name");
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (img_icon_name),
-                                  "nimf-system-keyboard", GTK_ICON_SIZE_LARGE_TOOLBAR);
-	gtk_image_set_pixel_size (GTK_IMAGE (img_icon_name), STATUS_ICON_SIZE);
+	gtk_size_group_add_widget (size_group, img_icon_name);
 
 	if (priv->nimf_stopped) {
+		icon_name = "integrationapplet-nimf-invalid";
 		engine_name = g_strdup (_("Input Method Not Running"));
 		gtk_widget_set_sensitive (priv->control, FALSE);
 	} else {
+		icon_name = "integrationapplet-nimf-system-keyboard";
 		if (priv->engine_id) {
 			engine_name = get_engine_name_by_id (priv->engine_id);
 		} else {
 			engine_name = get_default_engine_name ();
 		}
 	}
+
+	gtk_image_set_from_icon_name (GTK_IMAGE (img_icon_name), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+	gtk_image_set_pixel_size (GTK_IMAGE (img_icon_name), STATUS_ICON_SIZE);
 
 	gchar *markup = g_markup_printf_escaped ("%s", engine_name);
 	gtk_label_set_markup (GTK_LABEL (lbl_engine_id), markup);
@@ -448,7 +475,7 @@ build_control_menu_ui (NimfModule *module)
 	GtkStyleContext *context = gtk_widget_get_style_context (priv->control_menu);
 	gtk_style_context_add_class (context, "module-menu-box");
 
-	GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+	GtkWidget *vbox = gtk_box_new (GTK_ORIENTATION_VERTICAL, 8);
 	gtk_container_add (GTK_CONTAINER (priv->control_menu), vbox);
 	gtk_widget_show (vbox);
 
@@ -577,7 +604,8 @@ nimf_module_tray_new (NimfModule *module)
 	NimfModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("nimf-focus-out", GTK_ICON_SIZE_LARGE_TOOLBAR);
+		priv->tray = gtk_image_new_from_icon_name ("integrationapplet-nimf-focus-out",
+                                                   GTK_ICON_SIZE_LARGE_TOOLBAR);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -587,11 +615,11 @@ nimf_module_tray_new (NimfModule *module)
 }
 
 GtkWidget *
-nimf_module_control_new (NimfModule *module)
+nimf_module_control_new (NimfModule *module, GtkSizeGroup *size_group)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
-	build_control_ui (module);
+	build_control_ui (module, size_group);
 
 	return module->priv->control;
 }

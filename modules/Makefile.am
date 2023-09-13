@@ -6,4 +6,5 @@ SUBDIRS = \
 	security \
 	updater \
 	nimf \
+	tablet \
 	endsession

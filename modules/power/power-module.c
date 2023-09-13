@@ -2,7 +2,7 @@
  *  Copyright (C) 2010 Red Hat, Inc
  *  Copyright (C) 2008 William Jon McCann <jmccann@redhat.com>
  *  Copyright (C) 2010,2015 Richard Hughes <richard@hughsie.com>
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <gtk/gtk.h>
@@ -249,10 +249,10 @@ get_battery_icon_name (double percentage, UpDeviceState state)
 			break;
 
 		case UP_DEVICE_STATE_FULLY_CHARGED:
-			return g_strdup_printf ("battery-full-charged");
+			return g_strdup_printf ("integrationapplet-battery-full-charged");
 
 		case UP_DEVICE_STATE_EMPTY:
-			return g_strdup ("battery-empty");
+			return g_strdup ("integrationapplet-battery-empty");
 
 		default:
 			bat_state = NULL;
@@ -260,35 +260,35 @@ get_battery_icon_name (double percentage, UpDeviceState state)
 	}
 
 	if (!bat_state) {
-		return g_strdup ("battery-error");
+		return g_strdup ("integrationapplet-battery-error");
 	}
 
 	if (percentage >= 99) {
-		return g_strdup_printf ("battery-full%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-full%s", bat_state);
 	}
 	if (percentage >= 90) {
-		return g_strdup_printf ("battery-90%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-90%s", bat_state);
 	}
 	if (percentage >= 75) {
-		return g_strdup_printf ("battery-75%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-75%s", bat_state);
 	}
 	if (percentage >= 60) {
-		return g_strdup_printf ("battery-60%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-60%s", bat_state);
 	}
 	if (percentage >= 50) {
-		return g_strdup_printf ("battery-50%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-50%s", bat_state);
 	}
 	if (percentage >= 40) {
-		return g_strdup_printf ("battery-40%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-40%s", bat_state);
 	}
 	if (percentage >= 25) {
-		return g_strdup_printf ("battery-25%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-25%s", bat_state);
 	}
 	if (percentage >= 10) {
-		return g_strdup_printf ("battery-10%s", bat_state);
+		return g_strdup_printf ("integrationapplet-battery-10%s", bat_state);
 	}
 
-	return g_strdup_printf ("battery-empty%s", bat_state);
+	return g_strdup_printf ("integrationapplet-battery-empty%s", bat_state);
 }
 
 static void
@@ -324,7 +324,7 @@ update_primary (UpDevice *device, PowerModule *module)
 	icon_name = get_battery_icon_name (percentage, state);
 
 	if (priv->tray && gtk_widget_get_visible (priv->tray)) {
-		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+		gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_BUTTON);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -337,7 +337,7 @@ update_primary (UpDevice *device, PowerModule *module)
 
 		if (priv->bat_icon) {
 			gtk_image_set_from_icon_name (GTK_IMAGE (priv->bat_icon),
-                                          icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+                                          icon_name, GTK_ICON_SIZE_BUTTON);
 			gtk_image_set_pixel_size (GTK_IMAGE (priv->bat_icon), STATUS_ICON_SIZE);
 		}
 	}
@@ -472,24 +472,24 @@ on_battery_control_button_clicked_cb (GtkButton *button, gpointer data)
 }
 
 static void
-build_battery_control_ui (PowerModule *module)
+build_battery_control_ui (PowerModule *module, GtkSizeGroup *size_group)
 {
     GtkWidget *hbox, *icon;
 	PowerModulePrivate *priv = module->priv;
-	GtkStyleContext *context;
 
 	priv->bat_control = gtk_button_new ();
 	gtk_button_set_relief (GTK_BUTTON (priv->bat_control), GTK_RELIEF_NONE);
 
-	hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
+	hbox = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_container_set_border_width (GTK_CONTAINER (hbox), 0);
 
-	priv->bat_icon = icon = gtk_image_new_from_icon_name ("battery-full-charged", GTK_ICON_SIZE_LARGE_TOOLBAR);
+	priv->bat_icon = icon = gtk_image_new_from_icon_name ("integrationapplet-battery-full-charged",
+                                                          GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
-	gtk_box_pack_start (GTK_BOX (hbox), priv->bat_icon, FALSE, FALSE, 0);
-
-	context = gtk_widget_get_style_context (icon);
-	gtk_style_context_add_class (context, "rounded-icon-style2");
+	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
+	gtk_widget_set_halign (icon, GTK_ALIGN_CENTER);
+	gtk_box_pack_start (GTK_BOX (hbox), icon, FALSE, FALSE, 0);
+	gtk_size_group_add_widget (size_group, icon);
 
 	priv->bat_desc = gtk_label_new ("");
 	gtk_label_set_xalign (GTK_LABEL (priv->bat_desc), 0);
@@ -505,22 +505,21 @@ build_battery_control_ui (PowerModule *module)
 }
 
 static void
-build_brightness_control_ui (PowerModule *module)
+build_brightness_control_ui (PowerModule *module, GtkSizeGroup *size_group)
 {
-	GtkWidget *icon;
-    GtkWidget *scale;
+	GtkWidget *icon, *scale;
 	PowerModulePrivate *priv = module->priv;
-	GtkStyleContext *context;
 
-	priv->br_control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
+	priv->br_control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_container_set_border_width (GTK_CONTAINER (priv->br_control), 0);
 
-	icon = gtk_image_new_from_icon_name ("display-brightness-symbolic", GTK_ICON_SIZE_LARGE_TOOLBAR);
+	icon = gtk_image_new_from_icon_name ("integrationapplet-display-brightness",
+                                         GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
+	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
+	gtk_widget_set_halign (icon, GTK_ALIGN_CENTER);
 	gtk_box_pack_start (GTK_BOX (priv->br_control), icon, FALSE, FALSE, 0);
-
-	context = gtk_widget_get_style_context (icon);
-	gtk_style_context_add_class (context, "rounded-icon-style1");
+	gtk_size_group_add_widget (size_group, icon);
 
 	priv->br_scale = scale = gtk_scale_new_with_range (GTK_ORIENTATION_HORIZONTAL, 0.0, 100.0, 1.0);
 	gtk_range_set_inverted (GTK_RANGE (scale), FALSE);
@@ -737,8 +736,8 @@ power_module_tray_new (PowerModule *module)
 
 	if (has_battery (module)) {
 		if (!priv->tray) {
-			priv->tray = gtk_image_new_from_icon_name ("battery-full-charged",
-                                                       GTK_ICON_SIZE_LARGE_TOOLBAR);
+			priv->tray = gtk_image_new_from_icon_name ("integrationapplet-battery-full-charged",
+                                                       GTK_ICON_SIZE_BUTTON);
 			gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 		}
 
@@ -753,13 +752,13 @@ power_module_tray_new (PowerModule *module)
 }
 
 GtkWidget *
-power_module_brightness_control_new (PowerModule *module)
+power_module_brightness_control_new (PowerModule *module, GtkSizeGroup *size_group)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	PowerModulePrivate *priv = module->priv;
 
-	build_brightness_control_ui (module);
+	build_brightness_control_ui (module, size_group);
 
 	gtk_widget_show_all (priv->br_control);
 
@@ -769,14 +768,14 @@ power_module_brightness_control_new (PowerModule *module)
 }
 
 GtkWidget *
-power_module_battery_control_new (PowerModule *module)
+power_module_battery_control_new (PowerModule *module, GtkSizeGroup *size_group)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	PowerModulePrivate *priv = module->priv;
 
 	if (has_battery (module)) {
-		build_battery_control_ui (module);
+		build_battery_control_ui (module, size_group);
 		gtk_widget_show_all (priv->bat_control);
 
 		up_client_changed (priv->up_client, NULL, module);

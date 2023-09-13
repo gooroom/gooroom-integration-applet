@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -34,8 +34,7 @@
 #include "common.h"
 #include "popup-window.h"
 
-#define CLEANMODE "/tmp/.cleanmode"
-#define MODULE_BOX_NAME "module-box"
+#define MODULE_BOX_NAME "module-item"
 
 enum {
 	CONTROL_TYPE_USER = 0,
@@ -45,7 +44,8 @@ enum {
 	CONTROL_TYPE_BATTERY,
 	CONTROL_TYPE_DATETIME,
 	CONTROL_TYPE_UPDATER,
-	CONTROL_TYPE_NIMF
+	CONTROL_TYPE_NIMF,
+	CONTROL_TYPE_TABLET
 };
 
 
@@ -79,6 +79,7 @@ struct _PopupWindowPrivate
 	GtkWidget *lbl_datetime;
 	GtkWidget *lbl_sec_status;
 	GtkWidget *lbl_updater;
+	GtkSizeGroup *icon_size_group;
 
 	UserModule       *user_module;
 	SoundModule      *sound_module;
@@ -88,6 +89,7 @@ struct _PopupWindowPrivate
 	EndSessionModule *endsession_module;
 	NimfModule       *nimf_module;
 	UpdaterModule    *updater_module;
+	TabletModule     *tablet_module;
 
 	gboolean    block_focus_out_event;
 
@@ -469,7 +471,7 @@ on_system_button_clicked_cb (GtkButton *button, gpointer data)
 			g_object_unref (settings);
 			g_settings_schema_unref (schema);
 		}
-		g_signal_emit (G_OBJECT (window), signals[LAUNCH_DESKTOP], 0, "gnome-control-center.desktop");
+		g_signal_emit (G_OBJECT (window), signals[LAUNCH_DESKTOP], 0, "org.gnome.Settings.desktop");
 	} else if (button == GTK_BUTTON (priv->btn_screenlock)) {
 		g_signal_emit (G_OBJECT (window), signals[LAUNCH_COMMAND], 0, "xdg-screensaver lock");
 	}
@@ -537,12 +539,7 @@ add_control_widget (PopupWindow *window,
 	{
 		case CONTROL_TYPE_USER:
 		{
-			if (g_file_test (CLEANMODE, G_FILE_TEST_EXISTS)) {
-				const GdkRGBA color = {0, 0, 0, 0.5};
-				gtk_widget_override_background_color (priv->box_user, GTK_STATE_FLAG_NORMAL, &color);
-			}
 			gtk_box_pack_start (GTK_BOX (priv->box_user), control, TRUE, FALSE, 0);
-			gtk_widget_show (control);
 			break;
 		}
 
@@ -558,6 +555,7 @@ add_control_widget (PopupWindow *window,
 		case CONTROL_TYPE_BATTERY:
 		case CONTROL_TYPE_DATETIME:
 		case CONTROL_TYPE_NIMF:
+		case CONTROL_TYPE_TABLET:
 		{
 			gtk_box_pack_start (GTK_BOX (priv->box_general), control, TRUE, FALSE, 0);
 			break;
@@ -712,6 +710,8 @@ popup_window_init (PopupWindow *window)
 	priv->grab_pointer      = NULL;
 	priv->block_focus_out_event = FALSE;
 
+	priv->icon_size_group = gtk_size_group_new (GTK_SIZE_GROUP_BOTH);
+
 	provider = gtk_css_provider_new ();
 	gtk_css_provider_load_from_resource (provider, "/kr/gooroom/IntegrationApplet/ui/style.css");
 	gtk_style_context_add_provider_for_screen (gdk_screen_get_default (),
@@ -840,29 +840,29 @@ popup_window_class_init (PopupWindowClass *klass)
 	gtk_widget_class_set_template_from_resource (GTK_WIDGET_CLASS (klass),
 			"/kr/gooroom/IntegrationApplet/ui/popup-window.ui");
 
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_1);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_2);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_3);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_4);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_5);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, page_6);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_user);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_middle);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_control);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_general);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, box_end);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_settings);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_screenlock);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_endsession);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_endsession_back);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_security_back);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_datetime_back);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_nimf_back);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, btn_updater_back);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, stack);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_datetime);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_sec_status);
-	gtk_widget_class_bind_template_child_private (GTK_WIDGET_CLASS (klass), PopupWindow, lbl_updater);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, page_1);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, page_2);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, page_3);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, page_4);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, page_5);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, page_6);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, box_user);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, box_middle);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, box_control);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, box_general);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, box_end);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_settings);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_screenlock);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_endsession);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_endsession_back);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_security_back);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_datetime_back);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_nimf_back);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, btn_updater_back);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, stack);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, lbl_datetime);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, lbl_sec_status);
+	gtk_widget_class_bind_template_child_private (widget_class, PopupWindow, lbl_updater);
 }
 
 PopupWindow *
@@ -903,7 +903,7 @@ popup_window_setup_user (PopupWindow *window,
 	if (MODULE_IS_USER (module)) {
 		if (!priv->user_module) {
 			priv->user_module = module;
-			GtkWidget *w = user_module_control_new (priv->user_module);
+			GtkWidget *w = user_module_control_new (priv->user_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_USER);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -922,7 +922,7 @@ popup_window_setup_sound (PopupWindow *window,
 	if (MODULE_IS_SOUND (module)) {
 		if (!priv->sound_module) {
 			priv->sound_module = module;
-			GtkWidget *w = sound_module_control_new (priv->sound_module);
+			GtkWidget *w = sound_module_control_new (priv->sound_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_VOLUME);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -941,7 +941,7 @@ popup_window_setup_security (PopupWindow    *window,
 	if (MODULE_IS_SECURITY (module)) {
 		if (!priv->security_module) {
 			priv->security_module = module;
-			GtkWidget *w = security_module_control_new (priv->security_module);
+			GtkWidget *w = security_module_control_new (priv->security_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_SECURITY);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -966,14 +966,14 @@ popup_window_setup_power (PopupWindow *window,
 		if (!priv->power_module) {
 			priv->power_module = module;
 			GtkWidget *w = NULL;
-			w = power_module_brightness_control_new (priv->power_module);
+			w = power_module_brightness_control_new (priv->power_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_BRIGHTNESS);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
 				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
 
-			w = power_module_battery_control_new (priv->power_module);
+			w = power_module_battery_control_new (priv->power_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_BATTERY);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -992,7 +992,7 @@ popup_window_setup_datetime (PopupWindow    *window,
 	if (MODULE_IS_DATETIME (module)) {
 		if (!priv->datetime_module) {
 			priv->datetime_module = module;
-			GtkWidget *w = datetime_module_control_new (priv->datetime_module);
+			GtkWidget *w = datetime_module_control_new (priv->datetime_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_DATETIME);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -1029,7 +1029,7 @@ popup_window_setup_nimf (PopupWindow *window,
 	if (MODULE_IS_NIMF (module)) {
 		if (!priv->nimf_module) {
 			priv->nimf_module = module;
-			GtkWidget *w = nimf_module_control_new (priv->nimf_module);
+			GtkWidget *w = nimf_module_control_new (priv->nimf_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_NIMF);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -1051,7 +1051,7 @@ popup_window_setup_updater (PopupWindow    *window,
 	if (MODULE_IS_UPDATER (module)) {
 		if (!priv->updater_module) {
 			priv->updater_module = module;
-			GtkWidget *w = updater_module_control_new (priv->updater_module);
+			GtkWidget *w = updater_module_control_new (priv->updater_module, priv->icon_size_group);
 			if (w) {
 				add_control_widget (window, w, CONTROL_TYPE_UPDATER);
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
@@ -1062,6 +1062,25 @@ popup_window_setup_updater (PopupWindow    *window,
 			}
 			g_signal_connect (G_OBJECT (priv->updater_module), "status-changed",
                               G_CALLBACK (updater_status_changed_cb), window);
+		}
+	}
+}
+
+void
+popup_window_setup_tablet (PopupWindow  *window,
+                           TabletModule *module)
+{
+	PopupWindowPrivate *priv = window->priv;
+
+	if (MODULE_IS_TABLET (module)) {
+		if (!priv->tablet_module) {
+			priv->tablet_module = module;
+			GtkWidget *w = tablet_module_control_new (priv->tablet_module, priv->icon_size_group);
+			if (w) {
+				add_control_widget (window, w, CONTROL_TYPE_TABLET);
+				GtkStyleContext *context = gtk_widget_get_style_context (w);
+				gtk_style_context_add_class (context, MODULE_BOX_NAME);
+			}
 		}
 	}
 }

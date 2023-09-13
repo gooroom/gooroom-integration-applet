@@ -3,7 +3,7 @@
  *                             2017      Viktor Odintsev <zakhams@gmail.com>
  *                             2017      Matthieu Mota <matthieumota@gmail.com>
  *
- * Modified work Copyright (c) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ * Modified work Copyright (c) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *
  *  This program is free software; you can redistribute it and/or
@@ -32,9 +32,12 @@
 
 #include "pulseaudio-volume.h"
 
-//#define VOLUME_PLUGIN_RAISE_VOLUME_KEY  "XF86AudioRaiseVolume"
-//#define VOLUME_PLUGIN_LOWER_VOLUME_KEY  "XF86AudioLowerVolume"
-//#define VOLUME_PLUGIN_MUTE_KEY          "XF86AudioMute"
+#define AUDIO_VOLUME_ERROR  "integrationapplet-audio-volume-error"
+#define AUDIO_VOLUME_MUTED  "integrationapplet-audio-volume-muted-symbolic"
+#define AUDIO_VOLUME_ZERO   "integrationapplet-audio-volume-zero-symbolic"
+#define AUDIO_VOLUME_LOW    "integrationapplet-audio-volume-low-symbolic"
+#define AUDIO_VOLUME_MEDIUM "integrationapplet-audio-volume-medium-symbolic"
+#define AUDIO_VOLUME_HIGH   "integrationapplet-audio-volume-high-symbolic"
 
 
 
@@ -197,22 +200,22 @@ tray_icon_update (SoundModule *module)
 		gboolean muted = pulseaudio_volume_get_muted (priv->volume);
 		gdouble volume = pulseaudio_volume_get_volume (priv->volume);
 		if (muted) {
-			icon_name = "audio-volume-muted-symbolic";
+			icon_name = AUDIO_VOLUME_MUTED;
 		} else {
 			if (volume <= 0.0)
-				icon_name = "audio-volume-zero-symbolic";
+				icon_name = AUDIO_VOLUME_ZERO;
 			else if (volume <= 0.3)
-				icon_name = "audio-volume-low-symbolic";
+				icon_name = AUDIO_VOLUME_LOW;
 			else if (volume <= 0.7)
-				icon_name = "audio-volume-medium-symbolic";
+				icon_name = AUDIO_VOLUME_MEDIUM;
 			else
-				icon_name = "audio-volume-high-symbolic";
+				icon_name = AUDIO_VOLUME_HIGH;
 		}
 	} else {
-		icon_name = "audio-volume-error-symbolic";
+		icon_name = AUDIO_VOLUME_ERROR;
 	}
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+	gtk_image_set_from_icon_name (GTK_IMAGE (priv->tray), icon_name, GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 }
 
@@ -246,16 +249,16 @@ sync_volume_control (SoundModule *module)
 		gboolean muted = pulseaudio_volume_get_muted (priv->volume);
 		gdouble volume = pulseaudio_volume_get_volume (priv->volume);
 		if (muted) {
-			icon_name = "audio-volume-muted-symbolic";
+			icon_name = AUDIO_VOLUME_MUTED;
 		} else {
 			if (volume <= 0.0)
-				icon_name = "audio-volume-zero-symbolic";
+				icon_name = AUDIO_VOLUME_ZERO;
 			else if (volume <= 0.3)
-				icon_name = "audio-volume-low-symbolic";
+				icon_name = AUDIO_VOLUME_LOW;
 			else if (volume <= 0.7)
-				icon_name = "audio-volume-medium-symbolic";
+				icon_name = AUDIO_VOLUME_MEDIUM;
 			else
-				icon_name = "audio-volume-high-symbolic";
+				icon_name = AUDIO_VOLUME_HIGH;
 		}
 		gtk_widget_set_sensitive (priv->scale, !muted);
 		gtk_widget_set_sensitive (priv->status_button, TRUE);
@@ -264,7 +267,7 @@ sync_volume_control (SoundModule *module)
 		gtk_range_set_value (GTK_RANGE (priv->scale), volume * 100.0);
 		g_signal_handlers_unblock_by_func (G_OBJECT (priv->scale), on_scale_value_changed, module);
 	} else {
-		icon_name = "audio-volume-error-symbolic";
+		icon_name = AUDIO_VOLUME_ERROR;
 
 		gtk_widget_set_sensitive (priv->scale, FALSE);
 		gtk_widget_set_sensitive (priv->status_button, FALSE);
@@ -272,7 +275,7 @@ sync_volume_control (SoundModule *module)
 		gtk_range_set_value (GTK_RANGE (priv->scale), 0);
 	}
 
-	gtk_image_set_from_icon_name (GTK_IMAGE (priv->status_icon), icon_name, GTK_ICON_SIZE_LARGE_TOOLBAR);
+	gtk_image_set_from_icon_name (GTK_IMAGE (priv->status_icon), icon_name, GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (priv->status_icon), STATUS_ICON_SIZE);
 }
 
@@ -341,13 +344,13 @@ tray_icon_update_delay (gpointer data)
 }
 
 static void
-build_control_ui (SoundModule *module)
+build_control_ui (SoundModule *module, GtkSizeGroup *size_group)
 {
 	GtkWidget *scale, *icon;
-	SoundModulePrivate *priv = module->priv;
 	GtkStyleContext *context;
+	SoundModulePrivate *priv = module->priv;
 
-	priv->control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 15);
+	priv->control = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 8);
 	gtk_container_set_border_width (GTK_CONTAINER (priv->control), 0);
 
 	priv->status_button = gtk_button_new ();
@@ -355,14 +358,15 @@ build_control_ui (SoundModule *module)
 	gtk_widget_set_valign (priv->status_button, GTK_ALIGN_CENTER);
 	gtk_widget_set_halign (priv->status_button, GTK_ALIGN_CENTER);
 	gtk_box_pack_start (GTK_BOX (priv->control), priv->status_button, FALSE, FALSE, 0);
+	gtk_size_group_add_widget (size_group, priv->status_button);
 
 	context = gtk_widget_get_style_context (priv->status_button);
-	gtk_style_context_add_class (context, "rounded-icon-button");
+	gtk_style_context_add_class (context, "icon-button-normal");
 
-	g_signal_connect (G_OBJECT (priv->status_button), "clicked", G_CALLBACK (on_mute_button_clicked), module);
+	g_signal_connect (G_OBJECT (priv->status_button), "clicked",
+                      G_CALLBACK (on_mute_button_clicked), module);
 
-	priv->status_icon = icon = gtk_image_new_from_icon_name ("audio-volume-muted-symbolic",
-                                                             GTK_ICON_SIZE_LARGE_TOOLBAR);
+	priv->status_icon = icon = gtk_image_new_from_icon_name (AUDIO_VOLUME_MUTED, GTK_ICON_SIZE_BUTTON);
 	gtk_image_set_pixel_size (GTK_IMAGE (icon), STATUS_ICON_SIZE);
 	gtk_widget_set_valign (icon, GTK_ALIGN_CENTER);
 	gtk_widget_set_halign (icon, GTK_ALIGN_CENTER);
@@ -434,8 +438,7 @@ sound_module_tray_new (SoundModule *module)
 	SoundModulePrivate *priv = module->priv;
 
 	if (!priv->tray) {
-		priv->tray = gtk_image_new_from_icon_name ("audio-volume-high-symbolic",
-                                                   GTK_ICON_SIZE_LARGE_TOOLBAR);
+		priv->tray = gtk_image_new_from_icon_name (AUDIO_VOLUME_HIGH, GTK_ICON_SIZE_BUTTON);
 		gtk_image_set_pixel_size (GTK_IMAGE (priv->tray), TRAY_ICON_SIZE);
 	}
 
@@ -447,13 +450,13 @@ sound_module_tray_new (SoundModule *module)
 }
 
 GtkWidget *
-sound_module_control_new (SoundModule *module)
+sound_module_control_new (SoundModule *module, GtkSizeGroup *size_group)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	SoundModulePrivate *priv = module->priv;
 
-	build_control_ui (module);
+	build_control_ui (module, size_group);
 
 	gtk_widget_show_all (priv->control);
 

@@ -6,6 +6,8 @@ modules/datetime/datetime-module.c
 modules/security/security-module.c
 modules/endsession/endsession-module.c
 modules/nimf/nimf-module.c
+modules/tablet/tablet-module.c
+modules/tablet/tablet-mode-change-helper.c
 modules/updater/updater-module.c
 src/gooroom-integration-applet.c
 src/gooroom-integration-module.c
@@ -17,6 +19,7 @@ src/popup-window.c
 [type: gettext/glade]modules/datetime/datetime-control-menu.ui
 [type: gettext/glade]modules/endsession/endsession-control.ui
 [type: gettext/glade]modules/nimf/nimf-control.ui
+[type: gettext/glade]modules/tablet/tablet-control.ui
 [type: gettext/glade]modules/updater/updater-control.ui
 [type: gettext/glade]modules/updater/updater-control-menu.ui
 [type: gettext/ini]data/kr.gooroom.IntegrationApplet.panel-applet.in.in

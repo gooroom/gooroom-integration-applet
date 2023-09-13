@@ -95,6 +95,7 @@ AC_CONFIG_FILES([
   modules/security/utils/Makefile
   modules/endsession/Makefile
   modules/updater/Makefile
+  modules/tablet/Makefile
   modules/nimf/Makefile
   src/Makefile
   po/Makefile.in

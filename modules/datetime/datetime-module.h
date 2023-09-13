@@ -1,5 +1,5 @@
 /* 
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -56,7 +56,8 @@ GType           datetime_module_get_type             (void) G_GNUC_CONST;
 DateTimeModule *datetime_module_new                  (void);
 
 GtkWidget      *datetime_module_tray_new             (DateTimeModule *module);
-GtkWidget      *datetime_module_control_new          (DateTimeModule *module);
+GtkWidget      *datetime_module_control_new          (DateTimeModule *module,
+                                                      GtkSizeGroup   *size_group);
 GtkWidget      *datetime_module_control_menu_new     (DateTimeModule *module);
 void            datetime_module_control_destroy      (DateTimeModule *module);
 void            datetime_module_control_menu_destroy (DateTimeModule *module);

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ *  Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  *  This program is free software; you can redistribute it and/or
  *  modify it under the terms of the GNU General Public License
@@ -17,7 +17,7 @@
  */
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include <config.h>
 #endif
 
 #include <stdio.h>
@@ -31,7 +31,7 @@
 #include "common.h"
 #include "updater-module.h"
 
-#define UPDATER_PATH            "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py"
+//#define UPDATER_PATH            "/usr/lib/gooroom/gooroomUpdate/gooroomUpdate.py"
 #define UPDATER_CONTROL_UI      "/kr/gooroom/IntegrationApplet/modules/updater/updater-control.ui"
 #define UPDATER_CONTROL_MENU_UI "/kr/gooroom/IntegrationApplet/modules/updater/updater-control-menu.ui"
 
@@ -109,11 +109,13 @@ update_status_string (UpdaterModule *module)
 
 	if (priv->control) {
 		if (priv->status_string) {
-			gchar *markup = g_markup_printf_escaped ("%s", priv->status_string);
-			gtk_label_set_markup (GTK_LABEL (priv->lbl_updater_status), markup);
-			gtk_widget_set_tooltip_text (priv->control, markup);
+			gtk_label_set_text (GTK_LABEL (priv->lbl_updater_status), priv->status_string);
+			gtk_widget_set_tooltip_text (priv->control, priv->status_string);
 
-			g_clear_pointer (&markup, g_free);
+//			gchar *markup = g_markup_printf_escaped ("%s", priv->status_string);
+//			gtk_label_set_markup (GTK_LABEL (priv->lbl_updater_status), markup);
+//			gtk_widget_set_tooltip_text (priv->control, markup);
+//			g_clear_pointer (&markup, g_free);
 		}
 	}
 }
@@ -387,8 +389,6 @@ name_appeared_cb (GDBusConnection *connection,
 	UpdaterModule *module = UPDATER_MODULE (data);
 	UpdaterModulePrivate *priv = module->priv;
 
-//	priv->updater_stopped = FALSE;
-
 	g_clear_pointer (&priv->icon_name, g_free);
 	g_clear_pointer (&priv->status_string, g_free);
 	priv->icon_name = g_strdup ("updater-base-unkown");
@@ -564,7 +564,7 @@ updater_module_init (UpdaterModule *module)
 }
 
 static void
-build_control_ui (UpdaterModule *module)
+build_control_ui (UpdaterModule *module, GtkSizeGroup *size_group)
 {
 	GError *error = NULL;
 
@@ -580,6 +580,8 @@ build_control_ui (UpdaterModule *module)
 	priv->control = GET_WIDGET (priv->builder, "control");
 	priv->img_status = GET_WIDGET (priv->builder, "img_status");
 	priv->lbl_updater_status = GET_WIDGET (priv->builder, "lbl_updater_status");
+
+	gtk_size_group_add_widget (size_group, priv->img_status);
 
 	gtk_image_set_from_icon_name (GTK_IMAGE (priv->img_status),
                                   "updater-base-unkown",
@@ -642,13 +644,13 @@ updater_module_tray_new (UpdaterModule *module)
 }
 
 GtkWidget *
-updater_module_control_new (UpdaterModule *module)
+updater_module_control_new (UpdaterModule *module, GtkSizeGroup *size_group)
 {
 	g_return_val_if_fail (module != NULL, NULL);
 
 	UpdaterModulePrivate *priv = module->priv;
 
-	build_control_ui (module);
+	build_control_ui (module, size_group);
 
     g_idle_add ((GSourceFunc)updater_status_update_idle, module);
 

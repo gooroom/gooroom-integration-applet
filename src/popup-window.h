@@ -1,5 +1,5 @@
 /*-
- * Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>.
+ * Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "modules/endsession/endsession-module.h"
 #include "modules/nimf/nimf-module.h"
 #include "modules/updater/updater-module.h"
+#include "modules/tablet/tablet-module.h"
 
 G_BEGIN_DECLS
 
@@ -99,8 +100,11 @@ void popup_window_setup_endsession (PopupWindow      *window,
 void popup_window_setup_nimf       (PopupWindow *window,
                                     NimfModule  *module);
 
-void popup_window_setup_updater    (PopupWindow    *window,
-                                    UpdaterModule  *module);
+void popup_window_setup_updater    (PopupWindow   *window,
+                                    UpdaterModule *module);
+
+void popup_window_setup_tablet     (PopupWindow  *window,
+                                    TabletModule *module);
 
 G_END_DECLS
 

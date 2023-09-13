@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2021 Gooroom <gooroom@gooroom.kr>
+ * Copyright (C) 2015-2023 Gooroom <gooroom@gooroom.kr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ G_BEGIN_DECLS
 gboolean is_local_user                     (void);
 gboolean is_admin_group                    (void);
 gboolean is_standalone_mode                (void);
+gboolean is_tablet_mode                    (void);
 
 gboolean authenticate                      (const gchar *action_id);
 
