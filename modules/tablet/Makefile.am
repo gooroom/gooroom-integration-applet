@@ -11,7 +11,7 @@ libtablet_module_la_SOURCES = \
 
 libtablet_module_la_CPPFLAGS = \
 	-I$(top_srcdir)/common	\
-	-DTABLET_MODE_CHANGE_HELPER=\"$(pkglibexecdir)/tablet-mode-change-helper\" \
+	-DTABLET_MODE_CHANGE_HELPER=\"$(libexecdir)/tablet-mode-change-helper\" \
 	$(AM_CPPFLAGS)
 
 libtablet_module_la_CFLAGS =	\
@@ -25,7 +25,7 @@ libtablet_module_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(GTK_LIBS)
 
-pkglibexec_PROGRAMS = tablet-mode-change-helper
+libexec_PROGRAMS = tablet-mode-change-helper
 
 tablet_mode_change_helper_SOURCES = tablet-mode-change-helper.c
 tablet_mode_change_helper_CFLAGS = \
@@ -37,7 +37,7 @@ tablet_mode_change_helper_LDADD = \
 	$(GLIB_LIBS)
 
 kr.gooroom.integration.applet.policy.in: kr.gooroom.integration.applet.policy.in.in Makefile
-	$(AM_V_GEN) sed -e "s|\@pkglibexecdir\@|$(pkglibexecdir)|" $< >$@
+	$(AM_V_GEN) sed -e "s|\@libexecdir\@|$(libexecdir)|" $< >$@
 
 @INTLTOOL_POLICY_RULE@
 polkitdir       = $(datadir)/polkit-1/actions

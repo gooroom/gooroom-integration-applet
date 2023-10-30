@@ -39,6 +39,7 @@
       <object class="GtkSwitch" id="sw_tablet">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
+        <property name="valign">center</property>
       </object>
       <packing>
         <property name="expand">False</property>
