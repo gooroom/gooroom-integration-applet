@@ -267,6 +267,18 @@ adjust_layout (PopupWindow *window)
 #endif
 }
 
+static gboolean
+is_tablet_mode_possible (void)
+{
+	const gchar *TBL_MODE_CHK_FILE_1 = "/usr/libexec/i3-gnome-flashback-session";
+	const gchar *TBL_MODE_CHK_FILE_2 = "/usr/share/xsessions/i3-gnome-flashback-session.desktop";
+	const gchar *TBL_MODE_CHK_FILE_3 = "/usr/share/gnome-session/sessions/i3-gnome-flashback.session";
+
+	return (g_file_test (TBL_MODE_CHK_FILE_1, G_FILE_TEST_EXISTS) &&
+            g_file_test (TBL_MODE_CHK_FILE_2, G_FILE_TEST_EXISTS) &&
+			g_file_test (TBL_MODE_CHK_FILE_3, G_FILE_TEST_EXISTS));
+}
+
 static void
 on_endsession_back_button_clicked_cb (GtkWidget *button, gpointer data)
 {
@@ -1081,6 +1093,9 @@ popup_window_setup_tablet (PopupWindow  *window,
 				GtkStyleContext *context = gtk_widget_get_style_context (w);
 				gtk_style_context_add_class (context, MODULE_BOX_NAME);
 			}
+
+			if (!is_tablet_mode_possible ())
+				gtk_widget_hide (w);
 		}
 	}
 }
