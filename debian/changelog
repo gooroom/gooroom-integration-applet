@@ -1,3 +1,13 @@
+gooroom-integration-applet (0.4.0+grm4u1) unstable; urgency=medium
+
+  [ cjheo ]
+  * [39c70ff0] Rebase to debian 12
+  * [83a52fac] Released for gooroom-4.0
+  * [644a9535] Changed the install location of tablet-mode-change-helper
+  * [8cfbec0c] Add condition to display Tablet Mode UI
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Tue, 05 Mar 2024 11:28:00 +0900
+
 gooroom-integration-applet (0.3.5+grm3u1) unstable; urgency=medium
 
   [ boyeon.choi ]
