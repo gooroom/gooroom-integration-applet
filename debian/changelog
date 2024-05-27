@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.4.1+grm4u1) unstable; urgency=medium
+
+  [ cjheo ]
+  * [0a6c50d0] [Bug:5617] Fixed a bug where the dialog displayed when changing tablet mode was not touched.
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Mon, 27 May 2024 18:34:18 +0900
+
 gooroom-integration-applet (0.4.0+grm4u1) unstable; urgency=medium
 
   [ cjheo ]
