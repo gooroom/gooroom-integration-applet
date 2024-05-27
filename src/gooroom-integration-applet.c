@@ -252,6 +252,15 @@ _g_spawn_async (const gchar *command)
 		g_error_free (error);
 	}
 }
+
+static void
+on_popup_popup_cb (GObject *object, gpointer data)
+{
+	GooroomIntegrationApplet *applet = GOOROOM_INTEGRATION_APPLET (data);
+
+	gtk_toggle_button_set_active (GTK_TOGGLE_BUTTON (applet->priv->button), TRUE);
+}
+
 static void
 on_destroy_popup_cb (GObject *object, gpointer data)
 {
@@ -641,6 +650,8 @@ gooroom_integration_applet_init (GooroomIntegrationApplet *applet)
 	g_signal_connect (G_OBJECT (priv->nimf_module), "change-engine-done", G_CALLBACK (on_change_engine_done_cb), applet);
 	g_signal_connect (G_OBJECT (priv->endsession_module), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
 	g_signal_connect (G_OBJECT (priv->tablet_module), "launch-command", G_CALLBACK (on_launch_command_cb), applet);
+	g_signal_connect (G_OBJECT (priv->tablet_module), "destroy-popup", G_CALLBACK (on_destroy_popup_cb), applet);
+	g_signal_connect (G_OBJECT (priv->tablet_module), "popup-popup", G_CALLBACK (on_popup_popup_cb), applet);
 
 	g_signal_connect (gdk_display_get_default_screen (display),
                       "monitors-changed", G_CALLBACK (monitors_changed_cb), applet);

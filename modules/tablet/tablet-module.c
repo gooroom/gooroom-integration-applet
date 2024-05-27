@@ -45,6 +45,8 @@ struct _TabletModulePrivate
 };
 
 enum {
+	POPUP_POPUP,
+	DESTROY_POPUP,
 	LAUNCH_COMMAND,
 	LAST_SIGNAL
 };
@@ -128,9 +130,9 @@ logout_idle_cb (gpointer user_data)
 		gtk_widget_destroy (dialog);
 
 		if (launch_tablet_mode_switching_command (priv->init_tablet_mode)) {
-			g_signal_handlers_block_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
-			gtk_switch_set_active (GTK_SWITCH (priv->sw_tablet), priv->init_tablet_mode);
-			g_signal_handlers_unblock_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
+//			g_signal_handlers_block_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
+//			gtk_switch_set_active (GTK_SWITCH (priv->sw_tablet), priv->init_tablet_mode);
+//			g_signal_handlers_unblock_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
 		}
 	}
 
@@ -153,13 +155,44 @@ tablet_mode_switching_dialog_response_cb (GtkDialog *dialog,
 	}
 
 	if (launch_tablet_mode_switching_command (priv->init_tablet_mode)) {
-		g_signal_handlers_block_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
-		gtk_switch_set_active (GTK_SWITCH (priv->sw_tablet), priv->init_tablet_mode);
-		g_signal_handlers_unblock_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
+//		g_signal_handlers_block_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
+//		gtk_switch_set_active (GTK_SWITCH (priv->sw_tablet), priv->init_tablet_mode);
+//		g_signal_handlers_unblock_by_func (priv->sw_tablet, tablet_mode_changed_cb, module);
 	}
+
+//	g_signal_emit (G_OBJECT (module), signals[POPUP_POPUP], 0);
 
 done:
 	gtk_widget_destroy (GTK_WIDGET (dialog));
+}
+
+static void
+grab_pointer (GtkWidget *dialog)
+{
+    GdkSeat *seat;
+    GdkDevice *device;
+	GdkDevice *grab_pointer;
+
+    device = gtk_get_current_event_device ();
+
+    if (!device) {
+        GdkDisplay *display;
+
+        display = gtk_widget_get_display (GTK_WIDGET (dialog));
+        device = gdk_seat_get_pointer (gdk_display_get_default_seat (display));
+    }
+
+	if (gdk_device_get_source (device) == GDK_SOURCE_KEYBOARD)
+		grab_pointer = gdk_device_get_associated_device (device);
+	else
+		grab_pointer = device;
+
+    gtk_widget_grab_focus (dialog);
+
+    seat = gdk_device_get_seat (grab_pointer);
+    gdk_seat_grab (seat, gtk_widget_get_window (dialog),
+                   GDK_SEAT_CAPABILITY_ALL, TRUE,
+                   NULL, NULL, NULL, NULL);
 }
 
 static gboolean
@@ -200,6 +233,10 @@ tablet_mode_changed_cb (GtkSwitch *button, gboolean state, gpointer user_data)
 		gtk_window_set_title (GTK_WINDOW (dialog), title);
 		gtk_widget_show_all (dialog);
 
+		g_signal_emit (G_OBJECT (module), signals[DESTROY_POPUP], 0);
+
+		grab_pointer (dialog);
+
 		g_signal_connect (dialog, "response",
                           G_CALLBACK (tablet_mode_switching_dialog_response_cb), module);
 	}
@@ -224,7 +261,6 @@ build_control_ui (TabletModule *module, GtkSizeGroup *size_group)
 	priv->control = GET_WIDGET (priv->builder, "control");
 	priv->sw_tablet = GET_WIDGET (priv->builder, "sw_tablet");
 	priv->icon_tablet = GET_WIDGET (priv->builder, "icon_tablet");
-	priv->init_tablet_mode = is_tablet_mode ();
 
 	gtk_switch_set_active (GTK_SWITCH (priv->sw_tablet), priv->init_tablet_mode);
 
@@ -254,6 +290,26 @@ tablet_module_class_init (TabletModuleClass *class)
 
 	object_class->finalize = tablet_module_finalize;
 
+	signals[POPUP_POPUP] = g_signal_new ("popup-popup",
+                                         MODULE_TYPE_TABLET,
+                                         G_SIGNAL_RUN_LAST,
+                                         G_STRUCT_OFFSET(TabletModuleClass,
+                                         destroy_popup),
+                                         NULL, NULL,
+                                         g_cclosure_marshal_VOID__VOID,
+                                         G_TYPE_NONE, 0,
+                                         G_TYPE_NONE);
+
+	signals[DESTROY_POPUP] = g_signal_new ("destroy-popup",
+                                           MODULE_TYPE_TABLET,
+                                           G_SIGNAL_RUN_LAST,
+                                           G_STRUCT_OFFSET(TabletModuleClass,
+                                           destroy_popup),
+                                           NULL, NULL,
+                                           g_cclosure_marshal_VOID__VOID,
+                                           G_TYPE_NONE, 0,
+                                           G_TYPE_NONE);
+
 	signals[LAUNCH_COMMAND] = g_signal_new ("launch-command",
                                             MODULE_TYPE_TABLET,
                                             G_SIGNAL_RUN_LAST,
@@ -274,6 +330,7 @@ tablet_module_init (TabletModule *module)
 	module->priv = priv = tablet_module_get_instance_private (module);
 
 	priv->control = NULL;
+	priv->init_tablet_mode = is_tablet_mode ();
 
 	priv->builder = gtk_builder_new ();
 	gtk_builder_set_translation_domain (priv->builder, GETTEXT_PACKAGE);

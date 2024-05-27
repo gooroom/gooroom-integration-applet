@@ -41,6 +41,8 @@ struct _TabletModuleClass
 	GObjectClass parent_class;
 
 	/*< signals >*/
+    void (*popup_popup)(TabletModule *module);
+    void (*destroy_popup)(TabletModule *module);
 	void (*launch_command)(TabletModule *module, const gchar *command);
 };
 
