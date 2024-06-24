@@ -25,6 +25,9 @@ libtablet_module_la_LIBADD = \
 	$(GLIB_LIBS) \
 	$(GTK_LIBS)
 
+tablet_module_scriptsdir = $(libexecdir)
+tablet_module_scripts_SCRIPTS = query-package-install
+
 libexec_PROGRAMS = tablet-mode-change-helper
 
 tablet_mode_change_helper_SOURCES = tablet-mode-change-helper.c
