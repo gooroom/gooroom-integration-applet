@@ -5,7 +5,8 @@ libgooroom_integration_applet_la_CPPFLAGS = \
 	-I$(srcdir) \
 	-I$(top_srcdir)/common \
 	-DPKGDATADIR=\"$(pkgdatadir)\" \
-	-DGNOMELOCALEDIR=\""$(localedir)"\"
+	-DGNOMELOCALEDIR=\"$(localedir)\" \
+	-DQUERY_PACKAGE_INSTALL=\"$(libexecdir)/query-package-install\"
 
 BUILT_SOURCES = \
 	applet-resources.c \
