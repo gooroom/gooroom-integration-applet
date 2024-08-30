@@ -1,3 +1,10 @@
+gooroom-integration-applet (0.4.2+grm4u1) unstable; urgency=medium
+
+  [ cjheo ]
+  * [b6bff370] Change the exposure conditions of button for switching tablet mode
+
+ -- Gooroom Autobuilder <jenkins@gooroom.kr>  Fri, 30 Aug 2024 15:43:11 +0900
+
 gooroom-integration-applet (0.4.1+grm4u1) unstable; urgency=medium
 
   [ cjheo ]
