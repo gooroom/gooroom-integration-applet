@@ -268,16 +268,39 @@ adjust_layout (PopupWindow *window)
 }
 
 static gboolean
+is_package_installed (const gchar *package_name)
+{
+	gchar *cmd = NULL;
+	GError *error = NULL;
+	gchar *output = NULL;
+	gboolean ret = FALSE;
+
+	cmd = g_strdup_printf ("%s %s", QUERY_PACKAGE_INSTALL, package_name);
+	g_spawn_command_line_sync (cmd, &output, NULL, NULL, &error);
+	if (error) {
+		g_warning ("Failed to run '%s': %s", QUERY_PACKAGE_INSTALL, error->message);
+		g_clear_error (&error);
+		goto done;
+	}
+
+	g_debug ("'%s': %s\n", cmd, output);
+
+	if (output) {
+		ret = (strstr (output, "1") != NULL) ? TRUE : FALSE;
+	}
+
+
+done:
+	g_clear_pointer (&cmd, g_free);
+	g_clear_pointer (&output, g_free);
+
+	return ret;
+}
+
+static gboolean
 is_tablet_mode_possible (void)
 {
-	const gchar *TBL_MODE_CHK_FILE_1 = "/usr/libexec/i3-gnome-flashback-session";
-	const gchar *TBL_MODE_CHK_FILE_2 = "/usr/share/xsessions/i3-gnome-flashback-session.desktop";
-	const gchar *TBL_MODE_CHK_FILE_3 = "/usr/share/gnome-session/sessions/i3-gnome-flashback.session";
-
-	return (g_file_test (TBL_MODE_CHK_FILE_1, G_FILE_TEST_EXISTS) &&
-            g_file_test (TBL_MODE_CHK_FILE_2, G_FILE_TEST_EXISTS) &&
-			g_file_test (TBL_MODE_CHK_FILE_3, G_FILE_TEST_EXISTS));
-}
+	return is_package_installed ("gooroom-tabletmode-setting"); }
 
 static void
 on_endsession_back_button_clicked_cb (GtkWidget *button, gpointer data)
